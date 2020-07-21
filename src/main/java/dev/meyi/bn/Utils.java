@@ -1,4 +1,4 @@
-package dev.meyi;
+package dev.meyi.bn;
 
 import java.io.BufferedReader;
 import java.io.File;

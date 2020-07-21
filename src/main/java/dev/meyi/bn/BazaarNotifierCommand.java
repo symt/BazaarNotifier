@@ -1,4 +1,4 @@
-package dev.meyi;
+package dev.meyi.bn;
 
 import java.util.ArrayList;
 import java.util.List;
