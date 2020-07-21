@@ -1,4 +1,4 @@
-package dev.meyi;
+package dev.meyi.bn;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.0.1";
+  public static final String VERSION = "1.1.0";
   public static String apiKey = "";
 
   public static boolean activeBazaar = false;
@@ -82,14 +82,14 @@ public class BazaarNotifier {
                         .getDouble("pricePerUnit") - price > 0) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(new ChatComponentText(
-                              EnumChatFormatting.LIGHT_PURPLE + "Buy Order"
+                              EnumChatFormatting.DARK_PURPLE + "Buy Order"
                                   + EnumChatFormatting.GRAY + " for "
-                                  + EnumChatFormatting.LIGHT_PURPLE + orders.getJSONArray(key)
+                                  + EnumChatFormatting.DARK_PURPLE + orders.getJSONArray(key)
                                   .getJSONObject(i).getString("product").split("x")[0]
-                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.LIGHT_PURPLE
+                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.DARK_PURPLE
                                   + bazaarConversions.get(key) + EnumChatFormatting.YELLOW
                                   + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.LIGHT_PURPLE + price
+                                  + EnumChatFormatting.DARK_PURPLE + price
                                   + EnumChatFormatting.GRAY + ")"
                           ));
                       orders.getJSONArray(key).remove(i);
