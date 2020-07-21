@@ -1,0 +1,16 @@
+[
+{
+  "modid": "BazaarNotifier",
+  "name": "BazaarNotifier",
+  "description": "Notifies when your bazaar orders are outdated.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["meyi"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
