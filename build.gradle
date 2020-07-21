@@ -35,6 +35,12 @@ dependencies {
     compile group: 'org.json', name: 'json', version: '20200518'
 }
 
+jar {
+    manifest {
+        attributes 'FMLAT': 'BazaarNotifier_at.cfg'
+    }
+}
+
 processResources
 {
     inputs.property "version", project.version
@@ -46,6 +52,7 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+    rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
 shadowJar {
