@@ -32,6 +32,8 @@ public class BazaarNotifier {
       EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
   public static JSONObject orders = new JSONObject();
   public static JSONObject bazaarData = new JSONObject();
+  public static JSONObject bazaarConversions = new JSONObject(
+      new JSONTokener(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json")));
   public static JSONObject bazaarConversionsReversed = new JSONObject(
       new JSONTokener(BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json")));
 
@@ -79,15 +81,17 @@ public class BazaarNotifier {
                     if (bazaarData.getJSONObject(key).getJSONArray("sell_summary").getJSONObject(0)
                         .getDouble("pricePerUnit") - price > 0) {
                       Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(new ChatComponentText(BazaarNotifier.prefix +
-                              EnumChatFormatting.DARK_RED + orders.getJSONArray(key)
-                              .getJSONObject(i)
-                              .getString("product") + EnumChatFormatting.RED + " -> "
-                              + EnumChatFormatting.DARK_RED + price
-                              + EnumChatFormatting.RED + " (you) vs " + EnumChatFormatting.DARK_RED
-                              + bazaarData
-                              .getJSONObject(key).getJSONArray("sell_summary").getJSONObject(0)
-                              .getDouble("pricePerUnit") + EnumChatFormatting.RED + " (top) | " + EnumChatFormatting.GREEN + "BUY ORDER"));
+                          .addChatMessage(new ChatComponentText(
+                              EnumChatFormatting.LIGHT_PURPLE + "Buy Order"
+                                  + EnumChatFormatting.GRAY + " for "
+                                  + EnumChatFormatting.LIGHT_PURPLE + orders.getJSONArray(key)
+                                  .getJSONObject(i).getString("product").split("x")[0]
+                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.LIGHT_PURPLE
+                                  + bazaarConversions.get(key) + EnumChatFormatting.YELLOW
+                                  + " OUTDATED " + EnumChatFormatting.GRAY + "("
+                                  + EnumChatFormatting.LIGHT_PURPLE + price
+                                  + EnumChatFormatting.GRAY + ")"
+                          ));
                       orders.getJSONArray(key).remove(i);
                     }
                   } else {
@@ -96,15 +100,17 @@ public class BazaarNotifier {
                         .getJSONObject(0)
                         .getDouble("pricePerUnit") > 0) {
                       Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(new ChatComponentText(BazaarNotifier.prefix +
-                              EnumChatFormatting.DARK_RED + orders.getJSONArray(key)
-                              .getJSONObject(i)
-                              .getString("product") + EnumChatFormatting.RED + " -> "
-                              + EnumChatFormatting.DARK_RED + price
-                              + EnumChatFormatting.RED + " (you) vs " + EnumChatFormatting.DARK_RED
-                              + bazaarData
-                              .getJSONObject(key).getJSONArray("buy_summary").getJSONObject(0)
-                              .getDouble("pricePerUnit") + EnumChatFormatting.RED + " (top) | " + EnumChatFormatting.GREEN + "SELL OFFER"));
+                          .addChatMessage(new ChatComponentText(
+                              EnumChatFormatting.BLUE + "Sell Offer"
+                                  + EnumChatFormatting.GRAY + " of "
+                                  + EnumChatFormatting.BLUE + orders.getJSONArray(key)
+                                  .getJSONObject(i).getString("product").split("x")[0]
+                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.BLUE
+                                  + bazaarConversions.get(key) + EnumChatFormatting.YELLOW
+                                  + " OUTDATED " + EnumChatFormatting.GRAY + "("
+                                  + EnumChatFormatting.BLUE + price
+                                  + EnumChatFormatting.GRAY + ")"
+                          ));
                       orders.getJSONArray(key).remove(i);
                     }
                   }
