@@ -37,8 +37,10 @@ public class Suggester {
       double diff = currentProduct.getDouble("sellOfferPrice") * .99d - currentProduct
           .getDouble("buyOrderPrice");
       double profitFlowPerMinute =
-          ((currentProduct.getLong("sellCount") * currentProduct.getLong("buyCount")) / (10080d * (
-              currentProduct.getLong("sellCount") + currentProduct.getLong("buyCount")))) * diff;
+          (currentProduct.getLong("sellCount") + currentProduct.getLong("buyCount") == 0) ? 0 :
+              ((currentProduct.getLong("sellCount") * currentProduct.getLong("buyCount")) / (10080d
+                  * (currentProduct.getLong("sellCount") + currentProduct.getLong("buyCount"))))
+                  * diff;
       bazaarDataFormatted.put(currentProduct.put("profitFlowPerMinute", profitFlowPerMinute));
     }
 

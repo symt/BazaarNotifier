@@ -64,7 +64,7 @@ public class BazaarNotifierCommand extends CommandBase {
         BazaarNotifier.render ^= true;
         player.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + EnumChatFormatting.RED + "Suggestions have been turned "
-                + EnumChatFormatting.DARK_RED + (BazaarNotifier.activeBazaar ? "on" : "off")));
+                + EnumChatFormatting.DARK_RED + (BazaarNotifier.render ? "on" : "off")));
       } else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't work"));

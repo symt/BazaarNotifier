@@ -150,7 +150,7 @@ public class EventHandler {
 
   @SubscribeEvent
   public void renderBazaarEvent(BackgroundDrawnEvent e) {
-    if (e.gui instanceof GuiChest && BazaarNotifier.render) {
+    if (e.gui instanceof GuiChest && BazaarNotifier.render && BazaarNotifier.bazaarDataFormatted.length() != 0) {
       IInventory chestInventory = ((GuiChest) e.gui).lowerChestInventory;
       if (chestInventory.hasCustomName()) {
         if (Utils.stripString(chestInventory.getDisplayName().getUnformattedText())
