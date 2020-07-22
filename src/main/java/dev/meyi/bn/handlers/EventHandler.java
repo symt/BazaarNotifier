@@ -1,5 +1,12 @@
-package dev.meyi.bn;
+package dev.meyi.bn.handlers;
 
+import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.utilities.ColorUtils;
+import dev.meyi.bn.utilities.Utils;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import net.minecraft.client.Minecraft;
@@ -10,6 +17,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -93,7 +101,6 @@ public class EventHandler {
     }
   }
 
-
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
     if (e.gui instanceof GuiChest) {
@@ -133,6 +140,54 @@ public class EventHandler {
               }
             }
           }, 50);
+        }
+      }
+    }
+    if (e.gui == null) {
+      BazaarNotifier.inBazaar = false;
+    }
+  }
+
+  @SubscribeEvent
+  public void renderBazaarEvent(BackgroundDrawnEvent e) {
+    if (e.gui instanceof GuiChest && BazaarNotifier.render) {
+      IInventory chestInventory = ((GuiChest) e.gui).lowerChestInventory;
+      if (chestInventory.hasCustomName()) {
+        if (Utils.stripString(chestInventory.getDisplayName().getUnformattedText())
+            .startsWith("Bazaar") || BazaarNotifier.inBazaar) {
+          if (!BazaarNotifier.inBazaar) {
+            BazaarNotifier.inBazaar = true;
+          }
+          List<LinkedHashMap<String, Color>> items = new ArrayList<>();
+
+          for (int i = 0; i < 10; i++) {
+            LinkedHashMap<String, Color> message = new LinkedHashMap<>();
+            message.put((i + 1) + ". ", Color.BLUE);
+            message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
+                Color.CYAN);
+            message.put(" - ", Color.GRAY);
+            message.put("" + (Math.round(
+                BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getDouble("profitFlowPerMinute")
+                    * 100) / 100), Color.ORANGE);
+            items.add(message);
+          }
+
+          int longestXString = 0;
+          for (int i = 0; i < items.size(); i++) {
+            int length = ColorUtils
+                .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
+                    BazaarNotifier.X_POS, BazaarNotifier.Y_POS
+                        + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i,
+                    items.get(i), false);
+
+            if (length > longestXString) {
+              longestXString = length;
+            }
+          }
+          BazaarNotifier.currentBoundsX = BazaarNotifier.X_POS + longestXString;
+          BazaarNotifier.currentBoundsY = BazaarNotifier.Y_POS
+              + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT) * (items.size()) + 2 * (
+              items.size() - 1);
         }
       }
     }
