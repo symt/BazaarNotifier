@@ -23,7 +23,7 @@ public class MouseHandler {
           scaleFactor = new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
           if (!mouseButtonDownAlready && inMovementBox()) {
             mouseButtonDownAlready = true;
-          } else {
+          } else if (mouseButtonDownAlready) {
             int shiftedX = getMouseCoordinateX() - x;
             int shiftedY = getMouseCoordinateY() - y;
 
