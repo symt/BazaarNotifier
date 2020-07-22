@@ -1,20 +1,21 @@
 package dev.meyi.bn;
 
+import dev.meyi.bn.commands.BazaarNotifierCommand;
+import dev.meyi.bn.handlers.EventHandler;
+import dev.meyi.bn.handlers.MouseHandler;
+import dev.meyi.bn.utilities.ScheduledEvents;
+import dev.meyi.bn.utilities.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -22,16 +23,26 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.1.0";
+  public static final String VERSION = "1.2.1";
+  public static final String prefix =
+      EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
-  public static boolean activeBazaar = false;
-  public static boolean inRequest = false;
+  public static int X_POS = 5;
+  public static int Y_POS = 5;
+  public static int currentBoundsX;
+  public static int currentBoundsY;
 
-  public static String prefix =
-      EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
+  public static boolean activeBazaar = true;
+  public static boolean inBazaar = false;
+  public static boolean render = true;
+
+
   public static JSONObject orders = new JSONObject();
-  public static JSONObject bazaarData = new JSONObject();
+  public static JSONObject bazaarDataRaw = new JSONObject();
+  public static JSONObject bazaarCache = new JSONObject();
+  public static JSONArray bazaarDataFormatted = new JSONArray();
+
   public static JSONObject bazaarConversions = new JSONObject(
       new JSONTokener(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json")));
   public static JSONObject bazaarConversionsReversed = new JSONObject(
@@ -45,7 +56,15 @@ public class BazaarNotifier {
 
     if (configFile.isFile()) {
       try {
-        apiKey = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
+        String config = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
+        String[] splitConfig = config.split(",");
+        if (splitConfig.length == 1) {
+          apiKey = splitConfig[0];
+        } else if (splitConfig.length == 3) {
+          apiKey = splitConfig[0];
+          X_POS = Integer.parseInt(splitConfig[1]);
+          Y_POS = Integer.parseInt(splitConfig[2]);
+        }
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -56,80 +75,11 @@ public class BazaarNotifier {
   @Mod.EventHandler
   public void init(FMLInitializationEvent event) {
     MinecraftForge.EVENT_BUS.register(new EventHandler());
-
+    MinecraftForge.EVENT_BUS.register(new MouseHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
+    ScheduledEvents.create();
 
-    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-      if (!inRequest) {
-        inRequest = true;
-        try {
-          if (activeBazaar) {
-            try {
-              bazaarData = Utils.getBazaarData();
-            } catch (IOException e) {
-              e.printStackTrace();
-            }
-
-            if (orders.length() > 0) {
-              Iterator<String> ordersIT = orders.keys();
-              while (ordersIT.hasNext()) {
-                String key = ordersIT.next();
-                for (int i = 0; i < orders.getJSONArray(key).length(); i++) {
-                  double price = orders.getJSONArray(key).getJSONObject(i).getDouble("price");
-                  if (orders.getJSONArray(key).getJSONObject(i).getString("type").equals("buy")) {
-                    // Buy
-                    if (bazaarData.getJSONObject(key).getJSONArray("sell_summary").getJSONObject(0)
-                        .getDouble("pricePerUnit") - price > 0) {
-                      Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(new ChatComponentText(
-                              EnumChatFormatting.DARK_PURPLE + "Buy Order"
-                                  + EnumChatFormatting.GRAY + " for "
-                                  + EnumChatFormatting.DARK_PURPLE + orders.getJSONArray(key)
-                                  .getJSONObject(i).getString("product").split("x")[0]
-                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.DARK_PURPLE
-                                  + bazaarConversions.get(key) + EnumChatFormatting.YELLOW
-                                  + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.DARK_PURPLE + price
-                                  + EnumChatFormatting.GRAY + ")"
-                          ));
-                      orders.getJSONArray(key).remove(i);
-                    }
-                  } else {
-                    // Sell
-                    if (price - bazaarData.getJSONObject(key).getJSONArray("buy_summary")
-                        .getJSONObject(0)
-                        .getDouble("pricePerUnit") > 0) {
-                      Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(new ChatComponentText(
-                              EnumChatFormatting.BLUE + "Sell Offer"
-                                  + EnumChatFormatting.GRAY + " of "
-                                  + EnumChatFormatting.BLUE + orders.getJSONArray(key)
-                                  .getJSONObject(i).getString("product").split("x")[0]
-                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.BLUE
-                                  + bazaarConversions.get(key) + EnumChatFormatting.YELLOW
-                                  + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.BLUE + price
-                                  + EnumChatFormatting.GRAY + ")"
-                          ));
-                      orders.getJSONArray(key).remove(i);
-                    }
-                  }
-                }
-                if (BazaarNotifier.orders.getJSONArray(key).length() == 0) {
-                  ordersIT.remove();
-                }
-              }
-            }
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-        inRequest = false;
-      }
-    }, 0, 3, TimeUnit.SECONDS);
-
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      Utils.saveConfigFile(configFile, apiKey);
-    }));
+    Runtime.getRuntime()
+        .addShutdownHook(new Thread(() -> Utils.saveConfigFile(configFile, apiKey + "," + X_POS + "," + Y_POS)));
   }
 }

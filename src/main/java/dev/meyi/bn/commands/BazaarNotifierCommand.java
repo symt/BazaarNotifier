@@ -1,5 +1,6 @@
-package dev.meyi.bn;
+package dev.meyi.bn.commands;
 
+import dev.meyi.bn.BazaarNotifier;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.command.CommandBase;
@@ -43,12 +44,14 @@ public class BazaarNotifierCommand extends CommandBase {
                   + EnumChatFormatting.DARK_RED + (BazaarNotifier.activeBazaar ? "on" : "off")));
         } else {
           player.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED + "Run /bn api (key) to set your api key. Do /api if you need to get your api key"));
+              BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Run /bn api (key) to set your api key. Do /api if you need to get your api key"));
         }
       } else if (args.length == 2 && args[0].equalsIgnoreCase("api")) {
         BazaarNotifier.apiKey = args[1];
         player.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.RED + "Your api key has been set. Do /bn toggle to start the mod"));
+            BazaarNotifier.prefix + EnumChatFormatting.RED
+                + "Your api key has been set. Do /bn toggle to start the mod"));
       } else if (args.length == 1 && args[0].equalsIgnoreCase("dump")) {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -57,12 +60,21 @@ public class BazaarNotifierCommand extends CommandBase {
         BazaarNotifier.orders = new JSONObject();
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Order list was emptied"));
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("suggest")) {
+        BazaarNotifier.render ^= true;
+        player.addChatMessage(new ChatComponentText(
+            BazaarNotifier.prefix + EnumChatFormatting.RED + "Suggestions have been turned "
+                + EnumChatFormatting.DARK_RED + (BazaarNotifier.activeBazaar ? "on" : "off")));
       } else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't work"));
       } else {
-        player.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.RED + "Use /bn toggle to start the mod"));
+        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
+            EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn empty\n"
+            + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
+            + EnumChatFormatting.RED + "/bn suggest\n"
+            + BazaarNotifier.prefix
+        ));
       }
     }
   }

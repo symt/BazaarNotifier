@@ -1,5 +1,6 @@
-package dev.meyi.bn;
+package dev.meyi.bn.utilities;
 
+import dev.meyi.bn.BazaarNotifier;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -9,12 +10,16 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import net.minecraft.util.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Utils {
@@ -67,7 +72,9 @@ public class Utils {
   }
 
   public static double round(double value, int places) {
-    if (places < 0) throw new IllegalArgumentException();
+    if (places < 0) {
+      throw new IllegalArgumentException();
+    }
 
     BigDecimal bd = new BigDecimal(Double.toString(value));
     bd = bd.setScale(places, RoundingMode.HALF_UP);
@@ -85,5 +92,18 @@ public class Utils {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public static JSONArray sortJSONArray(JSONArray jsonArr, String key) {
+    List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+    for (int i = 0; i < jsonArr.length(); i++) {
+      jsonValues.add(jsonArr.getJSONObject(i));
+    }
+    Collections.sort(jsonValues, new JSONComparator(key));
+    JSONArray sortedJsonArray = new JSONArray();
+    for (int i = 0; i < jsonArr.length(); i++) {
+      sortedJsonArray.put(jsonValues.get(i));
+    }
+    return sortedJsonArray;
   }
 }
