@@ -26,7 +26,8 @@ public class ScheduledEvents {
   }
 
   public void suggestionLoop() {
-    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(Suggester::basic, 5, 5, TimeUnit.SECONDS);
+    Executors.newScheduledThreadPool(1)
+        .scheduleAtFixedRate(Suggester::basic, 5, 5, TimeUnit.SECONDS);
   }
 
   public void outdatedNotification() {
@@ -46,46 +47,36 @@ public class ScheduledEvents {
                       .getDouble("price");
                   if (BazaarNotifier.orders.getJSONArray(key).getJSONObject(i).getString("type")
                       .equals("buy")) {
-                    // Buy
                     if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
-                        .getJSONObject(0)
-                        .getDouble("pricePerUnit") - price > 0) {
+                        .getJSONObject(0).getInt("orders") != 1 &&
+                        BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
+                            .getJSONObject(0)
+                            .getDouble("pricePerUnit") == price) {
                       Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(new ChatComponentText(
-                              EnumChatFormatting.DARK_PURPLE + "Buy Order"
-                                  + EnumChatFormatting.GRAY + " for "
-                                  + EnumChatFormatting.DARK_PURPLE + BazaarNotifier.orders
-                                  .getJSONArray(key)
-                                  .getJSONObject(i).getString("product").split("x")[0]
-                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.DARK_PURPLE
-                                  + BazaarNotifier.bazaarConversions.get(key)
-                                  + EnumChatFormatting.YELLOW
-                                  + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.DARK_PURPLE + price
-                                  + EnumChatFormatting.GRAY + ")"
-                          ));
+                          .addChatMessage(chatNotification(key, price, i, "Buy Order", "MATCHED"));
+                    } else if (
+                        BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
+                            .getJSONObject(0)
+                            .getDouble("pricePerUnit") - price > 0) {
+                      Minecraft.getMinecraft().thePlayer
+                          .addChatMessage(chatNotification(key, price, i, "Buy Order", "OUTDATED"));
                       BazaarNotifier.orders.getJSONArray(key).remove(i);
                     }
                   } else {
-                    // Sell
-                    if (price - BazaarNotifier.bazaarDataRaw.getJSONObject(key)
+                    if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
+                        .getJSONObject(0).getInt("orders") != 1 &&
+                        BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
+                            .getJSONObject(0)
+                            .getDouble("pricePerUnit") == price) {
+                      Minecraft.getMinecraft().thePlayer
+                          .addChatMessage(chatNotification(key, price, i, "Sell Offer", "MATCHED"));
+                    } else if (price - BazaarNotifier.bazaarDataRaw.getJSONObject(key)
                         .getJSONArray("buy_summary")
                         .getJSONObject(0)
                         .getDouble("pricePerUnit") > 0) {
                       Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(new ChatComponentText(
-                              EnumChatFormatting.BLUE + "Sell Offer"
-                                  + EnumChatFormatting.GRAY + " of "
-                                  + EnumChatFormatting.BLUE + BazaarNotifier.orders
-                                  .getJSONArray(key)
-                                  .getJSONObject(i).getString("product").split("x")[0]
-                                  + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.BLUE
-                                  + BazaarNotifier.bazaarConversions.get(key)
-                                  + EnumChatFormatting.YELLOW
-                                  + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.BLUE + price
-                                  + EnumChatFormatting.GRAY + ")"
-                          ));
+                          .addChatMessage(
+                              chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
                       BazaarNotifier.orders.getJSONArray(key).remove(i);
                     }
                   }
@@ -102,5 +93,23 @@ public class ScheduledEvents {
         inOutdatedRequest = false;
       }
     }, 0, 2, TimeUnit.SECONDS);
+  }
+
+
+  private ChatComponentText chatNotification(String key, double price, int i, String type,
+      String notification) {
+    return new ChatComponentText(
+        EnumChatFormatting.DARK_PURPLE + type
+            + EnumChatFormatting.GRAY + " for "
+            + EnumChatFormatting.DARK_PURPLE + BazaarNotifier.orders
+            .getJSONArray(key)
+            .getJSONObject(i).getString("product").split("x")[0]
+            + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.DARK_PURPLE
+            + BazaarNotifier.bazaarConversions.get(key)
+            + EnumChatFormatting.YELLOW
+            + " " + notification + " " + EnumChatFormatting.GRAY + "("
+            + EnumChatFormatting.DARK_PURPLE + BazaarNotifier.df.format(price)
+            + EnumChatFormatting.GRAY + ")"
+    );
   }
 }
