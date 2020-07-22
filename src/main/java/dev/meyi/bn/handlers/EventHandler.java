@@ -150,7 +150,8 @@ public class EventHandler {
 
   @SubscribeEvent
   public void renderBazaarEvent(BackgroundDrawnEvent e) {
-    if (e.gui instanceof GuiChest && BazaarNotifier.render && BazaarNotifier.bazaarDataFormatted.length() != 0) {
+    if (e.gui instanceof GuiChest && BazaarNotifier.render
+        && BazaarNotifier.bazaarDataFormatted.length() != 0) {
       IInventory chestInventory = ((GuiChest) e.gui).lowerChestInventory;
       if (chestInventory.hasCustomName()) {
         if (Utils.stripString(chestInventory.getDisplayName().getUnformattedText())
@@ -177,7 +178,7 @@ public class EventHandler {
           for (int i = 0; i < items.size(); i++) {
             int length = ColorUtils
                 .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
-                    BazaarNotifier.X_POS, BazaarNotifier.Y_POS
+                    BazaarNotifier.suggestionModuleX, BazaarNotifier.suggestionModuleY
                         + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i,
                     items.get(i), false);
 
@@ -185,8 +186,8 @@ public class EventHandler {
               longestXString = length;
             }
           }
-          BazaarNotifier.currentBoundsX = BazaarNotifier.X_POS + longestXString;
-          BazaarNotifier.currentBoundsY = BazaarNotifier.Y_POS
+          BazaarNotifier.currentBoundsX = BazaarNotifier.suggestionModuleX + longestXString;
+          BazaarNotifier.currentBoundsY = BazaarNotifier.suggestionModuleY
               + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT) * (items.size()) + 2 * (
               items.size() - 1);
         }

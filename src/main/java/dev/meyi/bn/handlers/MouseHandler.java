@@ -27,8 +27,8 @@ public class MouseHandler {
             int shiftedX = getMouseCoordinateX() - x;
             int shiftedY = getMouseCoordinateY() - y;
 
-            BazaarNotifier.X_POS += shiftedX;
-            BazaarNotifier.Y_POS += shiftedY;
+            BazaarNotifier.suggestionModuleX += shiftedX;
+            BazaarNotifier.suggestionModuleY += shiftedY;
           }
           x = getMouseCoordinateX();
           y = getMouseCoordinateY();
@@ -48,8 +48,8 @@ public class MouseHandler {
   }
 
   private boolean inMovementBox() {
-    return (getMouseCoordinateX() >= BazaarNotifier.X_POS
-        && getMouseCoordinateY() >= BazaarNotifier.Y_POS
+    return (getMouseCoordinateX() >= BazaarNotifier.suggestionModuleX
+        && getMouseCoordinateY() >= BazaarNotifier.suggestionModuleY
         && getMouseCoordinateX() <= BazaarNotifier.currentBoundsX
         && getMouseCoordinateY() <= BazaarNotifier.currentBoundsY);
   }

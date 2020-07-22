@@ -3,6 +3,8 @@ package dev.meyi.bn;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
+import dev.meyi.bn.handlers.UpdateHandler;
+import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
 import java.io.File;
@@ -29,10 +31,10 @@ public class BazaarNotifier {
       EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
-  public static DecimalFormat df = new DecimalFormat("#,###.00");
+  public static DecimalFormat df = new DecimalFormat("#,###.0");
 
-  public static int X_POS = 5;
-  public static int Y_POS = 5;
+  public static int suggestionModuleX = Defaults.DEFAULT_SUGGESTION_MODULE_X;
+  public static int suggestionModuleY = Defaults.DEFAULT_SUGGESTION_MODULE_Y;
   public static int currentBoundsX;
   public static int currentBoundsY;
 
@@ -53,6 +55,15 @@ public class BazaarNotifier {
 
   public static File configFile;
 
+  /**
+   * Resets the location of all of the modules and clears all stored user preferences or orders
+   */
+  public static void resetMod() {
+    suggestionModuleX = Defaults.DEFAULT_SUGGESTION_MODULE_X;
+    suggestionModuleY = Defaults.DEFAULT_SUGGESTION_MODULE_Y;
+    orders = Defaults.DEFAULT_ORDERS_LAYOUT;
+  }
+
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
     configFile = event.getSuggestedConfigurationFile();
@@ -65,8 +76,8 @@ public class BazaarNotifier {
           apiKey = splitConfig[0];
         } else if (splitConfig.length == 3) {
           apiKey = splitConfig[0];
-          X_POS = Integer.parseInt(splitConfig[1]);
-          Y_POS = Integer.parseInt(splitConfig[2]);
+          suggestionModuleX = Integer.parseInt(splitConfig[1]);
+          suggestionModuleY = Integer.parseInt(splitConfig[2]);
         }
       } catch (IOException e) {
         e.printStackTrace();
@@ -79,11 +90,12 @@ public class BazaarNotifier {
   public void init(FMLInitializationEvent event) {
     MinecraftForge.EVENT_BUS.register(new EventHandler());
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
+    MinecraftForge.EVENT_BUS.register(new UpdateHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
     ScheduledEvents.create();
 
     Runtime.getRuntime()
         .addShutdownHook(
-            new Thread(() -> Utils.saveConfigFile(configFile, apiKey + "," + X_POS + "," + Y_POS)));
+            new Thread(() -> Utils.saveConfigFile(configFile, apiKey + "," + suggestionModuleX + "," + suggestionModuleY)));
   }
 }

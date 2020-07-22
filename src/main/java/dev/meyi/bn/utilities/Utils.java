@@ -106,4 +106,10 @@ public class Utils {
     }
     return sortedJsonArray;
   }
+
+  public static boolean updateChecker() {
+
+
+    return false;
+  }
 }
