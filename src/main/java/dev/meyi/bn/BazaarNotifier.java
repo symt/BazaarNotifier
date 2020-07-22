@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,10 +24,12 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.2.1";
+  public static final String VERSION = "1.2.2";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
+
+  public static DecimalFormat df = new DecimalFormat("#,###.00");
 
   public static int X_POS = 5;
   public static int Y_POS = 5;
@@ -80,6 +83,7 @@ public class BazaarNotifier {
     ScheduledEvents.create();
 
     Runtime.getRuntime()
-        .addShutdownHook(new Thread(() -> Utils.saveConfigFile(configFile, apiKey + "," + X_POS + "," + Y_POS)));
+        .addShutdownHook(
+            new Thread(() -> Utils.saveConfigFile(configFile, apiKey + "," + X_POS + "," + Y_POS)));
   }
 }

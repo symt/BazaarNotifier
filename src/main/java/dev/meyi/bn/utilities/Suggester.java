@@ -34,11 +34,11 @@ public class Suggester {
               bazaarData.getJSONObject(key).getJSONObject("quick_status")
                   .getLong("sellMovingWeek"));
 
-      double diff = currentProduct.getDouble("sellOfferPrice") * .99 - currentProduct
+      double diff = currentProduct.getDouble("sellOfferPrice") * .99d - currentProduct
           .getDouble("buyOrderPrice");
       double profitFlowPerMinute =
-          diff * Math.min(currentProduct.getLong("sellCount"), currentProduct.getLong("buyCount"))
-              / 10080;
+          ((currentProduct.getLong("sellCount") * currentProduct.getLong("buyCount")) / (10080d * (
+              currentProduct.getLong("sellCount") + currentProduct.getLong("buyCount")))) * diff;
       bazaarDataFormatted.put(currentProduct.put("profitFlowPerMinute", profitFlowPerMinute));
     }
 
@@ -46,7 +46,7 @@ public class Suggester {
 
     JSONObject bazaarCache = new JSONObject();
     bazaarDataFormatted.forEach((data) -> {
-      JSONObject jsonData = (JSONObject)data;
+      JSONObject jsonData = (JSONObject) data;
       bazaarCache.put(jsonData.getString("productId").toLowerCase(), data);
     });
 

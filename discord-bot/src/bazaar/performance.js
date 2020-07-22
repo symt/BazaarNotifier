@@ -3,8 +3,7 @@
 module.exports = bazaarData => {
     bazaarData.forEach(product => {
         let diff = product.sellOrderPrice * 0.99 - product.buyOrderPrice;
-        let profitFlowPerMinute = diff * Math.min(product.sellCount, product.buyCount) / (7 * 24 * 60);
-        product.profitFlowPerMinute = profitFlowPerMinute;
+        product.profitFlowPerMinute = (product.sellCount * product.buyCount)/(10080 * (product.sellCount + product.buyCount)) * diff;
     });
     
     bazaarData.sort((a, b) => {

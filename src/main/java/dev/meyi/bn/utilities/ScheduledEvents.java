@@ -61,7 +61,7 @@ public class ScheduledEvents {
                                   + BazaarNotifier.bazaarConversions.get(key)
                                   + EnumChatFormatting.YELLOW
                                   + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.DARK_PURPLE + price
+                                  + EnumChatFormatting.DARK_PURPLE + BazaarNotifier.df.format(price)
                                   + EnumChatFormatting.GRAY + ")"
                           ));
                       BazaarNotifier.orders.getJSONArray(key).remove(i);
@@ -83,7 +83,7 @@ public class ScheduledEvents {
                                   + BazaarNotifier.bazaarConversions.get(key)
                                   + EnumChatFormatting.YELLOW
                                   + " OUTDATED " + EnumChatFormatting.GRAY + "("
-                                  + EnumChatFormatting.BLUE + price
+                                  + EnumChatFormatting.BLUE + BazaarNotifier.df.format(price)
                                   + EnumChatFormatting.GRAY + ")"
                           ));
                       BazaarNotifier.orders.getJSONArray(key).remove(i);

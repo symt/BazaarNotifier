@@ -43,7 +43,7 @@ const Bazaar = (discordClient, text) => {
                 Math.round(
                   (data.sellOrderPrice * 0.99 - data.buyOrderPrice) * 100
                 ) / 100
-              }\n**Max Profit Possible (coins/minute)**: ${
+              }\n**Estimated Profit (coins/minute)**: ${
                 Math.round(data.profitFlowPerMinute * 100) / 100
               }`
             )
@@ -103,7 +103,7 @@ const Bazaar = (discordClient, text) => {
       bazaarData.forEach((data) => {
         fields.push({
           name: `${i++}. ${data.productId}`,
-          value: `MPP: ${Math.round(data.profitFlowPerMinute * 100) / 100}`,
+          value: `EP: ${Math.round(data.profitFlowPerMinute * 100) / 100}`,
           inline: true,
         });
         if (i % 2 == 0) {
@@ -114,7 +114,7 @@ const Bazaar = (discordClient, text) => {
         .setTitle("Bazaar")
         .setColor(Math.floor(Math.random() * 16777215))
         .addFields(...fields)
-        .setFooter("MPP is Max Profit Possible (in coins/minute). It shows roughly how much money is flowing through an item every minute");
+        .setFooter("EP is about how much money you'd make while flipping an item per minute of flipping. It assumes you miss no instants.");
       client.channels.cache.get(channel).send(embed);
       inRequest = false;
     }

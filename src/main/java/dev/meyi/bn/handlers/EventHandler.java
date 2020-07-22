@@ -166,9 +166,10 @@ public class EventHandler {
             message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
                 Color.CYAN);
             message.put(" - ", Color.GRAY);
-            message.put("" + (Math.round(
-                BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getDouble("profitFlowPerMinute")
-                    * 100) / 100), Color.ORANGE);
+            message.put("EP: ", Color.RED);
+            message.put("" + BazaarNotifier.df.format(
+                BazaarNotifier.bazaarDataFormatted.getJSONObject(i)
+                    .getDouble("profitFlowPerMinute")), Color.ORANGE);
             items.add(message);
           }
 
