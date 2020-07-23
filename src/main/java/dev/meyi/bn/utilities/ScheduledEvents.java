@@ -52,7 +52,7 @@ public class ScheduledEvents {
                         BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
                             .getJSONObject(0)
                             .getDouble("pricePerUnit") == price && !BazaarNotifier.bazaarDataRaw
-                        .getJSONObject(key).getBoolean("wasMatched")) {
+                        .getJSONObject(key).has("wasMatched")) {
                       BazaarNotifier.bazaarDataRaw.getJSONObject(key).put("wasMatched", true);
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(chatNotification(key, price, i, "Buy Order", "MATCHED"));
@@ -70,7 +70,7 @@ public class ScheduledEvents {
                         BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
                             .getJSONObject(0)
                             .getDouble("pricePerUnit") == price && !BazaarNotifier.bazaarDataRaw
-                        .getJSONObject(key).getBoolean("wasMatched")) {
+                        .getJSONObject(key).has("wasMatched")) {
                       BazaarNotifier.bazaarDataRaw.getJSONObject(key).put("wasMatched", true);
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(chatNotification(key, price, i, "Sell Offer", "MATCHED"));
