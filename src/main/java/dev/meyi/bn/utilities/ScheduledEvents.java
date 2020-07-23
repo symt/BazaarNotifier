@@ -51,7 +51,9 @@ public class ScheduledEvents {
                         .getJSONObject(0).getInt("orders") != 1 &&
                         BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
                             .getJSONObject(0)
-                            .getDouble("pricePerUnit") == price) {
+                            .getDouble("pricePerUnit") == price && !BazaarNotifier.bazaarDataRaw
+                        .getJSONObject(key).getBoolean("wasMatched")) {
+                      BazaarNotifier.bazaarDataRaw.getJSONObject(key).put("wasMatched", true);
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(chatNotification(key, price, i, "Buy Order", "MATCHED"));
                     } else if (
@@ -67,7 +69,9 @@ public class ScheduledEvents {
                         .getJSONObject(0).getInt("orders") != 1 &&
                         BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
                             .getJSONObject(0)
-                            .getDouble("pricePerUnit") == price) {
+                            .getDouble("pricePerUnit") == price && !BazaarNotifier.bazaarDataRaw
+                        .getJSONObject(key).getBoolean("wasMatched")) {
+                      BazaarNotifier.bazaarDataRaw.getJSONObject(key).put("wasMatched", true);
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(chatNotification(key, price, i, "Sell Offer", "MATCHED"));
                     } else if (price - BazaarNotifier.bazaarDataRaw.getJSONObject(key)
@@ -98,17 +102,20 @@ public class ScheduledEvents {
 
   private ChatComponentText chatNotification(String key, double price, int i, String type,
       String notification) {
+    EnumChatFormatting messageColor =
+        (type.equalsIgnoreCase("Buy Order")) ? EnumChatFormatting.DARK_PURPLE
+            : EnumChatFormatting.BLUE;
     return new ChatComponentText(
-        EnumChatFormatting.DARK_PURPLE + type
+        messageColor + type
             + EnumChatFormatting.GRAY + " for "
-            + EnumChatFormatting.DARK_PURPLE + BazaarNotifier.orders
+            + messageColor + BazaarNotifier.orders
             .getJSONArray(key)
             .getJSONObject(i).getString("product").split("x")[0]
-            + EnumChatFormatting.GRAY + "x " + EnumChatFormatting.DARK_PURPLE
+            + EnumChatFormatting.GRAY + "x " + messageColor
             + BazaarNotifier.bazaarConversions.get(key)
             + EnumChatFormatting.YELLOW
             + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + EnumChatFormatting.DARK_PURPLE + BazaarNotifier.df.format(price)
+            + messageColor + BazaarNotifier.df.format(price)
             + EnumChatFormatting.GRAY + ")"
     );
   }
