@@ -19,8 +19,7 @@ public class ColorUtils {
       LinkedHashMap<String, Color> message, boolean dropShadow) {
     int renderLength = 0;
     for (Entry<String, Color> substring : message.entrySet()) {
-      renderer.drawString(substring.getKey(), x + renderLength, y, substring.getValue().getRGB(),
-          dropShadow);
+      renderer.drawString(substring.getKey(), x + renderLength, y, substring.getValue().getRGB(),dropShadow);
       renderLength += renderer.getStringWidth(substring.getKey());
     }
     return renderLength;
