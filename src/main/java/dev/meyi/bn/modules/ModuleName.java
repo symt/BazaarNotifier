@@ -4,7 +4,7 @@ public enum ModuleName {
   SUGGESTION, BANK, NOTIFICATION;
 
   public Module returnDefaultModule() {
-    switch(this) {
+    switch (this) {
       case SUGGESTION:
         return new SuggestionModule();
       case BANK:

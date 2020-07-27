@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONComparator implements Comparator<JSONObject> {
+
   String key = "";
 
   public JSONComparator(String key) {
@@ -20,7 +21,7 @@ public class JSONComparator implements Comparator<JSONObject> {
       valA = a.getDouble(key);
       valB = b.getDouble(key);
     } catch (JSONException e) {
-      System.err.println("The provided value in " + key  + " is not a double.");
+      System.err.println("The provided value in " + key + " is not a double.");
     }
 
     return -valA.compareTo(valB);

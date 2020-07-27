@@ -3,7 +3,6 @@ package dev.meyi.bn.handlers;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.StringUtils;
