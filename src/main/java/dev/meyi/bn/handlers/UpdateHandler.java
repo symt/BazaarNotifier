@@ -1,6 +1,7 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.utilities.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -59,6 +60,12 @@ public class UpdateHandler {
                 break;
               }
             }
+          }
+          BazaarNotifier.validApiKey = Utils.validateApiKey();
+          if (!BazaarNotifier.validApiKey) {
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "The mod doesn't have access to a valid api key yet. Please run /bn api (key) to set your key"));
           }
         } catch (IOException e) {
           e.printStackTrace();

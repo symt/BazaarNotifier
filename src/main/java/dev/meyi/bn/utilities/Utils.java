@@ -1,6 +1,8 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.modules.Module;
+import dev.meyi.bn.modules.ModuleName;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -20,6 +25,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Utils {
@@ -107,9 +113,72 @@ public class Utils {
     return sortedJsonArray;
   }
 
-  public static boolean updateChecker() {
+  public static boolean isValidJSONObject(String json) {
+    try {
+      new JSONObject(json);
+    } catch (JSONException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public static JSONObject initializeConfig() {
+    JSONObject newConfig = new JSONObject().put("api", BazaarNotifier.apiKey)
+        .put("version", BazaarNotifier.VERSION);
+
+    JSONArray modules = new JSONArray();
+
+    for (ModuleName value : ModuleName.values()) {
+      Module m = value.returnDefaultModule();
+      if (m != null) {
+        modules.put(m.generateModuleConfig());
+      }
+    }
+
+    BazaarNotifier.validApiKey = false;
+
+    return newConfig.put("modules", modules);
+  }
+
+  public static boolean validateApiKey() throws IOException {
+    return new JSONObject(IOUtils.toString(new BufferedReader
+        (new InputStreamReader(
+            HttpClientBuilder.create().build().execute(new HttpGet(
+                "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
+                .getContent())))).getBoolean("success");
+  }
 
 
-    return false;
+  /**
+   * @param key order key
+   * @param price price per unit of order
+   * @param i index of order
+   * @param type Buy Order or Sell Offer (sets message color to dark purple vs blue)
+   * @param notification yellow notification message
+   * @return ChatComponentText completed message
+   */
+  public static ChatComponentText chatNotification(String key, double price, int i, String type,
+      String notification) {
+    EnumChatFormatting messageColor =
+        (type.equalsIgnoreCase("Buy Order")) ? EnumChatFormatting.DARK_PURPLE
+            : notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN : EnumChatFormatting.BLUE;
+    return new ChatComponentText(
+        messageColor + type
+            + EnumChatFormatting.GRAY + " for "
+            + messageColor + BazaarNotifier.dfNoDecimal
+            .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
+            + EnumChatFormatting.GRAY + "x " + messageColor
+            + BazaarNotifier.orders.getJSONObject(i).getString("product")
+            + EnumChatFormatting.YELLOW
+            + " " + notification + " " + EnumChatFormatting.GRAY + "("
+            + messageColor + BazaarNotifier.df.format(price)
+            + EnumChatFormatting.GRAY + ")"
+    );
+  }
+
+  public static void drawCenteredString(String text, int x, int y, int color, double scale) {
+    Minecraft.getMinecraft().fontRendererObj.drawString(text,
+        (int) (x / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2,
+        (int) (y / scale), color);
   }
 }

@@ -1,9 +1,11 @@
 package dev.meyi.bn;
 
 import dev.meyi.bn.commands.BazaarNotifierCommand;
+import dev.meyi.bn.handlers.ChestTickHandler;
 import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
+import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
@@ -26,24 +28,20 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.2.4";
+  public static final String VERSION = "1.3.0";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
   public static DecimalFormat df = new DecimalFormat("#,###.0");
-
-  public static int suggestionModuleX = Defaults.DEFAULT_SUGGESTION_MODULE_X;
-  public static int suggestionModuleY = Defaults.DEFAULT_SUGGESTION_MODULE_Y;
-  public static int currentBoundsX;
-  public static int currentBoundsY;
+  public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
 
   public static boolean activeBazaar = true;
   public static boolean inBazaar = false;
-  public static boolean render = true;
+  public static boolean forceRender = false;
+  public static boolean validApiKey = false;
 
-
-  public static JSONObject orders = new JSONObject();
+  public static JSONArray orders = new JSONArray();
   public static JSONObject bazaarDataRaw = new JSONObject();
   public static JSONObject bazaarCache = new JSONObject();
   public static JSONArray bazaarDataFormatted = new JSONArray();
@@ -55,40 +53,38 @@ public class BazaarNotifier {
 
   public static File configFile;
 
-  /**
-   * Resets the location of all of the modules and clears all stored user preferences or orders
-   */
+  public static ModuleList modules;
+
   public static void resetMod() {
-    suggestionModuleX = Defaults.DEFAULT_SUGGESTION_MODULE_X;
-    suggestionModuleY = Defaults.DEFAULT_SUGGESTION_MODULE_Y;
+    modules.resetAll();
     orders = Defaults.DEFAULT_ORDERS_LAYOUT;
   }
 
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
     configFile = event.getSuggestedConfigurationFile();
+    String config = null;
 
-    if (configFile.isFile()) {
-      try {
-        String config = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
-        String[] splitConfig = config.split(",");
-        if (splitConfig.length == 1) {
-          apiKey = splitConfig[0];
-        } else if (splitConfig.length == 3) {
-          apiKey = splitConfig[0];
-          suggestionModuleX = Integer.parseInt(splitConfig[1]);
-          suggestionModuleY = Integer.parseInt(splitConfig[2]);
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
+    try {
+      if (configFile.isFile()) {
+        config = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
       }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
+    if (Utils.isValidJSONObject(config) && config != null) {
+      modules = new ModuleList(
+          new JSONObject(config));
+    } else {
+      modules = new ModuleList();
+    }
   }
 
   @Mod.EventHandler
   public void init(FMLInitializationEvent event) {
     MinecraftForge.EVENT_BUS.register(new EventHandler());
+    MinecraftForge.EVENT_BUS.register(new ChestTickHandler());
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
@@ -96,6 +92,7 @@ public class BazaarNotifier {
 
     Runtime.getRuntime()
         .addShutdownHook(
-            new Thread(() -> Utils.saveConfigFile(configFile, apiKey + "," + suggestionModuleX + "," + suggestionModuleY)));
+            new Thread(
+                () -> Utils.saveConfigFile(configFile, modules.generateConfig().toString())));
   }
 }
