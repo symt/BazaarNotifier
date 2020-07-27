@@ -104,7 +104,7 @@ public class ChestTickHandler {
             }
             if (forceRemove) {
               Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                  BazaarNotifier.prefix
+                  BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
               BazaarNotifier.orders.remove(orderInQuestion);
             } else if (amountLeft > 0) {
