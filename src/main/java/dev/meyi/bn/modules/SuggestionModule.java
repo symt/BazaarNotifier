@@ -3,6 +3,7 @@ package dev.meyi.bn.modules;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,7 +26,7 @@ public class SuggestionModule extends Module {
     if (BazaarNotifier.bazaarDataFormatted.length() != 0) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-      for (int i = 0; i < 10; i++) {
+      for (int i = shift; i < 10 + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.BLUE);
         message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
@@ -38,23 +39,16 @@ public class SuggestionModule extends Module {
         items.add(message);
       }
 
-      int longestXString = 0;
-      for (int i = 0; i < items.size(); i++) {
-        int length = ColorUtils
-            .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
-                x, y
-                    + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i,
-                items.get(i), false);
+      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
 
-        if (length > longestXString) {
-          longestXString = length;
-        }
-      }
       boundsX = x + longestXString;
-      boundsY = y
-          + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * items.size() + 2 * (
-          items.size() - 1);
+
+    } else {
+      Utils.drawCenteredString("Waiting for bazaar data", x + 100,
+          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
+      boundsX = x + 200;
     }
+    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 18;
   }
 
   @Override
@@ -70,7 +64,12 @@ public class SuggestionModule extends Module {
 
   @Override
   protected boolean shouldDrawBounds() {
-    return BazaarNotifier.bazaarDataFormatted.length() != 0;
+    return true;
+  }
+
+  @Override
+  protected int getMaxShift() {
+    return BazaarNotifier.bazaarDataFormatted.length() - 10;
   }
 
   @Override

@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
@@ -160,18 +161,24 @@ public class Utils {
       String notification) {
     EnumChatFormatting messageColor =
         (type.equalsIgnoreCase("Buy Order")) ? EnumChatFormatting.DARK_PURPLE
-            : EnumChatFormatting.BLUE;
+            : notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN : EnumChatFormatting.BLUE;
     return new ChatComponentText(
         messageColor + type
             + EnumChatFormatting.GRAY + " for "
-            + messageColor + BazaarNotifier.orders.getJSONObject(i).getString("product")
-            .split("x")[0]
+            + messageColor + BazaarNotifier.dfNoDecimal
+            .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
             + EnumChatFormatting.GRAY + "x " + messageColor
-            + BazaarNotifier.bazaarConversions.get(key)
+            + BazaarNotifier.orders.getJSONObject(i).getString("product")
             + EnumChatFormatting.YELLOW
             + " " + notification + " " + EnumChatFormatting.GRAY + "("
             + messageColor + BazaarNotifier.df.format(price)
             + EnumChatFormatting.GRAY + ")"
     );
+  }
+
+  public static void drawCenteredString(String text, int x, int y, int color, double scale) {
+    Minecraft.getMinecraft().fontRendererObj.drawString(text,
+        (int) (x / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2,
+        (int) (y / scale), color);
   }
 }

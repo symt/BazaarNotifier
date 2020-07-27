@@ -1,12 +1,15 @@
 package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONObject;
 
 public class NotificationModule extends Module {
@@ -25,14 +28,43 @@ public class NotificationModule extends Module {
 
     List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-    for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-      // Do stuff
-    }
+    if (BazaarNotifier.orders.length() != 0) {
 
-    boundsX =
-        x + Minecraft.getMinecraft().fontRendererObj.getStringWidth(Defaults.LONGEST_NOTIFICATION);
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * Math.max(items.size(), 10)
-        + 2 * (Math.max(items.size(), 10) - 1);
+      int size = Math.min(shift + 10, BazaarNotifier.orders.length());
+
+      for (int i = shift; i < size; i++) {
+        JSONObject currentOrder = BazaarNotifier.orders.getJSONObject(i);
+        LinkedHashMap<String, Color> message = new LinkedHashMap<>();
+
+        Color typeSpecificColor = currentOrder.getBoolean("goodOrder") ? new Color(0x55FF55)
+            : currentOrder.getString("type").equals("buy") ? new Color(0xFF55FF)
+                : new Color(0x55FFFF);
+
+        String notification = currentOrder.getBoolean("goodOrder") ? "BEST" :
+            currentOrder.getBoolean("matchedOrder") ? "MATCHED" : "OUTDATED";
+        message.put(WordUtils.capitalizeFully(currentOrder.getString("type")), typeSpecificColor);
+        message.put(" - ", new Color(0xAAAAAA));
+        message.put(notification + " ", new Color(0xFFFF55));
+        message.put("(", new Color(0xAAAAAA));
+        message.put(BazaarNotifier.dfNoDecimal.format(currentOrder.getInt("startAmount")),
+            typeSpecificColor);
+        message.put("x ", new Color(0xAAAAAA));
+        message.put(currentOrder.getString("product"), typeSpecificColor);
+        message.put(", ", new Color(0xAAAAAA));
+        message.put(BazaarNotifier.df.format(currentOrder.getDouble("pricePerUnit")),
+            typeSpecificColor);
+        message.put(")", new Color(0xAAAAAA));
+        items.add(message);
+      }
+
+      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
+      boundsX = x + longestXString;
+    } else {
+      Utils.drawCenteredString("No orders found", x + 100,
+          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
+      boundsX = x + 200;
+    }
+    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 18;
   }
 
   @Override
@@ -49,7 +81,12 @@ public class NotificationModule extends Module {
 
   @Override
   protected boolean shouldDrawBounds() {
-    return false;
+    return true;
+  }
+
+  @Override
+  protected int getMaxShift() {
+    return BazaarNotifier.orders.length() - 10;
   }
 
 }

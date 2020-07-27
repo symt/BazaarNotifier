@@ -36,64 +36,76 @@ public class ScheduledEvents {
           if (BazaarNotifier.activeBazaar && BazaarNotifier.validApiKey) {
             BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
             if (BazaarNotifier.orders.length() > 0) {
-                for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-                  JSONObject currentOrder = BazaarNotifier.orders.getJSONObject(i);
-                  String key = BazaarNotifier.bazaarConversionsReversed.getString(currentOrder.getString("product"));
-                  double price = currentOrder.getDouble("price");
-                  if (currentOrder.getString("type").equals("buy")) {
-                    double diff =
-                        BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
-                            .getJSONObject(0)
-                            .getDouble("pricePerUnit") - price;
-                    if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
-                        .getJSONObject(0).getInt("orders") != 1 && diff == 0
-                        && !currentOrder.getBoolean("matchedOrder")) {
-                      currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
-                          .put("goodOrder", false)
-                          .put("currentNotification", "MATCHED");
-                      Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(
-                              Utils.chatNotification(key, price, i, "Buy Order", "MATCHED"));
-                    } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
-                      Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(
-                              Utils.chatNotification(key, price, i, "Buy Order", "OUTDATED"));
-                      currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
-                          .put("goodOrder", false)
-                          .put("currentNotification", "OUTDATED");
-                    } else {
-                      currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
-                          .put("goodOrder", true);
-                    }
-                  } else {
-                    if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
-                        .getJSONObject(0).getInt("orders") != 1 &&
-                        BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
-                            .getJSONObject(0)
-                            .getDouble("pricePerUnit") == price && !currentOrder
+              for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
+                JSONObject currentOrder = BazaarNotifier.orders.getJSONObject(i);
+                String key = BazaarNotifier.bazaarConversionsReversed
+                    .getString(currentOrder.getString("product"));
+                double price = currentOrder.getDouble("pricePerUnit");
+                if (currentOrder.getString("type").equals("buy")) {
+                  double diff =
+                      BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
+                          .getJSONObject(0)
+                          .getDouble("pricePerUnit") - price;
+                  if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
+                      .getJSONObject(0).getInt("orders") != 1 && diff == 0
+                      && !currentOrder.getBoolean("matchedOrder")) {
+                    currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
+                        .put("goodOrder", false)
+                        .put("currentNotification", "MATCHED");
+                    Minecraft.getMinecraft().thePlayer
+                        .addChatMessage(
+                            Utils.chatNotification(key, price, i, "Buy Order", "MATCHED"));
+                  } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
+                    Minecraft.getMinecraft().thePlayer
+                        .addChatMessage(
+                            Utils.chatNotification(key, price, i, "Buy Order", "OUTDATED"));
+                    currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
+                        .put("goodOrder", false)
+                        .put("currentNotification", "OUTDATED");
+                  } else if (diff == 0 &&
+                      BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
+                          .getJSONObject(0).getInt("orders") == 1) {
+                    if (currentOrder.getBoolean("outdatedOrder") || currentOrder
                         .getBoolean("matchedOrder")) {
-                      currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
-                          .put("goodOrder", false)
-                          .put("currentNotification", "MATCHED");
-                      Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(
-                              Utils.chatNotification(key, price, i, "Sell Offer", "MATCHED"));
-                    } else if (price - BazaarNotifier.bazaarDataRaw.getJSONObject(key)
-                        .getJSONArray("buy_summary")
-                        .getJSONObject(0)
-                        .getDouble("pricePerUnit") > 0 && !currentOrder
-                        .getBoolean("outdatedOrder")) {
-                      currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
-                          .put("goodOrder", false)
-                          .put("currentNotification", "OUTDATED");
-                      Minecraft.getMinecraft().thePlayer
-                          .addChatMessage(
-                              Utils.chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
-                    } else {
-                      currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
-                          .put("goodOrder", true);
+                      Minecraft.getMinecraft().thePlayer.addChatMessage(
+                          Utils.chatNotification(key, price, i, "Buy Order", "REVIVED"));
                     }
+                    currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
+                        .put("goodOrder", true);
                   }
+                } else {
+                  double diff = price - BazaarNotifier.bazaarDataRaw.getJSONObject(key)
+                      .getJSONArray("buy_summary")
+                      .getJSONObject(0)
+                      .getDouble("pricePerUnit");
+                  if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
+                      .getJSONObject(0).getInt("orders") != 1 && diff == 0 && !currentOrder
+                      .getBoolean("matchedOrder")) {
+                    currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
+                        .put("goodOrder", false)
+                        .put("currentNotification", "MATCHED");
+                    Minecraft.getMinecraft().thePlayer
+                        .addChatMessage(
+                            Utils.chatNotification(key, price, i, "Sell Offer", "MATCHED"));
+                  } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
+                    currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
+                        .put("goodOrder", false)
+                        .put("currentNotification", "OUTDATED");
+                    Minecraft.getMinecraft().thePlayer
+                        .addChatMessage(
+                            Utils.chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
+                  } else if (diff == 0
+                      && BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
+                      .getJSONObject(0).getInt("orders") == 1) {
+                    if (currentOrder.getBoolean("outdatedOrder") || currentOrder
+                        .getBoolean("matchedOrder")) {
+                      Minecraft.getMinecraft().thePlayer.addChatMessage(
+                          Utils.chatNotification(key, price, i, "Sell Offer", "REVIVED"));
+                    }
+                    currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
+                        .put("goodOrder", true);
+                  }
+                }
               }
             }
           }

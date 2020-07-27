@@ -2,6 +2,9 @@ package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
@@ -17,7 +20,7 @@ import org.json.JSONObject;
 
 public class ChestTickHandler {
 
-  String lastScreenDisplayName = "";
+  public static String lastScreenDisplayName = "";
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
 
   @SubscribeEvent
@@ -35,55 +38,59 @@ public class ChestTickHandler {
           } else if (chestName.equals("confirm buy order") || chestName
               .equals("confirm sell offer")) {
             orderConfirmation(chest);
-          } else if (chestName.equalsIgnoreCase("order options")) {
-            // trying to cancel buy order OR sell offer
           }
         }
       }
     }
   }
 
-  private void updateBazaarOrders(IInventory chest) {
+  public static void updateBazaarOrders(IInventory chest) {
     for (int i = 0; i < chest.getSizeInventory(); i++) {
       if (chest.getStackInSlot(i) != null
           && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 160    // Glass
           && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 262) { // Arrow
-        NBTTagList lore = chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
+        NBTTagList lorePreFilter = chest.getStackInSlot(i).getTagCompound().getCompoundTag("display")
             .getTagList("Lore", 8);
 
-        String displayName = chest.getStackInSlot(13).getDisplayName().split(": ")[1];
-        String type = chest.getStackInSlot(13).getDisplayName().split(": ")[0].toLowerCase();
+
+        List<String> lore = new ArrayList<>();
+
+        for (int j = 0; j < lorePreFilter.tagCount(); j++) {
+          lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(j)));
+        }
+
+        String displayName = StringUtils.stripControlCodes(chest.getStackInSlot(i).getDisplayName().split(": ")[1]);
+        String type = StringUtils.stripControlCodes(chest.getStackInSlot(i).getDisplayName().split(": ")[0].toLowerCase());
 
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
-          String product = BazaarNotifier.bazaarConversionsReversed.getString(displayName);
           int amountLeft = -1;
           double price = Double
               .parseDouble(
-                  lore.getStringTagAt((lore.getStringTagAt(3).startsWith("Filled:")) ? 5 : 4)
-                      .replaceAll(",", "").split(" ")[3]);
+                  StringUtils.stripControlCodes(lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4)
+                      .replaceAll(",", "").split(" ")[3]));
 
           int orderInQuestion = -1;
           for (int j = 0; j < BazaarNotifier.orders.length(); j++) {
             JSONObject order = BazaarNotifier.orders.getJSONObject(j);
-            if (Double.compare(order.getDouble("price"), price) == 0 && type
+            if (Double.compare(order.getDouble("pricePerUnit"), price) == 0 && type
                 .equals(order.getString("type"))) {
               orderInQuestion = j;
               break;
             }
           }
           if (orderInQuestion != -1) {
-            int totalAmount = BazaarNotifier.orders.getJSONObject(orderInQuestion).getInt("amountRemaining");
-            if (lore.getStringTagAt(3).startsWith("Filled:")) {
-              if (lore.getStringTagAt(3).split(" ")[2].equals("100%")) {
+            int totalAmount = BazaarNotifier.orders.getJSONObject(orderInQuestion).getInt("startAmount");
+            if (lore.get(3).startsWith("Filled:")) {
+              if (lore.get(3).split(" ")[2].equals("100%")) {
                 amountLeft = 0;
               } else {
                 int amountFulfilled = 0;
-                for (int j = 8; j < lore.tagCount(); j++) {
-                  if (lore.getStringTagAt(j).isEmpty()) {
+                for (int j = 8; j < lore.size(); j++) {
+                  if (lore.get(j).isEmpty()) {
                     break;
                   }
                   amountFulfilled += Integer.parseInt(
-                      lore.getStringTagAt(j).replaceAll(",", "").split("x ")[0].substring(2));
+                      lore.get(j).replaceAll(",", "").split("x ")[0].substring(2));
                 }
                 amountLeft = totalAmount - amountFulfilled;
               }
@@ -94,9 +101,8 @@ public class ChestTickHandler {
             }
           }
         } else {
-          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "One or more bazaar orders has an unknown item. Please report this in the discord server"));
+          System.out.println(BazaarNotifier.orders);
+          System.err.println("Some orders weren't found! Bad display name: " + displayName);
           return;
         }
       }
@@ -124,7 +130,7 @@ public class ChestTickHandler {
                 .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1];
         int amount = Integer.parseInt(StringUtils.stripControlCodes(
             chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
-                .getTagList("Lore", 8).getStringTagAt(4)).split("x ")[0].replaceAll(",", ""));
+                .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1].split("x ")[0].replaceAll(",", ""));
         EventHandler.productVerify[0] = productName;
         EventHandler.productVerify[1] = productWithAmount;
         EventHandler.verify = new JSONObject()

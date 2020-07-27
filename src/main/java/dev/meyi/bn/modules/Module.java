@@ -13,6 +13,7 @@ public abstract class Module {
   int x, y;
   int boundsX, boundsY;
   int padding = 3;
+  int shift = 0;
 
   boolean moving = false;
   boolean needsToMove = false;
@@ -33,6 +34,8 @@ public abstract class Module {
   protected abstract String name();
 
   protected abstract boolean shouldDrawBounds();
+
+  protected abstract int getMaxShift();
 
   public void handleMovement() {
     if (moving) {

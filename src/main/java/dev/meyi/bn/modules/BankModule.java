@@ -33,4 +33,9 @@ public class BankModule extends Module {
   protected boolean shouldDrawBounds() {
     return false;
   }
+
+  @Override
+  protected int getMaxShift() {
+    return 0;
+  }
 }

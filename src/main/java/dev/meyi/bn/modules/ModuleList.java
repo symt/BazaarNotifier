@@ -5,6 +5,7 @@ import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class ModuleList extends ArrayList<Module> {
@@ -82,6 +83,25 @@ public class ModuleList extends ArrayList<Module> {
         movingModule.moving = false;
       }
       movingModule = null;
+    }
+  }
+
+  public void pageFlipCheck() {
+    if (Mouse.isButtonDown(1) && !Mouse.isButtonDown(0)) {
+      for (Module m : this) {
+        if (m.inMovementBox() && m.getMaxShift() > 0) {
+          if (Keyboard.isKeyDown(17) && !Keyboard.isKeyDown(31)) {
+            if (m.shift != 0) {
+              m.shift--;
+            }
+          } else if (Keyboard.isKeyDown(31) && !Keyboard.isKeyDown(17)) {
+            if (m.shift != m.getMaxShift()) {
+              m.shift++;
+            }
+          }
+          break;
+        }
+      }
     }
   }
 

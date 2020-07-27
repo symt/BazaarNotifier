@@ -2,7 +2,9 @@ package dev.meyi.bn.utilities;
 
 import java.awt.Color;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
 public class ColorUtils {
@@ -23,5 +25,20 @@ public class ColorUtils {
       renderLength += renderer.getStringWidth(substring.getKey());
     }
     return renderLength;
+  }
+
+  public static int drawColorfulParagraph(List<LinkedHashMap<String, Color>> items, int x, int y) {
+    int longestXString = 0;
+    for (int i = 0; i < items.size(); i++) {
+      int length = ColorUtils
+          .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
+              x, y
+                  + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i,
+              items.get(i), false);
+      if (length > longestXString) {
+        longestXString = length;
+      }
+    }
+    return longestXString;
   }
 }
