@@ -92,7 +92,7 @@ public class ChestTickHandler {
                 for (int j = 8; j < lore.size(); j++) {
                   if (lore.get(j).isEmpty()) {
                     break;
-                  } else if (lore.get(j).contains("+")) {
+                  } else if (lore.get(j).startsWith(" + ") && lore.get(j).endsWith("others")) {
                     forceRemove = true;
                     break;
                   }
