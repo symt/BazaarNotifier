@@ -73,7 +73,7 @@ public class BazaarNotifier {
       e.printStackTrace();
     }
 
-    if (Utils.isValidJSONObject(config) && config != null) {
+    if (config != null && Utils.isValidJSONObject(config)) {
       modules = new ModuleList(
           new JSONObject(config));
     } else {
