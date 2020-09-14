@@ -57,66 +57,73 @@ const Bazaar = (discordClient, text) => {
   });
 
   schedule.scheduleJob("*/30 * * * * *", async function () {
-    if (client && !inRequest) {
-      inRequest = true;
-      let bazaarData = [];
-      let key = process.env.HYPIXEL_API_KEY;
-      await axios({
-        method: "GET",
-        url: `https://api.hypixel.net/skyblock/bazaar?key=${key}`,
-      })
-        .then((res) => {
-          let products = res.data.products;
-          let productIds = Object.keys(res.data.products);
-
-          productIds.forEach((id) => {
-            let product = products[id];
-            bazaarData.push({
-              productId: bazaarConversions[id],
-              sellOrderPrice:
-                product.buy_summary[0] && product.sell_summary[0]
-                  ? product.buy_summary[0].pricePerUnit
-                  : 0,
-              buyOrderPrice:
-                product.sell_summary[0] && product.buy_summary[0]
-                  ? product.sell_summary[0].pricePerUnit
-                  : 0,
-              sellCount: product.quick_status.buyMovingWeek,
-              buyCount: product.quick_status.sellMovingWeek,
-            });
-          });
+    try {
+      if (client && !inRequest) {
+        inRequest = true;
+        let bazaarData = [];
+        let key = process.env.HYPIXEL_API_KEY;
+        await axios({
+          method: "GET",
+          url: `https://api.hypixel.net/skyblock/bazaar?key=${key}`,
         })
-        .catch((e) => {
-          console.log(e);
+          .then((res) => {
+            let products = res.data.products;
+            let productIds = Object.keys(res.data.products);
+
+            productIds.forEach((id) => {
+              let product = products[id];
+              bazaarData.push({
+                productId: bazaarConversions[id],
+                sellOrderPrice:
+                  product.buy_summary[0] && product.sell_summary[0]
+                    ? product.buy_summary[0].pricePerUnit
+                    : 0,
+                buyOrderPrice:
+                  product.sell_summary[0] && product.buy_summary[0]
+                    ? product.sell_summary[0].pricePerUnit
+                    : 0,
+                sellCount: product.quick_status.buyMovingWeek,
+                buyCount: product.quick_status.sellMovingWeek,
+              });
+            });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+
+        bazaarData = performance(bazaarData);
+
+        bazaarData.forEach((data) => {
+          bazaarCache[data.productId.toLowerCase()] = data;
         });
 
-      bazaarData = performance(bazaarData);
+        bazaarData = bazaarData.slice(0, 16);
 
-      bazaarData.forEach((data) => {
-        bazaarCache[data.productId.toLowerCase()] = data;
-      });
-
-      bazaarData = bazaarData.slice(0, 16);
-
-      let fields = [];
-      let i = 1;
-      bazaarData.forEach((data) => {
-        fields.push({
-          name: `${i++}. ${data.productId}`,
-          value: `EP: ${Math.round(data.profitFlowPerMinute * 100) / 100}`,
-          inline: true,
+        let fields = [];
+        let i = 1;
+        bazaarData.forEach((data) => {
+          fields.push({
+            name: `${i++}. ${data.productId}`,
+            value: `EP: ${Math.round(data.profitFlowPerMinute * 100) / 100}`,
+            inline: true,
+          });
+          if (i % 2 == 0) {
+            fields.push({ name: "\u200B", value: "\u200B", inline: true });
+          }
         });
-        if (i % 2 == 0) {
-          fields.push({ name: "\u200B", value: "\u200B", inline: true });
-        }
-      });
-      let embed = new Discord.MessageEmbed()
-        .setTitle("Bazaar")
-        .setColor(Math.floor(Math.random() * 16777215))
-        .addFields(...fields)
-        .setFooter("EP is about how much money you'd make while flipping an item per minute of flipping. It assumes you miss no instants.");
-      client.channels.cache.get(channel).send(embed);
+        let embed = new Discord.MessageEmbed()
+          .setTitle("Bazaar")
+          .setColor(Math.floor(Math.random() * 16777215))
+          .addFields(...fields)
+          .setFooter(
+            "EP is about how much money you'd make while flipping an item per minute of flipping. It assumes you miss no instants."
+          );
+        client.channels.cache.get(channel).send(embed);
+        inRequest = false;
+      }
+    } catch (e) {
       inRequest = false;
+      console.log(e);
     }
   });
 };
