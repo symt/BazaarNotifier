@@ -65,12 +65,17 @@ public class ChestTickHandler {
 
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
-          double price = Double
-              .parseDouble(
-                  StringUtils
-                      .stripControlCodes(lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4)
-                          .replaceAll(",", "").split(" ")[3]));
-
+          double price;
+          if (lore.get(4).equalsIgnoreCase("Expired!")) {
+            price = Double.parseDouble(
+                StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "").split(" ")[3]);
+          } else {
+            price = Double
+                .parseDouble(
+                    StringUtils
+                        .stripControlCodes(lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4)
+                            .replaceAll(",", "").split(" ")[3]));
+          }
           int orderInQuestion = -1;
           for (int j = 0; j < BazaarNotifier.orders.length(); j++) {
             JSONObject order = BazaarNotifier.orders.getJSONObject(j);
