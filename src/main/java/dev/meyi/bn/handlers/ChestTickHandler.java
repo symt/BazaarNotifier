@@ -16,6 +16,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import org.json.JSONObject;
+import org.lwjgl.Sys;
+import scala.Console;
+import scala.collection.immutable.Stream;
 
 public class ChestTickHandler {
 
@@ -26,18 +29,26 @@ public class ChestTickHandler {
   public void onChestTick(TickEvent e) {
     if (e.phase == Phase.END) {
       if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar) {
+
         IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
-        if (chest.hasCustomName() && !lastScreenDisplayName
-            .equalsIgnoreCase(Utils.stripString(chest.getDisplayName().getUnformattedText()))) {
-          lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
-          String chestName = Utils.stripString(chest.getDisplayName().getUnformattedText())
-              .toLowerCase();
-          if (chestName.contains("bazaar orders")) {
-            updateBazaarOrders(chest);
-          } else if (chestName.equals("confirm buy order") || chestName
-              .equals("confirm sell offer")) {
+        String chestName = Utils.stripString(chest.getDisplayName().getUnformattedText().toLowerCase());
+
+        if (chest.hasCustomName() && !lastScreenDisplayName.equalsIgnoreCase(chestName)) {
+
+          if (chestName.equals("confirm buy order") ||
+                  chestName.equals("confirm sell offer")) {
+
+            if(chest.getStackInSlot(13) == null){
+              return;
+            }
             orderConfirmation(chest);
+
+          }else if(chestName.contains("bazaar orders")){
+            updateBazaarOrders(chest);
           }
+
+          lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
+
         }
       }
     }
@@ -127,28 +138,36 @@ public class ChestTickHandler {
   }
 
   private void orderConfirmation(IInventory chest) {
+
     if (chest.getStackInSlot(13) != null) {
+
       double price = Double.parseDouble(StringUtils.stripControlCodes(
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
               .getTagList("Lore", 8).getStringTagAt(2)).split(" ")[3].replaceAll(",", ""));
+
+
       String product = StringUtils.stripControlCodes(
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
               .getTagList("Lore", 8).getStringTagAt(4)).split("x ")[1];
+
       if (!BazaarNotifier.bazaarConversionsReversed
           .has(product)) {
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + EnumChatFormatting.RED
                 + "The bazaar item you just put an order for doesn't exist. Please report this in the discord server"));
+
       } else {
         String productName = BazaarNotifier.bazaarConversionsReversed
             .getString(product);
         String productWithAmount = StringUtils.stripControlCodes(
             chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
                 .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1];
+
         int amount = Integer.parseInt(StringUtils.stripControlCodes(
             chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
                 .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1].split("x ")[0]
             .replaceAll(",", ""));
+
         EventHandler.productVerify[0] = productName;
         EventHandler.productVerify[1] = productWithAmount;
         EventHandler.verify = new JSONObject()
