@@ -66,9 +66,12 @@ public class ChestTickHandler {
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
           double price;
-          if (lore.get(4).equalsIgnoreCase("Expired!")) {
+          if (lore.get(4).toLowerCase().contains("expire")) {
             price = Double.parseDouble(
                 StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "").split(" ")[3]);
+          } else if (lore.get(5).toLowerCase().contains("expire")) {
+            price = Double.parseDouble(
+                StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "").split(" ")[3]);
           } else {
             price = Double
                 .parseDouble(
