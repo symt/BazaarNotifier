@@ -230,5 +230,12 @@
   "Spooky Shard": "SPOOKY_SHARD",
   "Werewolf Skin": "WEREWOLF_SKIN",
   "Soul Fragment": "SOUL_FRAGMENT",
-  "Jacob's Ticket": "JACOBS_TICKET"
+  "Jacob's Ticket": "JACOBS_TICKET",
+  "Experience Bottle": "EXP_BOTTLE",
+  "Grand Experience Bottle": "GRAND_EXP_BOTTLE",
+  "Titanic Experience Bottle": "TITANIC_EXP_BOTTLE",
+  "Colossal Experience Bottle": "COLOSSAL_EXP_BOTTLE",
+  "Polished Pumpkin": "POLISHED_PUMPKIN",
+  "Tightly-Tied Hale Bale": "TIGHTLY_TIED_HAY_BALE",
+  "Mutant Nether Wart": "MUTANT_NETHER_STALK"
 }

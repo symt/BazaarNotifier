@@ -32,8 +32,12 @@ public class Utils {
 
   public static JSONObject getBazaarData() throws IOException {
     HttpClient client = HttpClientBuilder.create().build();
+    String apiBit = "";
+    if (!BazaarNotifier.apiKeyDisabled) {
+      apiBit = "?key=" + BazaarNotifier.apiKey;
+    }
     HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar?key=" + BazaarNotifier.apiKey);
+        "https://api.hypixel.net/skyblock/bazaar" + apiBit);
     HttpResponse response = client.execute(request);
 
     String result = IOUtils.toString(new BufferedReader

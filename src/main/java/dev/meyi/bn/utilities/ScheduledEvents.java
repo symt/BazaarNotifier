@@ -33,7 +33,7 @@ public class ScheduledEvents {
       if (!inOutdatedRequest) {
         inOutdatedRequest = true;
         try {
-          if (BazaarNotifier.activeBazaar && BazaarNotifier.validApiKey) {
+          if (BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled)) {
             BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
             if (BazaarNotifier.orders.length() > 0) {
               for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
