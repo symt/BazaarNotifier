@@ -35,15 +35,17 @@ public class ChestTickHandler {
           if (chestName.equals("confirm buy order") ||
               chestName.equals("confirm sell offer")) {
 
-            if (chest.getStackInSlot(13) == null) {
-              return;
+            if (chest.getStackInSlot(13) != null) {
+              lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
+              orderConfirmation(chest);
             }
-            lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
-            orderConfirmation(chest);
 
           } else if (chestName.contains("bazaar orders")) {
-            lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
-            updateBazaarOrders(chest);
+            if (chest.getStackInSlot(chest.getSizeInventory()-5) != null
+                && Item.itemRegistry.getIDForObject(chest.getStackInSlot(chest.getSizeInventory()-5).getItem()) == 262) {
+              lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
+              updateBazaarOrders(chest);
+            }
           }
         }
       }
