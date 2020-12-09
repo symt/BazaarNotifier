@@ -9,7 +9,7 @@ public class Suggester {
 
   public static void basic() {
     try {
-      if (BazaarNotifier.validApiKey) {
+      if (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled) {
         JSONObject bazaarData = BazaarNotifier.bazaarDataRaw;
         Iterator<String> bazaarKeys = bazaarData.keys();
         JSONArray bazaarDataFormatted = new JSONArray();

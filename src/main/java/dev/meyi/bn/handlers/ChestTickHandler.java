@@ -16,9 +16,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import org.json.JSONObject;
-import org.lwjgl.Sys;
-import scala.Console;
-import scala.collection.immutable.Stream;
 
 public class ChestTickHandler {
 
@@ -31,24 +28,23 @@ public class ChestTickHandler {
       if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar) {
 
         IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
-        String chestName = Utils.stripString(chest.getDisplayName().getUnformattedText().toLowerCase());
+        String chestName = Utils
+            .stripString(chest.getDisplayName().getUnformattedText().toLowerCase());
 
         if (chest.hasCustomName() && !lastScreenDisplayName.equalsIgnoreCase(chestName)) {
-
           if (chestName.equals("confirm buy order") ||
-                  chestName.equals("confirm sell offer")) {
+              chestName.equals("confirm sell offer")) {
 
-            if(chest.getStackInSlot(13) == null){
+            if (chest.getStackInSlot(13) == null) {
               return;
             }
+            lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
             orderConfirmation(chest);
 
-          }else if(chestName.contains("bazaar orders")){
+          } else if (chestName.contains("bazaar orders")) {
+            lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
             updateBazaarOrders(chest);
           }
-
-          lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
-
         }
       }
     }
@@ -58,6 +54,7 @@ public class ChestTickHandler {
     for (int i = 0; i < chest.getSizeInventory(); i++) {
       if (chest.getStackInSlot(i) != null
           && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 160    // Glass
+          && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 102    // Glass
           && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 262) { // Arrow
         NBTTagList lorePreFilter = chest.getStackInSlot(i).getTagCompound()
             .getCompoundTag("display")
@@ -147,7 +144,6 @@ public class ChestTickHandler {
       double price = Double.parseDouble(StringUtils.stripControlCodes(
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
               .getTagList("Lore", 8).getStringTagAt(2)).split(" ")[3].replaceAll(",", ""));
-
 
       String product = StringUtils.stripControlCodes(
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")

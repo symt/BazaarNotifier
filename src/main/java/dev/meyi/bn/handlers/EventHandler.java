@@ -105,7 +105,7 @@ public class EventHandler {
 
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
-    if (e.gui instanceof GuiChest && BazaarNotifier.validApiKey
+    if (e.gui instanceof GuiChest && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled)
         && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() && (Utils
         .stripString(((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
         .startsWith("Bazaar") || Utils

@@ -28,7 +28,7 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.3.4";
+  public static final String VERSION = "1.3.5";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
@@ -40,6 +40,7 @@ public class BazaarNotifier {
   public static boolean inBazaar = false;
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
+  public static boolean apiKeyDisabled = true; // Change this if an api key is ever required to access the bazaar again.
 
   public static JSONArray orders = new JSONArray();
   public static JSONObject bazaarDataRaw = new JSONObject();
@@ -57,7 +58,7 @@ public class BazaarNotifier {
 
   public static void resetMod() {
     modules.resetAll();
-    orders = Defaults.DEFAULT_ORDERS_LAYOUT;
+    orders = Defaults.DEFAULT_ORDERS_LAYOUT();
   }
 
   @Mod.EventHandler

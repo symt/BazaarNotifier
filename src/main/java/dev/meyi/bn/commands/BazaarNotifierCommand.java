@@ -1,6 +1,7 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class BazaarNotifierCommand extends CommandBase {
     if (ics instanceof EntityPlayer) {
       EntityPlayer player = (EntityPlayer) ics;
       if (args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
-        if (!BazaarNotifier.apiKey.equals("")) {
+        if (!BazaarNotifier.apiKey.equals("") || BazaarNotifier.apiKeyDisabled) {
           BazaarNotifier.orders = new JSONArray();
           BazaarNotifier.activeBazaar ^= true;
           player.addChatMessage(new ChatComponentText(
@@ -59,6 +60,7 @@ public class BazaarNotifierCommand extends CommandBase {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
+              BazaarNotifier.apiKey = "";
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
             } else {
@@ -84,10 +86,16 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("reset")) {
-        BazaarNotifier.resetMod();
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-            + "All module locations have been reset and the order list has been emptied"));
+      } else if (args.length >= 1 && args[0].equalsIgnoreCase("reset")) {
+        if (args.length == 1) {
+          BazaarNotifier.resetMod();
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+              + "All module locations have been reset and the order list has been emptied"));
+        } else if (args.length == 2 && args[1].equalsIgnoreCase("orders")){
+          BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+              + "Your orders have been cleared"));
+        }
       } else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
         if (args.length == 1) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -125,7 +133,7 @@ public class BazaarNotifierCommand extends CommandBase {
             + "The command you just tried to do doesn't exist. Do /bn"));
       } else {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
-            EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset\n"
+            EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
             + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
             + EnumChatFormatting.RED + "/bn find (item)\n"
             + BazaarNotifier.prefix

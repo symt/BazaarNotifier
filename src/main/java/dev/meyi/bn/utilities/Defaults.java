@@ -10,5 +10,7 @@ public class Defaults {
   public static final int BANK_MODULE_Y = 10;
   public static final int NOTIFICATION_MODULE_X = 5;
   public static final int NOTIFICATION_MODULE_Y = 10;
-  public static final JSONArray DEFAULT_ORDERS_LAYOUT = new JSONArray();
+  public static JSONArray DEFAULT_ORDERS_LAYOUT() {
+    return new JSONArray();
+  }
 }
