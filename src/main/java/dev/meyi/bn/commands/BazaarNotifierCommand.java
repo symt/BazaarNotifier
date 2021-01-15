@@ -9,6 +9,8 @@ import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.ClickEvent.Action;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.text.WordUtils;
@@ -91,7 +93,7 @@ public class BazaarNotifierCommand extends CommandBase {
           BazaarNotifier.resetMod();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "All module locations have been reset and the order list has been emptied"));
-        } else if (args.length == 2 && args[1].equalsIgnoreCase("orders")){
+        } else if (args.length == 2 && args[1].equalsIgnoreCase("orders")) {
           BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared"));
@@ -117,6 +119,10 @@ public class BazaarNotifierCommand extends CommandBase {
                 BazaarNotifier.df.format(data.getDouble("profitFlowPerMinute")) + "\n"
                 + BazaarNotifier.prefix
             ));
+          } else if (BazaarNotifier.bazaarCache.length() == 0) {
+            player.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "Please wait a moment for the mod to get bazaar information"));
           } else {
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -128,6 +134,28 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "This command is intended for testing purposes only, use it at your own peril. Forced rendering has been turned "
             + EnumChatFormatting.DARK_RED + (BazaarNotifier.forceRender ? "on" : "off")));
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
+        ChatComponentText discordLink = new ChatComponentText(
+            EnumChatFormatting.DARK_GREEN + "" + EnumChatFormatting.BOLD
+                + "[DISCORD LINK]");
+        discordLink
+            .setChatStyle(discordLink.getChatStyle().setChatClickEvent(new ClickEvent(
+                Action.OPEN_URL,
+                "https://discord.com/invite/wjpJSVSwvD")));
+        ChatComponentText supportLink = new ChatComponentText(
+            EnumChatFormatting.DARK_GREEN + "" + EnumChatFormatting.BOLD
+                + "[DISCORD LINK]");
+        supportLink
+            .setChatStyle(supportLink.getChatStyle().setChatClickEvent(new ClickEvent(
+                Action.OPEN_URL,
+                "https://patreon.com/meyi")));
+
+        player.addChatMessage(new ChatComponentText(
+            BazaarNotifier.prefix + "\n" + EnumChatFormatting.GREEN + "Join the discord server: ")
+            .appendSibling(discordLink).appendSibling(
+                new ChatComponentText("\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
+                    .appendSibling(supportLink))
+            .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
       } else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
@@ -135,7 +163,7 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
             EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
             + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
-            + EnumChatFormatting.RED + "/bn find (item)\n"
+            + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED + "/bn discord"
             + BazaarNotifier.prefix
         ));
       }

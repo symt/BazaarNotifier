@@ -3,6 +3,7 @@ package dev.meyi.bn.handlers;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -53,6 +54,7 @@ public class ChestTickHandler {
   }
 
   public static void updateBazaarOrders(IInventory chest) {
+    int[] verifiedOrders = new int[BazaarNotifier.orders.length()];
     for (int i = 0; i < chest.getSizeInventory(); i++) {
       if (chest.getStackInSlot(i) != null
           && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 160    // Glass
@@ -99,6 +101,7 @@ public class ChestTickHandler {
             }
           }
           if (orderInQuestion != -1) {
+            verifiedOrders[orderInQuestion] = 1;
             boolean forceRemove = false;
             int totalAmount = BazaarNotifier.orders.getJSONObject(orderInQuestion)
                 .getInt("startAmount");
@@ -135,6 +138,12 @@ public class ChestTickHandler {
           System.err.println("Some orders weren't found! Bad display name: " + displayName);
           return;
         }
+      }
+    }
+
+    for (int i = verifiedOrders.length - 1; i >= 0; i--) {
+      if (verifiedOrders[i] == 0) {
+        BazaarNotifier.orders.remove(i);
       }
     }
   }
