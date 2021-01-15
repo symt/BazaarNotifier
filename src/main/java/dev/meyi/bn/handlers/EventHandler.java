@@ -5,12 +5,15 @@ import dev.meyi.bn.utilities.Utils;
 import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.json.JSONObject;
 
 public class EventHandler {
@@ -63,7 +66,16 @@ public class EventHandler {
         }
       }
       if (found) {
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+            BazaarNotifier.prefix + EnumChatFormatting.GREEN + "An order was filled!"));
+        e.setCanceled(true);
         BazaarNotifier.orders.remove(orderToRemove);
+      } else {
+        /*
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+            BazaarNotifier.prefix + EnumChatFormatting.RED
+                + "For some reason, you have an order that didn't successfully delete when filled! This message might be bugged. If all your orders are fine, ignore this message."));
+      */
       }
     } else if (message.startsWith("Cancelled!")) {
       double refund = 0;
@@ -122,6 +134,11 @@ public class EventHandler {
     if (e.gui == null && BazaarNotifier.inBazaar) {
       BazaarNotifier.inBazaar = false;
     }
+  }
+
+  @SubscribeEvent
+  public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
+    BazaarNotifier.inBazaar = false;
   }
 
   @SubscribeEvent

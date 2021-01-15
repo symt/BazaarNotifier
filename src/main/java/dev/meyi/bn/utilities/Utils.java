@@ -164,9 +164,9 @@ public class Utils {
   public static ChatComponentText chatNotification(String key, double price, int i, String type,
       String notification) {
     EnumChatFormatting messageColor =
-        (type.equalsIgnoreCase("Buy Order")) ? EnumChatFormatting.DARK_PURPLE
-            : notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
-                : EnumChatFormatting.BLUE;
+        (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
+            : type.equalsIgnoreCase("Buy Order") ? EnumChatFormatting.DARK_PURPLE
+                : EnumChatFormatting.BLUE);
     return new ChatComponentText(
         messageColor + type
             + EnumChatFormatting.GRAY + " for "

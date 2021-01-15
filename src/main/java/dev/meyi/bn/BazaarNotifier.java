@@ -28,9 +28,9 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.3.5";
+  public static final String VERSION = "1.3.6";
   public static final String prefix =
-      EnumChatFormatting.GOLD + "[BazaarNotifier] " + EnumChatFormatting.RESET;
+      EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
   public static DecimalFormat df = new DecimalFormat("#,###.0");

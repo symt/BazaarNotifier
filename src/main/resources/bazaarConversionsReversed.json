@@ -108,7 +108,7 @@
   "Enchanted Egg": "ENCHANTED_EGG",
   "Quartz": "QUARTZ",
   "Raw Beef": "RAW_BEEF",
-  "Enchanted Eye Of Ender": "ENCHANTED_EYE_OF_ENDER",
+  "Enchanted Eye of Ender": "ENCHANTED_EYE_OF_ENDER",
   "Sand": "SAND",
   "Raw Chicken": "RAW_CHICKEN",
   "Magma Cream": "MAGMA_CREAM",
@@ -237,5 +237,11 @@
   "Colossal Experience Bottle": "COLOSSAL_EXP_BOTTLE",
   "Polished Pumpkin": "POLISHED_PUMPKIN",
   "Tightly-Tied Hale Bale": "TIGHTLY_TIED_HAY_BALE",
-  "Mutant Nether Wart": "MUTANT_NETHER_STALK"
+  "Mutant Nether Wart": "MUTANT_NETHER_STALK",
+  "Refined Mithril": "REFINED_MITHRIL",
+  "Starfall": "STARFALL",
+  "Refined Titanium": "REFINED_TITANIUM",
+  "Refined Diamond": "REFINED_DIAMOND",
+  "Titanium Ore": "TITANIUM_ORE",
+  "Mithril Ore": "MITHRIL_ORE"
 }
