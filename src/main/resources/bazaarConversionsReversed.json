@@ -242,6 +242,10 @@
   "Starfall": "STARFALL",
   "Refined Titanium": "REFINED_TITANIUM",
   "Refined Diamond": "REFINED_DIAMOND",
-  "Titanium Ore": "TITANIUM_ORE",
-  "Mithril Ore": "MITHRIL_ORE"
+  "Titanium": "TITANIUM_ORE",
+  "Mithril": "MITHRIL_ORE",
+  "Green Jerry Box": "JERRY_BOX_GREEN",
+  "Blue Jerry Box": "JERRY_BOX_BLUE",
+  "Purple Jerry Box": "JERRY_BOX_PURPLE",
+  "Golden Jerry Box": "JERRY_BOX_GOLDEN"
 }
