@@ -240,9 +240,13 @@
   "TIGHTLY_TIED_HAY_BALE": "Tightly-Tied Hale Bale",
   "MUTANT_NETHER_STALK": "Mutant Nether Wart",
   "REFINED_MITHRIL": "Refined Mithril",
-  "TITANIUM_ORE": "Titanium Ore",
-  "MITHRIL_ORE": "Mithril Ore",
+  "TITANIUM_ORE": "Titanium",
+  "MITHRIL_ORE": "Mithril",
   "STARFALL": "Starfall",
   "REFINED_TITANIUM": "Refined Titanium",
-  "REFINED_DIAMOND": "Refined Diamond"
+  "REFINED_DIAMOND": "Refined Diamond",
+  "JERRY_BOX_GOLDEN": "Golden Jerry Box",
+  "JERRY_BOX_PURPLE": "Purple Jerry Box",
+  "JERRY_BOX_BLUE": "Blue Jerry Box",
+  "JERRY_BOX_GREEN": "Green Jerry Box"
 }
