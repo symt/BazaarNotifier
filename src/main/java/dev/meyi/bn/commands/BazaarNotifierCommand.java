@@ -144,7 +144,7 @@ public class BazaarNotifierCommand extends CommandBase {
                 "https://discord.com/invite/wjpJSVSwvD")));
         ChatComponentText supportLink = new ChatComponentText(
             EnumChatFormatting.DARK_GREEN + "" + EnumChatFormatting.BOLD
-                + "[PATREON LINK]");
+                + "[DISCORD LINK]");
         supportLink
             .setChatStyle(supportLink.getChatStyle().setChatClickEvent(new ClickEvent(
                 Action.OPEN_URL,

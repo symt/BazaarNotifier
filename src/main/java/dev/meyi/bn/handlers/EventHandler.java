@@ -66,9 +66,9 @@ public class EventHandler {
         }
       }
       if (found) {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.GREEN + "An order was filled!"));
-        e.setCanceled(true);
+        // Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+        //    BazaarNotifier.prefix + EnumChatFormatting.GREEN + "An order was filled!"));
+        // e.setCanceled(true);
         BazaarNotifier.orders.remove(orderToRemove);
       } else {
         /*
