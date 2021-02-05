@@ -28,15 +28,15 @@ public class EventHandler {
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConversionsReversed
-              .getString(message.split("x ")[1].split(" for ")[0])) && productVerify[1]
+              .getString(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.put(verify);
         verify = null;
         productVerify = new String[2];
       }
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
-      String item = message.split("x ")[1].split(" was ")[0];
-      int amount = Integer.parseInt(message.split(" for ")[1].split("x ")[0].replaceAll(",", ""));
+      String item = message.split("x ", 2)[1].split(" was ")[0];
+      int amount = Integer.parseInt(message.split(" for ")[1].split("x ", 2)[0].replaceAll(",", ""));
       int orderToRemove = 0;
       boolean found = false;
       double edgePrice;
@@ -89,8 +89,8 @@ public class EventHandler {
         }
       } else if (message.endsWith("sell offer!")) {
         refundAmount = Integer
-            .parseInt(message.split("Refunded ")[1].split("x ")[0].replaceAll(",", ""));
-        itemRefunded = message.split("x ")[1].split(" from")[0];
+            .parseInt(message.split("Refunded ")[1].split("x ", 2)[0].replaceAll(",", ""));
+        itemRefunded = message.split("x ", 2)[1].split(" from")[0];
       }
       for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
         JSONObject order = BazaarNotifier.orders.getJSONObject(i);
