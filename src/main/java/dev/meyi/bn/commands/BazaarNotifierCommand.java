@@ -47,8 +47,10 @@ public class BazaarNotifierCommand extends CommandBase {
           BazaarNotifier.orders = new JSONArray();
           BazaarNotifier.activeBazaar ^= true;
           player.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED + "The mod has been toggled "
-                  + EnumChatFormatting.DARK_RED + (BazaarNotifier.activeBazaar ? "on" : "off")));
+              BazaarNotifier.prefix + (BazaarNotifier.activeBazaar ? EnumChatFormatting.GREEN
+                  : EnumChatFormatting.RED) + "The mod has been toggled " + (
+                  BazaarNotifier.activeBazaar ? EnumChatFormatting.DARK_GREEN + "on"
+                      : EnumChatFormatting.DARK_RED + "off")));
         } else {
           player.addChatMessage(new ChatComponentText(
               BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -163,7 +165,7 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
             EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
             + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
-            + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED + "/bn discord"
+            + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED + "/bn discord\n"
             + BazaarNotifier.prefix
         ));
       }

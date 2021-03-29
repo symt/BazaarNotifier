@@ -49,6 +49,8 @@ public class ChestTickHandler {
             }
           }
         }
+      } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
+        ChestTickHandler.lastScreenDisplayName = "";
       }
     }
   }
