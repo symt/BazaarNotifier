@@ -26,7 +26,7 @@ public class ChestTickHandler {
   @SubscribeEvent
   public void onChestTick(TickEvent e) {
     if (e.phase == Phase.END) {
-      if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar) {
+      if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
 
         IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
         String chestName = Utils

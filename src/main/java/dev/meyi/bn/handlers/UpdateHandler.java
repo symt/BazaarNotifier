@@ -39,12 +39,15 @@ public class UpdateHandler {
 
           if (latestTag.length == 3 && currentTag.length == 3) {
             for (int i = 0; i < latestTag.length; i++) {
-              if (latestTag[i].compareTo(currentTag[i]) != 0) {
-                if (latestTag[i].compareTo(currentTag[i]) <= -1) {
+              int latestCheck = Integer.parseInt(latestTag[i]);
+              int currentCheck = Integer.parseInt(currentTag[i]);
+
+              if (latestCheck != currentCheck) {
+                if (latestCheck < currentCheck) {
                   Minecraft.getMinecraft().thePlayer.addChatMessage(
                       new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                           + "This version hasn't been released yet. Please report any bugs that you come across."));
-                } else if (latestTag[i].compareTo(currentTag[i]) >= 1) {
+                } else {
                   ChatComponentText updateLink = new ChatComponentText(
                       EnumChatFormatting.DARK_RED + "" + EnumChatFormatting.BOLD
                           + "[UPDATE LINK]");
