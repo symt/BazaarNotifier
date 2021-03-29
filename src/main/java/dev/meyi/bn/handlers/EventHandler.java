@@ -23,6 +23,9 @@ public class EventHandler {
 
   @SubscribeEvent
   public void bazaarChatHandler(ClientChatReceivedEvent e) {
+    if (!BazaarNotifier.activeBazaar) {
+      return;
+    }
     String message = Utils
         .stripString(StringUtils.stripControlCodes(e.message.getUnformattedText()));
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
@@ -71,6 +74,7 @@ public class EventHandler {
         // e.setCanceled(true);
         BazaarNotifier.orders.remove(orderToRemove);
       } else {
+        System.err.println("There is some error in removing your order from the list!!!");
         /*
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -143,15 +147,17 @@ public class EventHandler {
 
   @SubscribeEvent
   public void renderBazaarEvent(BackgroundDrawnEvent e) {
-    if (BazaarNotifier.inBazaar) {
+    if (BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
       BazaarNotifier.modules.drawAllModules();
     }
   }
 
   @SubscribeEvent
   public void renderOutlines(RenderGameOverlayEvent.Post e) {
-    if (BazaarNotifier.inBazaar) {
+    if (BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
       BazaarNotifier.modules.drawAllOutlines();
     }
   }
+
+  // TODO: Look for fix to old animations?
 }
