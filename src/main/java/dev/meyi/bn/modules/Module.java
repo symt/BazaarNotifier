@@ -51,7 +51,7 @@ public abstract class Module {
 
   public void drawBounds() {
     if (shouldDrawBounds()) {
-      Gui.drawRect(x - padding, y - padding, boundsX + padding, boundsY + padding, 0x66FFFFFF);
+      Gui.drawRect(x - padding, y - padding, boundsX + padding, boundsY + padding, 0x66000000);
     }
   }
 
