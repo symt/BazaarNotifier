@@ -66,7 +66,7 @@
   "Enchanted Bone": "ENCHANTED_BONE",
   "Enchanted Paper": "ENCHANTED_PAPER",
   "Enchanted Red Mushroom Block": "ENCHANTED_HUGE_MUSHROOM_2",
-  "Pork": "PORK",
+  "Raw Porkchop": "PORK",
   "Enchanted Diamond Block": "ENCHANTED_DIAMOND_BLOCK",
   "Emerald": "EMERALD",
   "Enchanted Rabbit Foot": "ENCHANTED_RABBIT_FOOT",
@@ -159,7 +159,7 @@
   "Revenant Flesh": "REVENANT_FLESH",
   "Enchanted Pork": "ENCHANTED_PORK",
   "Enchanted Glowstone": "ENCHANTED_GLOWSTONE",
-  "Enchanted Rabbit": "ENCHANTED_RABBIT",
+  "Enchanted Raw Rabbit": "ENCHANTED_RABBIT",
   "Enchanted Bread": "ENCHANTED_BREAD",
   "Feather": "FEATHER",
   "Enchanted Charcoal": "ENCHANTED_CHARCOAL",
@@ -249,5 +249,11 @@
   "Purple Jerry Box": "JERRY_BOX_PURPLE",
   "Golden Jerry Box": "JERRY_BOX_GOLDEN",
   "Enchanted Titanium": "ENCHANTED_TITANIUM",
-  "Enchanted Mithril": "ENCHANTED_MITHRIL"
+  "Enchanted Mithril": "ENCHANTED_MITHRIL",
+  "Magma Bucket": "MAGMA_BUCKET",
+  "Plasma Bucket": "PLASMA_BUCKET",
+  "Dwarven Super Compactor": "DWARVEN_COMPACTOR",
+  "Power Crystal": "POWER_CRYSTAL",
+  "Treasurite": "TREASURITE",
+  "Enchanted Netherrack": "ENCHANTED_NETHERRACK"
 }

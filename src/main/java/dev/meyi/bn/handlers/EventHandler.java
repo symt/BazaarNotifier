@@ -5,8 +5,6 @@ import dev.meyi.bn.utilities.Utils;
 import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -15,6 +13,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.json.JSONObject;
+import org.lwjgl.opengl.GL11;
 
 public class EventHandler {
 
@@ -39,7 +38,8 @@ public class EventHandler {
       }
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
       String item = message.split("x ", 2)[1].split(" was ")[0];
-      int amount = Integer.parseInt(message.split(" for ")[1].split("x ", 2)[0].replaceAll(",", ""));
+      int amount = Integer
+          .parseInt(message.split(" for ")[1].split("x ", 2)[0].replaceAll(",", ""));
       int orderToRemove = 0;
       boolean found = false;
       double edgePrice;
@@ -148,14 +148,10 @@ public class EventHandler {
   @SubscribeEvent
   public void renderBazaarEvent(BackgroundDrawnEvent e) {
     if (BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
-      BazaarNotifier.modules.drawAllModules();
-    }
-  }
-
-  @SubscribeEvent
-  public void renderOutlines(RenderGameOverlayEvent.Post e) {
-    if (BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
+      GL11.glTranslated(0, 0, 1);
       BazaarNotifier.modules.drawAllOutlines();
+      BazaarNotifier.modules.drawAllModules();
+      GL11.glTranslated(0, 0, -1);
     }
   }
 

@@ -3,7 +3,7 @@ buildscript {
         jcenter()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://maven.minecraftforge.net/"
         }
     }
     dependencies {
@@ -21,7 +21,7 @@ compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 }
-version = "1.4.0"
+version = "1.4.1"
 group = "dev.meyi.bn"
 archivesBaseName = "BazaarNotifier"
 

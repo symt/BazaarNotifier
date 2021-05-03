@@ -28,7 +28,7 @@ public class SuggestionModule extends Module {
 
       for (int i = shift; i < 10 + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
-        message.put((i + 1) + ". ", Color.BLUE);
+        message.put((i + 1) + ". ", Color.MAGENTA);
         message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
             Color.CYAN);
         message.put(" - ", Color.GRAY);
