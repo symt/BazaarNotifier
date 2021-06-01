@@ -134,7 +134,7 @@
   "Enchanted Grilled Pork": "ENCHANTED_GRILLED_PORK",
   "Gunpowder": "SULPHUR",
   "Nether Wart": "NETHER_STALK",
-  "Rabbit": "RABBIT",
+  "Raw Rabbit": "RABBIT",
   "Enchanted Nether Wart": "ENCHANTED_NETHER_STALK",
   "Enchanted Redstone Block": "ENCHANTED_REDSTONE_BLOCK",
   "Enchanted Quartz Block": "ENCHANTED_QUARTZ_BLOCK",
@@ -236,7 +236,7 @@
   "Titanic Experience Bottle": "TITANIC_EXP_BOTTLE",
   "Colossal Experience Bottle": "COLOSSAL_EXP_BOTTLE",
   "Polished Pumpkin": "POLISHED_PUMPKIN",
-  "Tightly-Tied Hale Bale": "TIGHTLY_TIED_HAY_BALE",
+  "Tightly-Tied Hay Bale": "TIGHTLY_TIED_HAY_BALE",
   "Mutant Nether Wart": "MUTANT_NETHER_STALK",
   "Refined Mithril": "REFINED_MITHRIL",
   "Starfall": "STARFALL",
@@ -255,5 +255,11 @@
   "Dwarven Super Compactor": "DWARVEN_COMPACTOR",
   "Power Crystal": "POWER_CRYSTAL",
   "Treasurite": "TREASURITE",
-  "Enchanted Netherrack": "ENCHANTED_NETHERRACK"
+  "Enchanted Netherrack": "ENCHANTED_NETHERRACK",
+  "Null Sphere":  "NULL_SPHERE",
+  "Null Ovoid": "NULL_OVOID",
+  "Null Atom": "NULL_ATOM",
+  "Raw Soulflow": "RAW_SOULFLOW",
+  "Soulflow": "SOULFLOW",
+  "Absolute Ender Pearl": "ABSOLUTE_ENDER_PEARL"
 }
