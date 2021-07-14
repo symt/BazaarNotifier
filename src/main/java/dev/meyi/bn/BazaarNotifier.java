@@ -28,7 +28,7 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.4.2";
+  public static final String VERSION = "1.4.3";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
