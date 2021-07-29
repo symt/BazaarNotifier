@@ -1,7 +1,7 @@
 const schedule = require("node-schedule");
 const Discord = require("discord.js");
 const axios = require("axios").default;
-const bazaarConversions = require("./bazaar_conversions.json");
+const bazaarConversions = require("./bazaarConversions.json");
 const performance = require("./performance.js");
 
 const toTitleCase = (phrase) => {
@@ -73,7 +73,7 @@ const Bazaar = (discordClient, text) => {
             productIds.forEach((id) => {
               let product = products[id];
               bazaarData.push({
-                productId: bazaarConversions[id],
+                productId: bazaarConversions[id] || id,
                 sellOrderPrice:
                   product.buy_summary[0] && product.sell_summary[0]
                     ? product.buy_summary[0].pricePerUnit
