@@ -115,9 +115,9 @@ public class EnchantedCraftingHandler {
                 double ProfitPerMilC = 1000000 / (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
                 double ProfitPerMil = ProfitPerMilC * BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
 
-                values[0] = String.valueOf(Price1);
-                values[1] = String.valueOf(Price2);
-                values[2] = String.valueOf(ProfitPerMil);
+                values[0] = BazaarNotifier.df.format(Price1);
+                values[1] = BazaarNotifier.df.format(Price2);
+                values[2] = BazaarNotifier.df.format(ProfitPerMil);
 
             } else if (BazaarNotifier.enchantCraftingList.getJSONObject("Other").has(ItemName)) {
                 double ItemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit");
@@ -139,9 +139,9 @@ public class EnchantedCraftingHandler {
                 double Price2 = ItemBuyPrice - P;
                 Double CountPerMil = 1000000 / P;
                 double ProfitPerMil = CountPerMil * Price1;
-                values[0] = String.valueOf(Price1);
-                values[1] = String.valueOf(Price2);
-                values[2] = String.valueOf(ProfitPerMil);
+                values[0] = BazaarNotifier.df.format(Price1);
+                values[1] = BazaarNotifier.df.format(Price2);
+                values[2] = BazaarNotifier.df.format(ProfitPerMil);
             }
         }catch (Exception e){
                 values[0] = "0";
