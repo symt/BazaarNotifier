@@ -55,7 +55,7 @@ public class CraftingModule extends Module{
                     message.put("  /   ", Color.GRAY);
                     message.put(BazaarNotifier.df.format(__Price2), getColor(__Price2.intValue()));
                     message.put(" ", Color.BLACK);
-                    message.put(BazaarNotifier.df.format(PricePerMil), Color.PINK);
+                    message.put(BazaarNotifier.df.format(PricePerMil), getColor(PricePerMil.intValue()));
 
 
 
