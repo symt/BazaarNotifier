@@ -11,8 +11,10 @@ import org.lwjgl.opengl.GL11;
 
 public abstract class Module {
 
+
   int lastMouseX, lastMouseY;
-  int x, y;
+  protected int x;
+  protected int y;
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
@@ -68,12 +70,13 @@ public abstract class Module {
     return config;
   }
 
-  private int getMouseCoordinateX() {
+  protected int getMouseCoordinateX() {
     return Mouse.getX() / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
   }
 
-  private int getMouseCoordinateY() {
+  protected int getMouseCoordinateY() {
     return (Display.getHeight() - Mouse.getY()) / new ScaledResolution(Minecraft.getMinecraft())
         .getScaleFactor();
   }
+
 }

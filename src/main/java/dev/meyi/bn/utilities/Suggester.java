@@ -68,4 +68,15 @@ public class Suggester {
       e.printStackTrace();
     }
   }
+
+  public static String setSuggestionLength(int Length){
+    if(Length >= BazaarNotifier.bazaarDataRaw.length()-1){
+      return "Error Number to high" + String.valueOf(Length);
+    }else{
+      BazaarNotifier.config.put("FlippingListLength" , Length);
+      return "Seting CraftingListLength to " + String.valueOf(Length);
+    }
+  }
+
+
 }

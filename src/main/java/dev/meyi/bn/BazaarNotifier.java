@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.Objects;
+
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -47,10 +49,16 @@ public class BazaarNotifier {
   public static JSONObject bazaarCache = new JSONObject();
   public static JSONArray bazaarDataFormatted = new JSONArray();
 
+
   public static JSONObject bazaarConversions = new JSONObject(
-      new JSONTokener(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json")));
+      new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json"))));
   public static JSONObject bazaarConversionsReversed = new JSONObject(
-      new JSONTokener(BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json")));
+      new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json"))));
+  public static JSONObject config = new JSONObject(
+          new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/config.json"))));
+  public static JSONObject enchantCraftingList = new JSONObject(
+          new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/enchantCraftingList.json"))));
+
 
   public static File configFile;
 

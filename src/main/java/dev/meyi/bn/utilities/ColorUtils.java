@@ -6,8 +6,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
 
-public class ColorUtils {
+public class ColorUtils extends GuiScreen {
+
+  public ColorUtils() {
+    super();
+  }
+
+
 
   /**
    * @param renderer Minecraft's renderer
@@ -39,7 +46,13 @@ public class ColorUtils {
       if (length > longestXString) {
         longestXString = length;
       }
+
+
+
     }
     return longestXString;
   }
+
+
+
 }
