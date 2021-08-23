@@ -26,7 +26,7 @@ public class SuggestionModule extends Module {
     if (BazaarNotifier.bazaarDataFormatted.length() != 0) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-      for (int i = shift; i < BazaarNotifier.config.getInt("FlippingListLength") + shift; i++) {
+      for (int i = shift; i < BazaarNotifier.config.getInt("suggesterLength") + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.MAGENTA);
         message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
@@ -45,10 +45,10 @@ public class SuggestionModule extends Module {
 
     } else {
       Utils.drawCenteredString("Waiting for bazaar data", x + 100,
-          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 16 + 16) / 2, 0xAAAAAA, 1F);
+          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
       boundsX = x + 200;
     }
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("FlippingListLength") + 18;
+    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("suggesterLength") + 18;
   }
 
   @Override

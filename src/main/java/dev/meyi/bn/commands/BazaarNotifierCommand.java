@@ -6,7 +6,9 @@ import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Suggester;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -93,7 +95,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   + "Run /bn api (key) to set your api key. Do /api if you need to get your api key."));
           BazaarNotifier.validApiKey = false;
         }
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("dumpToLog")) {
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("dump")) {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
@@ -113,26 +115,27 @@ public class BazaarNotifierCommand extends CommandBase {
               + "Use the following format: /bn find (item)"));
         } else {
           String item = String.join(" ", args).substring(5).toLowerCase();
-          if (BazaarNotifier.bazaarCache.has(item)) { // Super Egg is buged
+          if (BazaarNotifier.bazaarCache.has(item)) {
             JSONObject data = BazaarNotifier.bazaarCache.getJSONObject(item);
-            String itemConv;
-            try{itemConv = BazaarNotifier.bazaarConversionsReversed.getString(WordUtils.capitalize(item.toLowerCase()));}catch (Exception e){itemConv = "";}
-                if (BazaarNotifier.enchantCraftingList.getJSONObject("Normal").has(itemConv) || BazaarNotifier.enchantCraftingList.getJSONObject("Other").has(itemConv)){
+
+            String itemConv = BazaarNotifier.bazaarConversionsReversed.getString(WordUtils.capitalize(item.toLowerCase()));
+                if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(itemConv) || BazaarNotifier.enchantCraftingList.getJSONObject("other").has(itemConv)){
                   String[] prices = EnchantedCraftingHandler.getEnchantCraft(item);
 
-                  player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" + EnumChatFormatting.DARK_RED +
-                          EnumChatFormatting.BOLD + WordUtils.capitalize(item) + "\n" +
+                  player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
+                          EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item) + "\n" +
                           EnumChatFormatting.DARK_RED + "Buy Order: " +
                           EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("buyOrderPrice")) + "\n" +
                           EnumChatFormatting.DARK_RED + "Sell Offer: " +
                           EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("sellOfferPrice")) + "\n" +
                           EnumChatFormatting.DARK_RED + "Estimated Profit: " +
                           EnumChatFormatting.RED +  BazaarNotifier.df.format(data.getDouble("profitFlowPerMinute")) + "\n" +
-                          EnumChatFormatting.DARK_RED + "Craftingprofit Instasell: " +
+                          EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
+                          EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
                           EnumChatFormatting.RED + prices[0] + "\n" +
-                          EnumChatFormatting.DARK_RED + "Craftingprofit Selloffer: " +
+                          EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
                           EnumChatFormatting.RED + prices[1] +"\n" +
-                          EnumChatFormatting.DARK_RED + "Craftingprofit per Million: " +
+                          EnumChatFormatting.DARK_RED + "Profit per 1M: " +
                           EnumChatFormatting.RED + prices[2] + "\n" +
                           BazaarNotifier.prefix
                   ));
@@ -189,28 +192,23 @@ public class BazaarNotifierCommand extends CommandBase {
                 new ChatComponentText("\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("togglecrafting")) {
+      } else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0].equalsIgnoreCase("tc"))) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                 + EnchantedCraftingHandler.toggleCrafting()));
-
-      }else if (args.length == 1 && args[0].equalsIgnoreCase("tc")) {
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                + EnchantedCraftingHandler.toggleCrafting()));
-
       }else if (args.length == 2 && args[0].equalsIgnoreCase("setCraftingListLength")) {
-        try {
+        if (Utils.isInteger(args[1])){
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                   + EnchantedCraftingHandler.setCraftingLength(Integer.parseInt(args[1]))));
-        }catch (Exception e){
+        }else{
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Error"));
         }
 
       }else if (args.length == 2 && args[0].equalsIgnoreCase("setFlippingListLength")) {
-        try {
+        if (Utils.isInteger(args[1])) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                   + Suggester.setSuggestionLength(Integer.parseInt(args[1]))));
-        }catch (Exception e){
+        }else{
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Error"));
         }
@@ -236,26 +234,41 @@ public class BazaarNotifierCommand extends CommandBase {
 
   @Override
   public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-    List<String> arguments = new LinkedList<>();
+
 
     if (args.length == 1) {
+      List<String> arguments = new ArrayList<>();
+      List<String> sortedArguments = new ArrayList<>();
       //arguments.add("api");
       arguments.add("discord");
-      arguments.add("dumpToLog");
       arguments.add("find");
       arguments.add("setFlippingListLength");
       arguments.add("setCraftingListLength");
       arguments.add("toggle");
       arguments.add("toggleCrafting");
       arguments.add("reset");
-      return arguments;
+      for (String argument : arguments) {
+        if (argument.startsWith(args[0].toLowerCase())) {
+          sortedArguments.add(argument);
+        }
+      }
+      return sortedArguments;
+
     }else if(args.length ==2 && args[0].equalsIgnoreCase("reset")){
+      List<String> arguments = new ArrayList<>();
+      List<String> sortedArguments = new ArrayList<>();
       arguments.add("orders");
       arguments.add("all");
+      for (String argument : arguments) {
+        if (argument.startsWith(args[1].toLowerCase())) {
+          sortedArguments.add(argument);
+        }
+      }
+      return sortedArguments;
+
     }else {
       return null;
     }
-    return null;
   }
 }
 
