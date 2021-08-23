@@ -19,7 +19,7 @@ public class EnchantedCraftingHandler {
 
         for (int i = 0; i < BazaarNotifier.enchantCraftingList.getJSONObject("normal").length(); i++) {
             String itemName = normalKeys.next();
-            if(BazaarNotifier.enchantCraftingList.getJSONObject(itemName).getJSONArray("sell_summary").length() >0 && BazaarNotifier.enchantCraftingList.getJSONObject(itemName).getJSONArray("buy_summary").length() >0) {
+            if(BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").length() >0 && BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").length() >0) {
                 String material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("material");
                 double price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) * 160;
                 double price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) * 160;
@@ -39,7 +39,7 @@ public class EnchantedCraftingHandler {
 
 
             String itemName = otherKeys.next();
-            if(BazaarNotifier.enchantCraftingList.getJSONObject(itemName).getJSONArray("sell_summary").length() >0 && BazaarNotifier.enchantCraftingList.getJSONObject(itemName).getJSONArray("buy_summary").length() >0) {
+            if(BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").length() >0 && BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").length() >0) {
                 double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
                 double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit");
                 double ingredientPrice = 0d;
