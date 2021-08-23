@@ -36,8 +36,8 @@ public class EnchantedCraftingHandler {
 
 
             String itemName = otherKeys.next();
-            double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit");
-            double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(1).getDouble("pricePerUnit");
+            double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
+            double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit");
             double ingredientPrice= 0d;
             int ingredientCount;
             double P= 0d;
