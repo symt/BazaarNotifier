@@ -48,7 +48,7 @@ public class SuggestionModule extends Module {
           y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
       boundsX = x + 200;
     }
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("suggesterLength") + 18;
+    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("craftingLength") *2-2;
   }
 
   @Override
