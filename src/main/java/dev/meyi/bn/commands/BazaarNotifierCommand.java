@@ -22,7 +22,6 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import static dev.meyi.bn.utilities.EnchantedCraftingHandler.editCraftingModuleGUI;
 
 
 public class BazaarNotifierCommand extends CommandBase {
@@ -174,7 +173,7 @@ public class BazaarNotifierCommand extends CommandBase {
       } else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
         player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                        + editCraftingModuleGUI(args[1])));
+                        + EnchantedCraftingHandler.editCraftingModuleGUI(args[1])));
       }
       else if (args.length == 1 && args[0].equalsIgnoreCase("__force")) {
         BazaarNotifier.forceRender ^= true;
@@ -212,7 +211,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   + EnchantedCraftingHandler.setCraftingLength(Integer.parseInt(args[1]))));
         }else{
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Error"));
+                  + "Please enter a valid number"));
         }
 
       }else if (args.length == 2 && args[0].equalsIgnoreCase("setFlippingListLength")) {
@@ -221,7 +220,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   + Suggester.setSuggestionLength(Integer.parseInt(args[1]))));
         }else{
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Error"));
+                  + "Please enter a valid number"));
         }
 
       }else if (args.length > 0) {
