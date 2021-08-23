@@ -29,7 +29,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static net.minecraftforge.fml.client.config.GuiUtils.drawHoveringText;
 
 public class Utils {
 

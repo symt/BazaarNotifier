@@ -7,7 +7,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.lwjgl.input.Mouse;
 
 
 import java.awt.*;
@@ -34,14 +33,14 @@ public class CraftingModule extends Module{
             List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
             ArrayList<ArrayList<String>> list;
-            list = EnchantedCraftingHandler.GetBestEnchantRecipes();
+            list = EnchantedCraftingHandler.getBestEnchantRecipes();
 
-            for(int i = 0; i<BazaarNotifier.config.getInt("CraftingListLength"); i++) {
+            for(int i = 0; i<BazaarNotifier.config.getInt("craftingLength"); i++) {
                 LinkedHashMap<String, Color> message = new LinkedHashMap<>();
                 try{
 
-                    Double __Price = Double.valueOf(list.get(i).get(0));
-                    Double __Price2 =Double.valueOf(list.get(i).get(1));
+                    Double profitInstaSell = Double.valueOf(list.get(i).get(0));
+                    Double profitSellOffer =Double.valueOf(list.get(i).get(1));
                     Double PricePerMil =Double.valueOf(list.get(i).get(2));
                     String ItemName = list.get(i).get(3);
 
@@ -51,10 +50,10 @@ public class CraftingModule extends Module{
                     message.put(". ", Color.MAGENTA);
                     message.put(ItemNameC, Color.CYAN);
                     message.put(" - ", Color.GRAY);
-                    message.put(BazaarNotifier.df.format(__Price), getColor(__Price.intValue()));
-                    message.put("  /   ", Color.GRAY);
-                    message.put(BazaarNotifier.df.format(__Price2), getColor(__Price2.intValue()));
-                    message.put(" ", Color.BLACK);
+                    message.put(BazaarNotifier.df.format(profitInstaSell), getColor(profitInstaSell.intValue()));
+                    message.put(" / ", Color.GRAY);
+                    message.put(BazaarNotifier.df.format(profitSellOffer), getColor(profitSellOffer.intValue()));
+                    message.put(" /  ", Color.GRAY);
                     message.put(BazaarNotifier.df.format(PricePerMil), getColor(PricePerMil.intValue()));
 
 
@@ -68,9 +67,9 @@ public class CraftingModule extends Module{
             int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
             boundsX = x + longestXString;
             this.LongestXString = longestXString;
-            RenderMaterials(checkHoveredText(Mouse.getX()),list);
+            renderMaterials(checkHoveredText(),list);
         }
-       boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("CraftingListLength") + 18;
+       boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("craftingLength") + 18;
 
     }
 
@@ -102,49 +101,47 @@ public class CraftingModule extends Module{
     protected int getMaxShift() {
         return 50;
     }
-    //9 pixel on top
-    //12 between top and bottom of next(6+6)
-    //21 pixel numer
 
-    protected int checkHoveredText(int MouseX){
-        int y2 = y+((BazaarNotifier.config.getInt("CraftingListLength"))*11);
-        int MouseYFormatted = getMouseCoordinateY();
-        int relativeYMouse = (MouseYFormatted- (y))/11 ;
-        if(MouseX/3 >= x && MouseX/3 <= x + (LongestXString/2) && MouseYFormatted >= y && MouseYFormatted <= y2){
+    protected int checkHoveredText(){
+        int y2 = y+((BazaarNotifier.config.getInt("craftingLength"))*11);
+        int mouseYFormatted = getMouseCoordinateY();
+        int mouseXFormatted = getMouseCoordinateX();
+        int relativeYMouse = (mouseYFormatted- (y))/11 ;
+        if(mouseXFormatted >= x && mouseXFormatted <= x + (LongestXString/2) && mouseYFormatted >= y && mouseYFormatted <= y2){
             return relativeYMouse;
         }else{
             return -1;
         }
 
     }
-    protected void RenderMaterials(int HoveredText, ArrayList<ArrayList<String>> list){
-        List<LinkedHashMap<String, Color>> Material = new ArrayList<>();
-        LinkedHashMap<String, Color> Text = new LinkedHashMap<>();
+    protected void renderMaterials(int hoveredText, ArrayList<ArrayList<String>> list){
+        List<LinkedHashMap<String, Color>> material = new ArrayList<>();
+        LinkedHashMap<String, Color> text = new LinkedHashMap<>();
 
-        if (HoveredText > -1){
-           if(BazaarNotifier.enchantCraftingList.getJSONObject("Normal").has(list.get(HoveredText).get(3))){
+        if (hoveredText > -1){
+           if(BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(list.get(hoveredText).get(3))){
                try{
-               Text.put("160x ", Color.LIGHT_GRAY);
-               Text.put(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("Normal").getJSONObject(list.get(HoveredText).get(3)).getString("Material")), Color.LIGHT_GRAY);}catch (JSONException e){
-                   Text.put("Error", Color.RED);
+               text.put("160x ", Color.LIGHT_GRAY);
+               text.put(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(list.get(hoveredText).get(3)).getString("material")), Color.LIGHT_GRAY);}catch (JSONException e){
+                   text.put("Error", Color.RED);
                }
            }else{
                int MaterialCount;
-               StringBuilder NMaterial = new StringBuilder();
-               try{MaterialCount = BazaarNotifier.enchantCraftingList.getJSONObject("Other").getJSONObject(list.get(HoveredText).get(3)).getJSONArray("Material").length();}catch (Exception e){MaterialCount = -1;}
+               StringBuilder _material = new StringBuilder();
+               try{MaterialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();}catch (Exception e){MaterialCount = -1;}
                for(int b = 0; b < MaterialCount/2; b++){
                    if(b == 0) {
-                       try{NMaterial.append(BazaarNotifier.enchantCraftingList.getJSONObject("Other").getJSONObject(list.get(HoveredText).get(3)).getJSONArray("Material").getInt(1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("Other").getJSONObject(list.get(HoveredText).get(3)).getJSONArray("Material").getString(0)));}catch (Exception ignored){}
+                       _material.append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(0)));
                    }else{
-                       try{NMaterial.append(" | ").append(BazaarNotifier.enchantCraftingList.getJSONObject("Other").getJSONObject(list.get(HoveredText).get(3)).getJSONArray("Material").getInt(b * 2 + 1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("Other").getJSONObject(list.get(HoveredText).get(3)).getJSONArray("Material").getString(b * 2)));}catch (Exception ignored){}
+                       _material.append(" | ").append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(b * 2 + 1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(b * 2)));
                    }
                }
-               Text.put(NMaterial.toString(), Color.LIGHT_GRAY);
+               text.put(_material.toString(), Color.LIGHT_GRAY);
            }
-           Material.add(Text);
-            int longestXString = ColorUtils.drawColorfulParagraph(Material, getMouseCoordinateX(), getMouseCoordinateY()-8-padding);
+           material.add(text);
+            int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-8-padding);
             Gui.drawRect(getMouseCoordinateX() - padding, getMouseCoordinateY()-8 - padding, getMouseCoordinateX()+longestXString + padding, getMouseCoordinateY()+8 + padding-8, 0xFF404040);
-            ColorUtils.drawColorfulParagraph(Material, getMouseCoordinateX(), getMouseCoordinateY()-8);
+            ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-8);
         }
     }
 }

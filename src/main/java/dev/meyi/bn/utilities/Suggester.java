@@ -69,12 +69,12 @@ public class Suggester {
     }
   }
 
-  public static String setSuggestionLength(int Length){
-    if(Length >= BazaarNotifier.bazaarDataRaw.length()-1){
-      return "Error Number to high" + String.valueOf(Length);
+  public static String setSuggestionLength(int length){
+    if(length >= BazaarNotifier.bazaarDataRaw.length()-1){
+      return "Error Number to high" + String.valueOf(length);
     }else{
-      BazaarNotifier.config.put("FlippingListLength" , Length);
-      return "Seting CraftingListLength to " + String.valueOf(Length);
+      BazaarNotifier.config.put("suggesterLength" , length);
+      return "Item list size set to " + String.valueOf(length);
     }
   }
 
