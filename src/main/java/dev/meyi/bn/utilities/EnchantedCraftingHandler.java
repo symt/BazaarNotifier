@@ -18,15 +18,18 @@ public class EnchantedCraftingHandler {
 
 
         for (int i = 0; i < BazaarNotifier.enchantCraftingList.getJSONObject("normal").length(); i++) {
-                String key1 =normalKeys.next();
-                String Material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(key1).getString("material");
-                double Price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(key1).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
-                double Price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(key1).getJSONArray("buy_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
-                double ProfitPerMilC = 1000000 / (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
-                double ProfitPerMil = ProfitPerMilC * BazaarNotifier.bazaarDataRaw.getJSONObject(key1).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
+            String itemName = normalKeys.next();
+            try { //sometimes the bazaarDataRaw sell_summary is empty
+                String material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("material");
+                double price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
+                double price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
+                double profitPerMilC = 1000000 / (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") * 160);
+                double profitPerMil = profitPerMilC * BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
 
-                list.add(new ArrayList<>(Arrays.asList(Double.toString(Price1), Double.toString(Price2), Double.toString(ProfitPerMil), key1)));
-
+                list.add(new ArrayList<>(Arrays.asList(Double.toString(price1), Double.toString(price2), Double.toString(profitPerMil), itemName)));
+            }catch (Exception ignored){
+                list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
+            }
 
         }
 
@@ -36,29 +39,31 @@ public class EnchantedCraftingHandler {
 
 
             String itemName = otherKeys.next();
-            double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
-            double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit");
-            double ingredientPrice= 0d;
-            int ingredientCount;
-            double P= 0d;
+            try {  //sometimes the bazaarDataRaw sell_summary is empty
+                double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
+                double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit");
+                double ingredientPrice = 0d;
+                int ingredientCount;
+                double P = 0d;
 
-            for(int h = 0; h < BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").length(); h++){
-                if(h % 2 == 0){
-                    ingredientPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").getString(h)).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
-                }else{
-                    ingredientCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").getInt(h);
-                    P += (ingredientPrice*ingredientCount);
+                for (int h = 0; h < BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").length(); h++) {
+                    if (h % 2 == 0) {
+                        ingredientPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").getString(h)).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
+                    } else {
+                        ingredientCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").getInt(h);
+                        P += (ingredientPrice * ingredientCount);
+                    }
                 }
+
+
+                Double profitInstaSell = itemSellPrice - P;
+                double profitSellOffer = itemBuyPrice - P;
+                Double countPerMil = 1000000 / P;
+                double pricePerMil = countPerMil * profitInstaSell;
+                list.add(new ArrayList<>(Arrays.asList(profitInstaSell.toString(), Double.toString(profitSellOffer), Double.toString(pricePerMil), itemName)));
+            }catch (Exception ignored){
+                list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
             }
-
-
-
-            Double profitInstaSell = itemSellPrice - P;
-            double profitSellOffer = itemBuyPrice - P;
-            Double countPerMil = 1000000 / P;
-            double pricePerMil = countPerMil * profitInstaSell;
-            list.add(new ArrayList<>(Arrays.asList(profitInstaSell.toString(), Double.toString(profitSellOffer), Double.toString(pricePerMil), itemName)));
-
         }
 
 
@@ -103,33 +108,47 @@ public class EnchantedCraftingHandler {
             return "Item list size set to " + length;
         }
     }
+    public static String editCraftingModuleGUI(String craftingValue){
+        if(craftingValue.equalsIgnoreCase("instasell")){
+            BazaarNotifier.config.put("instasellProfit", !BazaarNotifier.config.getBoolean("instasellProfit"));
+            return "Toggled (Instant Sell)";
+        }else if(craftingValue.equalsIgnoreCase("selloffer")){
+            BazaarNotifier.config.put("sellofferProfit", !BazaarNotifier.config.getBoolean("sellofferProfit"));
+            return "Toggled Profit (Sell Offer)";
+        }else if(craftingValue.equalsIgnoreCase("profitPerMil")){
+            BazaarNotifier.config.put("profitPerMil", !BazaarNotifier.config.getBoolean("profitPerMil"));
+            return "Toggled Profit per 1M";
+        }else{
+            return "This value does not exist";
+        }
+    }
 
     public static String[] getEnchantCraft(String itemU){
-        String ItemName = BazaarNotifier.bazaarConversionsReversed.getString(WordUtils.capitalize(itemU.toLowerCase()));
+        String itemName = BazaarNotifier.bazaarConversionsReversed.getString(WordUtils.capitalize(itemU.toLowerCase()));
         String[] values = new String[3];
-            if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(ItemName)) {
-                String Material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(ItemName).getString("material");
-                double Price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
-                double Price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("buy_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
+            if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(itemName)) {
+                String Material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("material");
+                double Price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
+                double Price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit")) * 160;
                 double ProfitPerMilCount = 1000000 / (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
-                double ProfitPerMil = ProfitPerMilCount * BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
+                double ProfitPerMil = ProfitPerMilCount * BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(Material).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit") * 160);
 
                 values[0] = BazaarNotifier.df.format(Price1);
                 values[1] = BazaarNotifier.df.format(Price2);
                 values[2] = BazaarNotifier.df.format(ProfitPerMil);
 
-            } else if (BazaarNotifier.enchantCraftingList.getJSONObject("other").has(ItemName)) {
-                double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit");
-                double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(ItemName).getJSONArray("buy_summary").getJSONObject(1).getDouble("pricePerUnit");
+            } else if (BazaarNotifier.enchantCraftingList.getJSONObject("other").has(itemName)) {
+                double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(1).getDouble("pricePerUnit");
+                double itemBuyPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(1).getDouble("pricePerUnit");
                 double ingredientPrice = 0d;
                 int ingredientCount;
                 double materialCost = 0d;
 
-                for (int h = 0; h < BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(ItemName).getJSONArray("material").length(); h++) {
+                for (int h = 0; h < BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").length(); h++) {
                     if (h % 2 == 0) {
-                        ingredientPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(ItemName).getJSONArray("material").getString(h)).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
+                        ingredientPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").getString(h)).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
                     } else {
-                        ingredientCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(ItemName).getJSONArray("material").getInt(h);
+                        ingredientCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getJSONArray("material").getInt(h);
                         materialCost += (ingredientPrice * ingredientCount);
                     }
                 }

@@ -10,9 +10,6 @@ import net.minecraft.client.gui.FontRenderer;
 
 public class ColorUtils {
 
-  public ColorUtils() {
-    super();
-  }
 
 
 
