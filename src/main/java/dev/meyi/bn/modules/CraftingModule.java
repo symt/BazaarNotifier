@@ -76,7 +76,7 @@ public class CraftingModule extends Module{
             this.LongestXString = longestXString;
             renderMaterials(checkHoveredText(),list);
         }
-       boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("craftingLength") + 18;
+       boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("craftingLength") + BazaarNotifier.config.getInt("craftingLength")*2-2;
 
     }
 
