@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,31 +37,38 @@ public class CraftingModule extends Module{
 
             for(int i = 0; i<BazaarNotifier.config.getInt("craftingLength"); i++) {
                 LinkedHashMap<String, Color> message = new LinkedHashMap<>();
-                try{
+                if(!list.get(i).isEmpty()) {
 
                     Double profitInstaSell = Double.valueOf(list.get(i).get(0));
-                    Double profitSellOffer =Double.valueOf(list.get(i).get(1));
-                    Double PricePerMil =Double.valueOf(list.get(i).get(2));
-                    String ItemName = list.get(i).get(3);
+                    Double profitSellOffer = Double.valueOf(list.get(i).get(1));
+                    Double pricePerMil = Double.valueOf(list.get(i).get(2));
+                    String itemName = list.get(i).get(3);
 
 
-                    String ItemNameC = BazaarNotifier.bazaarConversions.getString(ItemName);
+                    String itemNameConverted = BazaarNotifier.bazaarConversions.getString(itemName);
                     message.put(String.valueOf(i + 1), Color.MAGENTA);
                     message.put(". ", Color.MAGENTA);
-                    message.put(ItemNameC, Color.CYAN);
+                    message.put(itemNameConverted, Color.CYAN);
                     message.put(" - ", Color.GRAY);
-                    message.put(BazaarNotifier.df.format(profitInstaSell), getColor(profitInstaSell.intValue()));
-                    message.put(" / ", Color.GRAY);
-                    message.put(BazaarNotifier.df.format(profitSellOffer), getColor(profitSellOffer.intValue()));
-                    message.put(" /  ", Color.GRAY);
-                    message.put(BazaarNotifier.df.format(PricePerMil), getColor(PricePerMil.intValue()));
-
-
-
-
-                }catch(IndexOutOfBoundsException e) {
-                    message.put("ERROR, JUST WAIT...",Color.RED);
+                    if(BazaarNotifier.config.getBoolean("instasellProfit")) {
+                        message.put(BazaarNotifier.df.format(profitInstaSell), getColor(profitInstaSell.intValue()));
+                    }
+                    if(BazaarNotifier.config.getBoolean("instasellProfit") && BazaarNotifier.config.getBoolean("sellofferProfit")) {
+                        message.put(" / ", Color.GRAY);
+                    }
+                    if(BazaarNotifier.config.getBoolean("sellofferProfit")) {
+                        message.put(BazaarNotifier.df.format(profitSellOffer), getColor(profitSellOffer.intValue()));
+                    }
+                    if(BazaarNotifier.config.getBoolean("sellofferProfit") && BazaarNotifier.config.getBoolean("profitPerMil")){
+                        message.put(" /  ", Color.GRAY);
+                    }
+                    if(BazaarNotifier.config.getBoolean("profitPerMil")) {
+                        message.put(BazaarNotifier.df.format(pricePerMil), getColorForMil(pricePerMil.intValue()));
+                    }
+                }else {
+                    message.put("Error, just wait" ,Color.RED);
                 }
+
                 items.add(message);
             }
             int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
@@ -73,10 +80,17 @@ public class CraftingModule extends Module{
 
     }
 
-    protected Color getColor(int Price){
-        if (Price <= 0) {
+    protected Color getColor(int price){
+        if (price <= 0) {
             return Color.RED;
-        }else if (Price <= 5000){
+        }else if (price <= 5000){
+            return Color.YELLOW;
+        }else return Color.GREEN;
+    }
+    protected Color getColorForMil(int price){
+        if (price <= 0) {
+            return Color.RED;
+        }else if (price <= 30000){
             return Color.YELLOW;
         }else return Color.GREEN;
     }
@@ -126,10 +140,10 @@ public class CraftingModule extends Module{
                    text.put("Error", Color.RED);
                }
            }else{
-               int MaterialCount;
+               int materialCount;
                StringBuilder _material = new StringBuilder();
-               try{MaterialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();}catch (Exception e){MaterialCount = -1;}
-               for(int b = 0; b < MaterialCount/2; b++){
+               materialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();
+               for(int b = 0; b < materialCount/2; b++){
                    if(b == 0) {
                        _material.append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(0)));
                    }else{
