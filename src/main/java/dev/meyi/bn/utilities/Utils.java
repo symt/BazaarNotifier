@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class Utils {
 
   public static JSONObject getBazaarData() throws IOException {
@@ -185,5 +186,8 @@ public class Utils {
     Minecraft.getMinecraft().fontRendererObj.drawString(text,
         (int) (x / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2,
         (int) (y / scale), color);
+
   }
+
+
 }

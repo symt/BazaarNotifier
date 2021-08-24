@@ -68,4 +68,15 @@ public class Suggester {
       e.printStackTrace();
     }
   }
+
+  public static String setSuggestionLength(int length){
+    if(length > BazaarNotifier.bazaarDataRaw.length()){
+      return length + " is too long";
+    }else{
+      BazaarNotifier.config.put("suggesterLength" , length);
+      return "Item list size set to " + length;
+    }
+  }
+
+
 }

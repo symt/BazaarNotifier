@@ -39,6 +39,9 @@ public class ModuleList extends ArrayList<Module> {
         case NOTIFICATION:
           add(new NotificationModule(module));
           break;
+        case CRAFTING:
+          add(new CraftingModule(module));
+          break;
         default:
           throw new IllegalStateException(
               "Unexpected value: " + ModuleName.valueOf(module.getString("name")));

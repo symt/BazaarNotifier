@@ -7,7 +7,11 @@ import java.util.Map.Entry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
+
 public class ColorUtils {
+
+
+
 
   /**
    * @param renderer Minecraft's renderer
@@ -39,7 +43,13 @@ public class ColorUtils {
       if (length > longestXString) {
         longestXString = length;
       }
+
+
+
     }
     return longestXString;
   }
+
+
+
 }
