@@ -17,11 +17,15 @@ plugins {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 }
-version = "1.4.4"
+version = "1.4.5"
 group = "dev.meyi.bn"
 archivesBaseName = "BazaarNotifier"
 
@@ -40,6 +44,7 @@ jar {
         attributes 'FMLAT': 'BazaarNotifier_at.cfg'
     }
 }
+
 
 processResources
         {
