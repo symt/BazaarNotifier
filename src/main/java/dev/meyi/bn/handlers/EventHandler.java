@@ -1,7 +1,6 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.Utils;
 import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -9,7 +8,6 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.json.JSONObject;
@@ -25,8 +23,7 @@ public class EventHandler {
     if (!BazaarNotifier.activeBazaar) {
       return;
     }
-    String message = Utils
-        .stripString(StringUtils.stripControlCodes(e.message.getUnformattedText()));
+    String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConversionsReversed
@@ -69,17 +66,9 @@ public class EventHandler {
         }
       }
       if (found) {
-        // Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-        //    BazaarNotifier.prefix + EnumChatFormatting.GREEN + "An order was filled!"));
-        // e.setCanceled(true);
         BazaarNotifier.orders.remove(orderToRemove);
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
-        /*
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.RED
-                + "For some reason, you have an order that didn't successfully delete when filled! This message might be bugged. If all your orders are fine, ignore this message."));
-      */
       }
     } else if (message.startsWith("Cancelled!")) {
       double refund = 0;
@@ -122,14 +111,15 @@ public class EventHandler {
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
     if (e.gui instanceof GuiChest && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled)
-        && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() && (Utils
-        .stripString(((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .startsWith("Bazaar") || Utils
-        .stripString(((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .equalsIgnoreCase("How much do you want to pay?") || Utils
-        .stripString(((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .matches("Confirm (Buy|Sell) (Order|Offer)")) || Utils
-        .stripString(((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
+        && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() && (StringUtils
+        .stripControlCodes(
+            ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
+        .startsWith("Bazaar") || StringUtils.stripControlCodes(
+        ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
+        .equalsIgnoreCase("How much do you want to pay?") || StringUtils.stripControlCodes(
+        ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
+        .matches("Confirm (Buy|Sell) (Order|Offer)")) || StringUtils.stripControlCodes(
+        ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
