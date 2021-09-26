@@ -3,7 +3,6 @@ package dev.meyi.bn.handlers;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -22,38 +21,6 @@ public class ChestTickHandler {
 
   public static String lastScreenDisplayName = "";
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
-
-  @SubscribeEvent
-  public void onChestTick(TickEvent e) {
-    if (e.phase == Phase.END) {
-      if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
-
-        IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
-        String chestName = Utils
-            .stripString(chest.getDisplayName().getUnformattedText().toLowerCase());
-
-        if (chest.hasCustomName() && !lastScreenDisplayName.equalsIgnoreCase(chestName)) {
-          if (chestName.equals("confirm buy order") ||
-              chestName.equals("confirm sell offer")) {
-
-            if (chest.getStackInSlot(13) != null) {
-              lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
-              orderConfirmation(chest);
-            }
-
-          } else if (chestName.contains("bazaar orders")) {
-            if (chest.getStackInSlot(chest.getSizeInventory()-5) != null
-                && Item.itemRegistry.getIDForObject(chest.getStackInSlot(chest.getSizeInventory()-5).getItem()) == 262) {
-              lastScreenDisplayName = Utils.stripString(chest.getDisplayName().getUnformattedText());
-              updateBazaarOrders(chest);
-            }
-          }
-        }
-      } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
-        ChestTickHandler.lastScreenDisplayName = "";
-      }
-    }
-  }
 
   public static void updateBazaarOrders(IInventory chest) {
     int[] verifiedOrders = new int[BazaarNotifier.orders.length()];
@@ -80,23 +47,25 @@ public class ChestTickHandler {
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
           double price;
+          String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
-            price = Double.parseDouble(
-                StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "").split(" ")[3]);
+            priceString = StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "")
+                .split(" ")[3];
+            price = Double.parseDouble(priceString);
           } else if (lore.get(5).toLowerCase().contains("expire")) {
-            price = Double.parseDouble(
-                StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "").split(" ")[3]);
+            priceString = StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "")
+                .split(" ")[3];
+            price = Double.parseDouble(priceString);
           } else {
-            price = Double
-                .parseDouble(
-                    StringUtils
-                        .stripControlCodes(lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4)
-                            .replaceAll(",", "").split(" ")[3]));
+            priceString = StringUtils.stripControlCodes(
+                lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
+                    .split(" ")[3]);
+            price = Double.parseDouble(priceString);
           }
           int orderInQuestion = -1;
           for (int j = 0; j < BazaarNotifier.orders.length(); j++) {
             JSONObject order = BazaarNotifier.orders.getJSONObject(j);
-            if (Double.compare(order.getDouble("pricePerUnit"), price) == 0 && type
+            if (priceString.equalsIgnoreCase(order.getString("priceString")) && type
                 .equals(order.getString("type"))) {
               orderInQuestion = j;
               break;
@@ -150,13 +119,48 @@ public class ChestTickHandler {
     }
   }
 
+  @SubscribeEvent
+  public void onChestTick(TickEvent e) {
+    if (e.phase == Phase.END) {
+      if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar
+          && BazaarNotifier.activeBazaar) {
+
+        IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
+        String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
+
+        if (chest.hasCustomName() && !lastScreenDisplayName.equalsIgnoreCase(chestName)) {
+          if (chestName.equals("confirm buy order") ||
+              chestName.equals("confirm sell offer")) {
+
+            if (chest.getStackInSlot(13) != null) {
+              lastScreenDisplayName = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText());
+              orderConfirmation(chest);
+            }
+
+          } else if (chestName.contains("bazaar orders")) {
+            if (chest.getStackInSlot(chest.getSizeInventory() - 5) != null
+                && Item.itemRegistry
+                .getIDForObject(chest.getStackInSlot(chest.getSizeInventory() - 5).getItem())
+                == 262) {
+              lastScreenDisplayName = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText());
+              updateBazaarOrders(chest);
+            }
+          }
+        }
+      } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
+        ChestTickHandler.lastScreenDisplayName = "";
+      }
+    }
+  }
+
   private void orderConfirmation(IInventory chest) {
 
     if (chest.getStackInSlot(13) != null) {
 
-      double price = Double.parseDouble(StringUtils.stripControlCodes(
-          chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
-              .getTagList("Lore", 8).getStringTagAt(2)).split(" ")[3].replaceAll(",", ""));
+      String priceString = StringUtils.stripControlCodes(
+          chest.getStackInSlot(13).getTagCompound().getCompoundTag("display").getTagList("Lore", 8)
+              .getStringTagAt(2)).split(" ")[3].replaceAll(",", "");
+      double price = Double.parseDouble(priceString);
 
       String product = StringUtils.stripControlCodes(
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
@@ -187,15 +191,14 @@ public class ChestTickHandler {
             .put("startAmount", amount)
             .put("amountRemaining", amount)
             .put("pricePerUnit", price)
+            .put("priceString", priceString)
             .put("outdatedOrder", false)
             .put("matchedOrder", false)
             .put("goodOrder", true)
             .put("orderValue", amount * price)
-            .put("type", Utils.stripString(chest.getDisplayName().getUnformattedText())
+            .put("type", StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
                 .equalsIgnoreCase("Confirm Sell Offer") ? "sell" : "buy");
       }
     }
   }
 }
-
-// TODO: add notification for a "good order" (an order that was revived)
