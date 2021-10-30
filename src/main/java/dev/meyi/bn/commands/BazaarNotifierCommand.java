@@ -6,6 +6,7 @@ import dev.meyi.bn.utilities.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 import net.minecraft.client.Minecraft;
@@ -76,6 +77,8 @@ public class BazaarNotifierCommand extends CommandBase {
               BazaarNotifier.apiKey = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
+              EnchantedCraftingHandler.getUnlockedRecipes();
+              EnchantedCraftingHandler.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -99,12 +102,16 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")){
-        if(EnchantedCraftingHandler.collectionCheckDisabled) {
+      }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
+        if (EnchantedCraftingHandler.collectionCheckDisabled && !Objects.equals(BazaarNotifier.apiKey, "")) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Only showing unlocked recipes"));
           EnchantedCraftingHandler.collectionCheckDisabled = false;
-        }else{
+        } else if (EnchantedCraftingHandler.collectionCheckDisabled) {
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Please set an API-Key first.(/bn api)"));
+          EnchantedCraftingHandler.collectionCheckDisabled = true;
+      }else{
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Showing all recipes"));
           EnchantedCraftingHandler.collectionCheckDisabled = true;

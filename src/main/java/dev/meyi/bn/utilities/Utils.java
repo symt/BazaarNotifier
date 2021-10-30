@@ -51,12 +51,12 @@ public class Utils {
   }
 
   public static JSONArray unlockedRecipes() throws IOException {
-    if(BazaarNotifier.apiKey != "") {
+    if(!Objects.equals(BazaarNotifier.apiKey, "")) {
 
       HttpClient client = HttpClientBuilder.create().build();
       if (Objects.equals(playerUUID, "")) {
         HttpGet request = new HttpGet(
-                "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft().getSession().getUsername());
+                "https://api.mojang.com/users/profiles/minecraft/" + "Detlev1");
         HttpResponse response = client.execute(request);
 
         String uuidResponse = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
