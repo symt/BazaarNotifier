@@ -19,6 +19,7 @@ public class ScheduledEvents {
   }
 
   public static void create() {
+    EnchantedCraftingHandler.getUnlockedRecipes();
     if (instance == null) {
       new ScheduledEvents();
     }
@@ -30,7 +31,7 @@ public class ScheduledEvents {
   }
 
   public void collectionLoop(){
-    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(EnchantedCraftingHandler::getUnlockedRecipes, 0, 5, TimeUnit.MINUTES);
+    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(EnchantedCraftingHandler::getUnlockedRecipes, 5, 5, TimeUnit.MINUTES);
   }
 
   public void outdatedNotification() {
