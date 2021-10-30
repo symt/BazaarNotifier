@@ -37,6 +37,7 @@ public class CraftingModule extends Module{
 
             for(int i = 0; i<BazaarNotifier.config.getInt("craftingLength"); i++) {
                 LinkedHashMap<String, Color> message = new LinkedHashMap<>();
+                if(i > list.size()){break;}
                 if(!list.get(i).isEmpty()) {
 
                     Double profitInstaSell = Double.valueOf(list.get(i).get(0));
@@ -76,8 +77,8 @@ public class CraftingModule extends Module{
             this.LongestXString = longestXString;
             renderMaterials(checkHoveredText(),list);
         }
-       boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("craftingLength") + BazaarNotifier.config.getInt("craftingLength")*2-2;
-
+       float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.scale* BazaarNotifier.config.getInt("craftingLength") + BazaarNotifier.config.getInt("craftingLength")*2*BazaarNotifier.scale-2;
+        boundsY = (int)Y;
     }
 
     protected Color getColor(int price){
@@ -117,12 +118,12 @@ public class CraftingModule extends Module{
     }
 
     protected int checkHoveredText(){
-        int y2 = y+((BazaarNotifier.config.getInt("craftingLength"))*11);
+        float y2 = y+((BazaarNotifier.config.getInt("craftingLength"))*11*BazaarNotifier.scale);
         int mouseYFormatted = getMouseCoordinateY();
         int mouseXFormatted = getMouseCoordinateX();
-        int relativeYMouse = (mouseYFormatted- (y))/11 ;
-        if(mouseXFormatted >= x && mouseXFormatted <= x + (LongestXString/2) && mouseYFormatted >= y && mouseYFormatted <= y2){
-            return relativeYMouse;
+        float relativeYMouse = (mouseYFormatted-y)/(11*BazaarNotifier.scale);
+        if(mouseXFormatted >= x && mouseXFormatted <= x + (LongestXString/2) && mouseYFormatted >= y && mouseYFormatted <= y2-3*BazaarNotifier.scale){
+            return (int)relativeYMouse;
         }else{
             return -1;
         }
@@ -153,9 +154,9 @@ public class CraftingModule extends Module{
                text.put(_material.toString(), Color.LIGHT_GRAY);
            }
            material.add(text);
-            int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-8-padding);
-            Gui.drawRect(getMouseCoordinateX() - padding, getMouseCoordinateY()-8 - padding, getMouseCoordinateX()+longestXString + padding, getMouseCoordinateY()+8 + padding-8, 0xFF404040);
-            ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-8);
+            int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-(int)(8*BazaarNotifier.scale));
+            Gui.drawRect(getMouseCoordinateX() - padding, getMouseCoordinateY()-(int)(8*BazaarNotifier.scale) - (int)(padding*BazaarNotifier.scale), (int)(getMouseCoordinateX()+longestXString + padding* BazaarNotifier.scale), (int)(getMouseCoordinateY()+ padding*BazaarNotifier.scale), 0xFF404040);
+            ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-(int)(8*BazaarNotifier.scale));
         }
     }
 }

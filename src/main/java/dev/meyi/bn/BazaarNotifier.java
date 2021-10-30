@@ -42,7 +42,9 @@ public class BazaarNotifier {
   public static boolean inBazaar = false;
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
-  public static boolean apiKeyDisabled = true; // Change this if an api key is ever required to access the bazaar again.
+  public static boolean apiKeyDisabled = true;// Change this if an api key is ever required to access the bazaar again.
+  public static float scale = 1f;
+  public static float scale_b = (float)Math.pow(scale, -1);
 
   public static JSONArray orders = new JSONArray();
   public static JSONObject bazaarDataRaw = new JSONObject();
@@ -67,6 +69,7 @@ public class BazaarNotifier {
   public static void resetMod() {
     modules.resetAll();
     orders = Defaults.DEFAULT_ORDERS_LAYOUT();
+    BazaarNotifier.scale = Defaults.SCALE;
   }
 
   @Mod.EventHandler

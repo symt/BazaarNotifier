@@ -1,5 +1,6 @@
 package dev.meyi.bn.utilities;
 
+import com.ibm.icu.impl.Normalizer2Impl;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
@@ -27,9 +28,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.lwjgl.opengl.GL11;
 
 
 public class Utils {
+
+
+  private static String playerUUID;
 
   public static JSONObject getBazaarData() throws IOException {
     HttpClient client = HttpClientBuilder.create().build();
@@ -47,6 +52,33 @@ public class Utils {
 
     return new JSONObject(result).getJSONObject("products");
   }
+
+  public static JSONArray unlockedRecipes() throws IOException {
+
+    HttpClient client = HttpClientBuilder.create().build();
+    if(playerUUID == null) {
+      HttpGet request = new HttpGet(
+              "https://api.mojang.com/users/profiles/minecraft/"+ Minecraft.getMinecraft().getSession().getUsername());
+      HttpResponse response = client.execute(request);
+
+      String uuidResponse = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+
+      playerUUID = new JSONObject(uuidResponse).getString("id");
+    }
+
+
+
+    HttpGet request = new HttpGet("https://api.hypixel.net/skyblock/profiles?key="+BazaarNotifier.apiKey+"&uuid="+playerUUID);
+    HttpResponse response = client.execute(request);
+
+    String results = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+
+
+    return new JSONObject(results).getJSONArray("profiles").getJSONObject(0).getJSONObject("members").getJSONObject(new JSONObject(results).getJSONArray("profiles").getJSONObject(0).getString("profile_id")).getJSONArray("unlocked_coll_tiers");
+
+  }
+
+
 
   public static String stripString(String s) {
     char[] nonValidatedString = StringUtils.stripControlCodes(s).toCharArray();
@@ -182,12 +214,17 @@ public class Utils {
     );
   }
 
-  public static void drawCenteredString(String text, int x, int y, int color, double scale) {
-    Minecraft.getMinecraft().fontRendererObj.drawString(text,
-        (int) (x / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2,
-        (int) (y / scale), color);
-
+  public static void setScale(float scale){
+    BazaarNotifier.scale = scale;
+    BazaarNotifier.scale_b = (float) Math.pow(scale, -1);
   }
 
+  public static void drawCenteredString(String text, int x, int y, int color) {
+    GL11.glScalef(BazaarNotifier.scale, BazaarNotifier.scale, 1);
+    Minecraft.getMinecraft().fontRendererObj.drawString(text,
+            (int)((x / BazaarNotifier.scale )- Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)*BazaarNotifier.scale  / 2),
+            (int)(y/BazaarNotifier.scale), color);
 
+    GL11.glScalef(BazaarNotifier.scale_b, BazaarNotifier.scale_b, 1);
+  }
 }
