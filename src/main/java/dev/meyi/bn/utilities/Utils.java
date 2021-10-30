@@ -1,6 +1,5 @@
 package dev.meyi.bn.utilities;
 
-import com.ibm.icu.impl.Normalizer2Impl;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
@@ -13,13 +12,11 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -34,7 +31,7 @@ import org.lwjgl.opengl.GL11;
 public class Utils {
 
 
-  private static String playerUUID;
+  private static String playerUUID = "";
 
   public static JSONObject getBazaarData() throws IOException {
     HttpClient client = HttpClientBuilder.create().build();
@@ -54,42 +51,48 @@ public class Utils {
   }
 
   public static JSONArray unlockedRecipes() throws IOException {
+    if(BazaarNotifier.apiKey != "") {
 
-    HttpClient client = HttpClientBuilder.create().build();
-    if(playerUUID == null) {
-      HttpGet request = new HttpGet(
-              "https://api.mojang.com/users/profiles/minecraft/"+ Minecraft.getMinecraft().getSession().getUsername());
+      HttpClient client = HttpClientBuilder.create().build();
+      if (Objects.equals(playerUUID, "")) {
+        HttpGet request = new HttpGet(
+                "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft().getSession().getUsername());
+        HttpResponse response = client.execute(request);
+
+        String uuidResponse = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+
+
+        playerUUID = new JSONObject(uuidResponse).getString("id");
+      }
+
+
+      HttpGet request = new HttpGet("https://api.hypixel.net/skyblock/profiles?key=" + BazaarNotifier.apiKey + "&uuid=" + playerUUID);
       HttpResponse response = client.execute(request);
 
-      String uuidResponse = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+      String _results = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+      JSONObject results = new JSONObject(_results);
+      long lastSaved = 0;
+      int profileIndex = 0;
 
-      playerUUID = new JSONObject(uuidResponse).getString("id");
-    }
-
-
-
-    HttpGet request = new HttpGet("https://api.hypixel.net/skyblock/profiles?key="+BazaarNotifier.apiKey+"&uuid="+playerUUID);
-    HttpResponse response = client.execute(request);
-
-    String results = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-
-
-    return new JSONObject(results).getJSONArray("profiles").getJSONObject(0).getJSONObject("members").getJSONObject(new JSONObject(results).getJSONArray("profiles").getJSONObject(0).getString("profile_id")).getJSONArray("unlocked_coll_tiers");
-
-  }
-
-
-
-  public static String stripString(String s) {
-    char[] nonValidatedString = StringUtils.stripControlCodes(s).toCharArray();
-    StringBuilder validated = new StringBuilder();
-    for (char a : nonValidatedString) {
-      if ((int) a < 127 && (int) a > 20) {
-        validated.append(a);
+      for(int i = 0; i < results.getJSONArray("profiles").length(); i++){
+        if(results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save") > lastSaved){
+          lastSaved = results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save");
+          profileIndex = i;
+        }
       }
+      JSONArray unlockedCollections =  results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONArray("unlocked_coll_tiers");
+      JSONObject slayer = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
+      if (slayer.getJSONObject("zombie").getJSONObject("claimed_levels").has("level_4")){unlockedCollections.put("zombie_4");}
+      if (slayer.getJSONObject("spider").getJSONObject("claimed_levels").has("level_4")){unlockedCollections.put("spider_4");}
+      if (slayer.getJSONObject("wolf").getJSONObject("claimed_levels").has("level_4")){unlockedCollections.put("wolf_4");}
+      if (slayer.getJSONObject("enderman").getJSONObject("claimed_levels").has("level_2")){unlockedCollections.put("enderman_2");}
+      return unlockedCollections;
+    }else{
+      EnchantedCraftingHandler.collectionCheckDisabled = true;
+      return new JSONArray();
     }
-    return validated.toString();
   }
+
 
   public static boolean isInteger(String s) {
     return isInteger(s, 10);

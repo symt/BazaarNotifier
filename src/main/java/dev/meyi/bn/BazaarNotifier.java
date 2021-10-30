@@ -7,6 +7,7 @@ import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.EnchantedCraftingHandler;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
 import java.io.File;
@@ -30,7 +31,7 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.4.4";
+  public static final String VERSION = "1.5.0";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";

@@ -99,17 +99,16 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      }else if(args.length ==1 && args[0].equalsIgnoreCase("test")){
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                + BazaarNotifier.apiKey));
-        JSONArray jo = new JSONArray();
-        try {
-         jo = Utils.unlockedRecipes();
-        } catch (IOException e) {
-          e.printStackTrace();
+      }else if(args.length ==1 && args[0].equalsIgnoreCase("disableCollectionChecking")){
+        if(EnchantedCraftingHandler.collectionCheckDisabled) {
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Only showing unlocked recipes"));
+          EnchantedCraftingHandler.collectionCheckDisabled = false;
+        }else{
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Showing all recipes"));
+          EnchantedCraftingHandler.collectionCheckDisabled = true;
         }
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED + jo));
-
       }else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
         if(args.length == 1) {
           BazaarNotifier.resetMod();
@@ -278,6 +277,7 @@ public class BazaarNotifierCommand extends CommandBase {
       //arguments.add("api");
       arguments.add("craftingModuleConfig");
       arguments.add("discord");
+      arguments.add("disableCollectionChecking");
       arguments.add("find");
       arguments.add("scale");
       arguments.add("setFlippingListLength");

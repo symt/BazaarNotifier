@@ -9,8 +9,10 @@ import java.util.*;
 
 
 public class EnchantedCraftingHandler {
-    private static String unlockedRecipes;
+    private static String unlockedRecipes = "";
     public static boolean collectionCheckDisabled = false;
+    static int i = 0;
+
 
 
     public static ArrayList<ArrayList<String>> getBestEnchantRecipes(){
