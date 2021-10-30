@@ -99,7 +99,7 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      }else if(args.length ==1 && args[0].equalsIgnoreCase("disableCollectionChecking")){
+      }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")){
         if(EnchantedCraftingHandler.collectionCheckDisabled) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Only showing unlocked recipes"));
@@ -274,15 +274,15 @@ public class BazaarNotifierCommand extends CommandBase {
     if (args.length == 1) {
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
-      //arguments.add("api");
+      arguments.add("api");
       arguments.add("craftingModuleConfig");
       arguments.add("discord");
-      arguments.add("disableCollectionChecking");
       arguments.add("find");
       arguments.add("scale");
       arguments.add("setFlippingListLength");
       arguments.add("setCraftingListLength");
       arguments.add("toggle");
+      arguments.add("toggleCollectionChecking");
       arguments.add("toggleCrafting");
       arguments.add("reset");
 
