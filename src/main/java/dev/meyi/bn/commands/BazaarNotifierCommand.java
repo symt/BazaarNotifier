@@ -1,15 +1,14 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
-import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Suggester;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.utilities.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -74,7 +73,7 @@ public class BazaarNotifierCommand extends CommandBase {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
-              BazaarNotifier.apiKey = "";
+              BazaarNotifier.apiKey = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
             } else {
@@ -100,7 +99,18 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      } else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
+      }else if(args.length ==1 && args[0].equalsIgnoreCase("test")){
+        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                + BazaarNotifier.apiKey));
+        JSONArray jo = new JSONArray();
+        try {
+         jo = Utils.unlockedRecipes();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED + jo));
+
+      }else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
         if(args.length == 1) {
           BazaarNotifier.resetMod();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -114,7 +124,7 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared"));
         }
-      } else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
+      }else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
         if (args.length == 1) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Use the following format: /bn find (item)"));
@@ -223,10 +233,26 @@ public class BazaarNotifierCommand extends CommandBase {
                   + "Please enter a valid number"));
         }
 
+      }else if(args.length == 2 && args[0].equalsIgnoreCase("scale")) {
+
+        if (Utils.isInteger(args[1])){
+          if (Integer.parseInt(args[1])>0 && Integer.parseInt(args[1])<=20) {
+            Utils.setScale(Float.parseFloat(args[1]) / 10);
+            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                    + "Set scale to " + args[1]));
+          }else{
+            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "Please enter a number between 1 and 20"));
+          }
+        }else{
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Please enter a valid number between 1 and 20"));
+        }
+
       }else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
-      } else {
+      }else {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
             EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
             + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
@@ -250,14 +276,16 @@ public class BazaarNotifierCommand extends CommandBase {
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       //arguments.add("api");
-      arguments.add("craftingModuleconfig");
+      arguments.add("craftingModuleConfig");
       arguments.add("discord");
       arguments.add("find");
+      arguments.add("scale");
       arguments.add("setFlippingListLength");
       arguments.add("setCraftingListLength");
       arguments.add("toggle");
       arguments.add("toggleCrafting");
       arguments.add("reset");
+
 
       for (String argument : arguments) {
         if (argument.startsWith(args[0].toLowerCase())) {
@@ -278,7 +306,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length ==2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
+    }else if(args.length ==2 && args[0].equalsIgnoreCase("craftingModuleConfig")){
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("instasell");

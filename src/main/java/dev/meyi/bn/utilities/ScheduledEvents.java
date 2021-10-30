@@ -15,6 +15,7 @@ public class ScheduledEvents {
   private ScheduledEvents() {
     outdatedNotification();
     suggestionLoop();
+    collectionLoop();
   }
 
   public static void create() {
@@ -26,6 +27,10 @@ public class ScheduledEvents {
   public void suggestionLoop() {
     Executors.newScheduledThreadPool(1)
         .scheduleAtFixedRate(Suggester::basic, 5, 5, TimeUnit.SECONDS);
+  }
+
+  public void collectionLoop(){
+    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(EnchantedCraftingHandler::getUnlockedRecipes, 0, 5, TimeUnit.MINUTES);
   }
 
   public void outdatedNotification() {

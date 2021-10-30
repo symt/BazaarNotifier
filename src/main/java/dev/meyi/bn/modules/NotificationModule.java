@@ -60,11 +60,13 @@ public class NotificationModule extends Module {
       int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
       boundsX = x + longestXString;
     } else {
-      Utils.drawCenteredString("No orders found", x + 100,
-          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
-      boundsX = x + 200;
+      Utils.drawCenteredString("No orders found", (int)(x + 100*BazaarNotifier.scale),
+              (int)(y + ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16)*BazaarNotifier.scale / 2)), 0xAAAAAA);
+      float X = x + 200*BazaarNotifier.scale;
+      boundsX = (int)X;
     }
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 18;
+    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT *BazaarNotifier.scale * 10 + 18;
+    boundsY = (int)Y;
   }
 
   @Override

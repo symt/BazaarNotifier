@@ -45,10 +45,11 @@ public class SuggestionModule extends Module {
 
     } else {
       Utils.drawCenteredString("Waiting for bazaar data", x + 100,
-          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
+          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA);
       boundsX = x + 200;
     }
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("suggesterLength") *2-2;
+    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.scale * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("suggesterLength") *2* BazaarNotifier.scale-2;
+    boundsY = (int) Y;
   }
 
   @Override
