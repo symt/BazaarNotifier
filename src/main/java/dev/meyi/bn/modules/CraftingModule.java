@@ -37,40 +37,40 @@ public class CraftingModule extends Module{
 
             for(int i = 0; i<BazaarNotifier.config.getInt("craftingLength"); i++) {
                 LinkedHashMap<String, Color> message = new LinkedHashMap<>();
-                if(i > list.size()){break;}
-                if(!list.get(i).isEmpty()) {
+                if(i < list.size()) {
+                    if (!list.get(i).isEmpty()) {
 
-                    Double profitInstaSell = Double.valueOf(list.get(i).get(0));
-                    Double profitSellOffer = Double.valueOf(list.get(i).get(1));
-                    Double pricePerMil = Double.valueOf(list.get(i).get(2));
-                    String itemName = list.get(i).get(3);
+                        Double profitInstaSell = Double.valueOf(list.get(i).get(0));
+                        Double profitSellOffer = Double.valueOf(list.get(i).get(1));
+                        Double pricePerMil = Double.valueOf(list.get(i).get(2));
+                        String itemName = list.get(i).get(3);
 
 
-                    String itemNameConverted = BazaarNotifier.bazaarConversions.getString(itemName);
-                    message.put(String.valueOf(i + 1), Color.MAGENTA);
-                    message.put(". ", Color.MAGENTA);
-                    message.put(itemNameConverted, Color.CYAN);
-                    message.put(" - ", Color.GRAY);
-                    if(BazaarNotifier.config.getBoolean("instasellProfit")) {
-                        message.put(BazaarNotifier.df.format(profitInstaSell), getColor(profitInstaSell.intValue()));
+                        String itemNameConverted = BazaarNotifier.bazaarConversions.getString(itemName);
+                        message.put(String.valueOf(i + 1), Color.MAGENTA);
+                        message.put(". ", Color.MAGENTA);
+                        message.put(itemNameConverted, Color.CYAN);
+                        message.put(" - ", Color.GRAY);
+                        if (BazaarNotifier.config.getBoolean("instasellProfit")) {
+                            message.put(BazaarNotifier.df.format(profitInstaSell), getColor(profitInstaSell.intValue()));
+                        }
+                        if (BazaarNotifier.config.getBoolean("instasellProfit") && BazaarNotifier.config.getBoolean("sellofferProfit")) {
+                            message.put(" / ", Color.GRAY);
+                        }
+                        if (BazaarNotifier.config.getBoolean("sellofferProfit")) {
+                            message.put(BazaarNotifier.df.format(profitSellOffer), getColor(profitSellOffer.intValue()));
+                        }
+                        if (BazaarNotifier.config.getBoolean("sellofferProfit") && BazaarNotifier.config.getBoolean("profitPerMil")) {
+                            message.put(" /  ", Color.GRAY);
+                        }
+                        if (BazaarNotifier.config.getBoolean("profitPerMil")) {
+                            message.put(BazaarNotifier.df.format(pricePerMil), getColorForMil(pricePerMil.intValue()));
+                        }
+                    } else {
+                        message.put("Error, just wait", Color.RED);
                     }
-                    if(BazaarNotifier.config.getBoolean("instasellProfit") && BazaarNotifier.config.getBoolean("sellofferProfit")) {
-                        message.put(" / ", Color.GRAY);
-                    }
-                    if(BazaarNotifier.config.getBoolean("sellofferProfit")) {
-                        message.put(BazaarNotifier.df.format(profitSellOffer), getColor(profitSellOffer.intValue()));
-                    }
-                    if(BazaarNotifier.config.getBoolean("sellofferProfit") && BazaarNotifier.config.getBoolean("profitPerMil")){
-                        message.put(" /  ", Color.GRAY);
-                    }
-                    if(BazaarNotifier.config.getBoolean("profitPerMil")) {
-                        message.put(BazaarNotifier.df.format(pricePerMil), getColorForMil(pricePerMil.intValue()));
-                    }
-                }else {
-                    message.put("Error, just wait" ,Color.RED);
+                    items.add(message);
                 }
-
-                items.add(message);
             }
             int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
             boundsX = x + longestXString;
@@ -133,30 +133,33 @@ public class CraftingModule extends Module{
         List<LinkedHashMap<String, Color>> material = new ArrayList<>();
         LinkedHashMap<String, Color> text = new LinkedHashMap<>();
 
-        if (hoveredText > -1){
-           if(BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(list.get(hoveredText).get(3))){
-               try{
-               text.put("160x ", Color.LIGHT_GRAY);
-               text.put(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(list.get(hoveredText).get(3)).getString("material")), Color.LIGHT_GRAY);}catch (JSONException e){
-                   text.put("Error", Color.RED);
-               }
-           }else{
-               int materialCount;
-               StringBuilder _material = new StringBuilder();
-               materialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();
-               for(int b = 0; b < materialCount/2; b++){
-                   if(b == 0) {
-                       _material.append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(0)));
-                   }else{
-                       _material.append(" | ").append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(b * 2 + 1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(b * 2)));
-                   }
-               }
-               text.put(_material.toString(), Color.LIGHT_GRAY);
-           }
-           material.add(text);
-            int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-(int)(8*BazaarNotifier.scale));
-            Gui.drawRect(getMouseCoordinateX() - padding, getMouseCoordinateY()-(int)(8*BazaarNotifier.scale) - (int)(padding*BazaarNotifier.scale), (int)(getMouseCoordinateX()+longestXString + padding* BazaarNotifier.scale), (int)(getMouseCoordinateY()+ padding*BazaarNotifier.scale), 0xFF404040);
-            ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY()-(int)(8*BazaarNotifier.scale));
+        if (hoveredText > -1) {
+            if (hoveredText < list.size()) {
+                if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(list.get(hoveredText).get(3))) {
+                    try {
+                        text.put("160x ", Color.LIGHT_GRAY);
+                        text.put(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(list.get(hoveredText).get(3)).getString("material")), Color.LIGHT_GRAY);
+                    } catch (JSONException e) {
+                        text.put("Error", Color.RED);
+                    }
+                } else {
+                    int materialCount;
+                    StringBuilder _material = new StringBuilder();
+                    materialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();
+                    for (int b = 0; b < materialCount / 2; b++) {
+                        if (b == 0) {
+                            _material.append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(0)));
+                        } else {
+                            _material.append(" | ").append(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(b * 2 + 1)).append("x ").append(BazaarNotifier.bazaarConversions.getString(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getString(b * 2)));
+                        }
+                    }
+                    text.put(_material.toString(), Color.LIGHT_GRAY);
+                }
+                material.add(text);
+                int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY() - (int) (8 * BazaarNotifier.scale));
+                Gui.drawRect(getMouseCoordinateX() - padding, getMouseCoordinateY() - (int) (8 * BazaarNotifier.scale) - (int) (padding * BazaarNotifier.scale), (int) (getMouseCoordinateX() + longestXString + padding * BazaarNotifier.scale), (int) (getMouseCoordinateY() + padding * BazaarNotifier.scale), 0xFF404040);
+                ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(), getMouseCoordinateY() - (int) (8 * BazaarNotifier.scale));
+            }
         }
     }
 }

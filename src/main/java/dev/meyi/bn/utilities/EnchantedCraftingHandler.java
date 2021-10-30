@@ -188,7 +188,6 @@ public class EnchantedCraftingHandler {
     }
 
     public static void getUnlockedRecipes(){
-
         try{
             unlockedRecipes = Utils.unlockedRecipes().toString();
         }catch (IOException ignored){}
