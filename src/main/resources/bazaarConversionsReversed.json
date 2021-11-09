@@ -301,5 +301,14 @@
   "Enchanted Hard Stone": "ENCHANTED_HARD_STONE",
   "Concentrated Stone": "CONCENTRATED_STONE",
   "Yoggie": "YOGGIE",
-  "Sludge Juice": "SLUDGE_JUICE"
+  "Sludge Juice": "SLUDGE_JUICE",
+  "Worm Membrane": "WORM_MEMBRANE",
+  "Green Goblin Egg": "GOBLIN_EGG_GREEN",
+  "Blue Goblin Egg": "GOBLIN_EGG_BLUE",
+  "Red Goblin Egg": "GOBLIN_EGG_RED",
+  "Yellow Goblin Egg": "GOBLIN_EGG_YELLOW",
+  "Goblin Egg": "GOBLIN_EGG",
+  "Arachne's Keeper Fragment": "ARACHNE_KEEPER_FRAGMENT",
+  "Soul String": "SOUL_STRING",
+  "Cheese": "CHEESE_FUEL"
 }
