@@ -303,12 +303,12 @@
   "Yoggie": "YOGGIE",
   "Sludge Juice": "SLUDGE_JUICE",
   "Worm Membrane": "WORM_MEMBRANE",
-  "Green Goblin Egg": "GREEN_GOBLIN_EGG",
-  "Blue Goblin Egg": "BLUE_GOBLIN_EGG",
-  "Red Goblin Egg": "RED_GOBLIN_EGG",
-  "Yellow Goblin Egg": "YELLOW_GOBLIN_EGG",
+  "Green Goblin Egg": "GOBLIN_EGG_GREEN",
+  "Blue Goblin Egg": "GOBLIN_EGG_BLUE",
+  "Red Goblin Egg": "GOBLIN_EGG_RED",
+  "Yellow Goblin Egg": "GOBLIN_EGG_YELLOW",
   "Goblin Egg": "GOBLIN_EGG",
   "Arachne's Keeper Fragment": "ARACHNE_KEEPER_FRAGMENT",
   "Soul String": "SOUL_STRING",
-  "Cheese": "CHEESE"
+  "Cheese": "CHEESE_FUEL"
 }
