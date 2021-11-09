@@ -302,4 +302,13 @@
   "Concentrated Stone": "CONCENTRATED_STONE",
   "Yoggie": "YOGGIE",
   "Sludge Juice": "SLUDGE_JUICE"
+  "Worm Membrane": "WORM_MEMBRANE",
+  "Green Goblin Egg": "GREEN_GOBLIN_EGG",
+  "Blue Goblin Egg": "BLUE_GOBLIN_EGG",
+  "Red Goblin Egg": "RED_GOBLIN_EGG",
+  "Yellow Goblin Egg": "YELLOW_GOBLIN_EGG",
+  "Goblin Egg": "GOBLIN_EGG",
+  "Arachne's Keeper Fragment": "ARACHNE_KEEPER_FRAGMENT",
+  "Soul String": "SOUL_STRING",
+  "Cheese": "CHEESE"
 }
