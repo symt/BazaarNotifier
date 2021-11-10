@@ -1,15 +1,17 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.*;
+import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.EnchantedCraftingHandler;
+import dev.meyi.bn.utilities.Suggester;
+import dev.meyi.bn.utilities.Utils;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -103,7 +105,7 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
       }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
-        if (EnchantedCraftingHandler.collectionCheckDisabled && !Objects.equals(BazaarNotifier.apiKey, "")) {
+        if (EnchantedCraftingHandler.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Only showing unlocked recipes"));
           EnchantedCraftingHandler.collectionCheckDisabled = false;
@@ -186,7 +188,7 @@ public class BazaarNotifierCommand extends CommandBase {
                             + "Please provide a valid item to find."));
           }
         }
-      } else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
+      }else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
         player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.GREEN
                         + EnchantedCraftingHandler.editCraftingModuleGUI(args[1])));
@@ -196,7 +198,7 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "This command is intended for testing purposes only, use it at your own peril. Forced rendering has been turned "
             + EnumChatFormatting.DARK_RED + (BazaarNotifier.forceRender ? "on" : "off")));
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
+      }else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
         ChatComponentText discordLink = new ChatComponentText(
             EnumChatFormatting.DARK_GREEN + "" + EnumChatFormatting.BOLD
                 + "[DISCORD LINK]");
@@ -218,7 +220,7 @@ public class BazaarNotifierCommand extends CommandBase {
                 new ChatComponentText("\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
-      } else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0].equalsIgnoreCase("tc"))) {
+      }else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0].equalsIgnoreCase("tc"))) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                 + EnchantedCraftingHandler.toggleCrafting()));
       }else if (args.length == 2 && args[0].equalsIgnoreCase("setCraftingListLength")) {
@@ -241,19 +243,15 @@ public class BazaarNotifierCommand extends CommandBase {
 
       }else if(args.length == 2 && args[0].equalsIgnoreCase("scale")) {
 
-        if (Utils.isInteger(args[1])){
-          if (Integer.parseInt(args[1])>0 && Integer.parseInt(args[1])<=20) {
+        if (Utils.isInteger(args[1]) && Integer.parseInt(args[1])>0 && Integer.parseInt(args[1])<=20){
             Utils.setScale(Float.parseFloat(args[1]) / 10);
             player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                     + "Set scale to " + args[1]));
-          }else{
+        }else{
             player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                     + "Please enter a number between 1 and 20"));
-          }
-        }else{
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Please enter a valid number between 1 and 20"));
         }
+
 
       }else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -301,7 +299,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length ==2 && args[0].equalsIgnoreCase("reset")){
+    }else if(args.length == 2 && args[0].equalsIgnoreCase("reset")){
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("orders");
@@ -313,7 +311,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length ==2 && args[0].equalsIgnoreCase("craftingModuleConfig")){
+    }else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleConfig")){
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("instasell");
