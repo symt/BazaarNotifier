@@ -103,8 +103,14 @@ public class EventHandler {
         }
       }
     } else if (message.startsWith("Bazaar! Claimed ")) {
+
       ChestTickHandler.updateBazaarOrders(
               ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
+/*
+      ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
+      // ChestTickHandler.updateBazaarOrders(
+      //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);*/ //I don´t know which is right I got this and in master is the other code. Idk how it works so just try
+
     }
   }
 

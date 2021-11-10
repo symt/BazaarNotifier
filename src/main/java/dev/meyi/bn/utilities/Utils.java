@@ -31,7 +31,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.lwjgl.opengl.GL11;
 
-
 public class Utils {
 
 
@@ -53,6 +52,7 @@ public class Utils {
 
     return new JSONObject(result).getJSONObject("products");
   }
+
 
   public static JSONArray unlockedRecipes() throws IOException {
     if(!BazaarNotifier.apiKey.equals("")) {
@@ -96,6 +96,7 @@ public class Utils {
       return new JSONArray();
     }
   }
+
 
 
   public static boolean isInteger(String s) {
@@ -234,4 +235,4 @@ public class Utils {
 
     GL11.glScalef(BazaarNotifier.scale_b, BazaarNotifier.scale_b, 1);
   }
-}
+
