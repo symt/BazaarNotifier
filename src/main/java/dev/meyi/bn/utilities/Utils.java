@@ -12,7 +12,11 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
@@ -51,10 +55,10 @@ public class Utils {
   }
 
   public static JSONArray unlockedRecipes() throws IOException {
-    if(!Objects.equals(BazaarNotifier.apiKey, "")) {
+    if(!BazaarNotifier.apiKey.equals("")) {
 
       HttpClient client = HttpClientBuilder.create().build();
-      if (Objects.equals(playerUUID, "")) {
+      if (playerUUID.equals("")) {
         HttpGet request = new HttpGet(
                 "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft().getSession().getUsername()); //Chance this to your Username
         HttpResponse response = client.execute(request);
