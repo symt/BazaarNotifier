@@ -2,24 +2,20 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            name = "forge"
-            url = "https://maven.minecraftforge.net/"
+            name 'JitPack'
+            url 'https://jitpack.io'
         }
+        maven { url = "https://maven.minecraftforge.net/" }
+        maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+        classpath 'com.github.asbyth:ForgeGradle:6f53277'
     }
 }
-plugins {
-    id "com.github.johnrengelman.shadow" version "1.2.3"
-}
-
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
+apply plugin: 'java'
+apply plugin: "net.minecraftforge.gradle.forge"
+apply plugin: 'com.github.johnrengelman.shadow'
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -32,7 +28,8 @@ archivesBaseName = "BazaarNotifier"
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
-    mappings = "stable_20"
+    mappings = "stable_22"
+    makeObfSourceJar = false
 }
 
 dependencies {
@@ -44,7 +41,6 @@ jar {
         attributes 'FMLAT': 'BazaarNotifier_at.cfg'
     }
 }
-
 
 processResources
         {
