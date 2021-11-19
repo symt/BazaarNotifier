@@ -142,7 +142,18 @@
     "FLAWLESS_JADE_GEM": {"material":["FINE_JADE_GEM", 80],"collection":"GEMSTONE_COLLECTION_9"},
     "FLAWLESS_TOPAZ_GEM": {"material":["FINE_TOPAZ_GEM", 80],"collection":"GEMSTONE_COLLECTION_9"},
     "FLAWLESS_SAPPHIRE_GEM": {"material":["FINE_SAPPHIRE_GEM", 80],"collection":"GEMSTONE_COLLECTION_9"},
-    "ENCHANTED_PAPER": { "material":["SUGAR_CANE", 192],"collection":"SUGAR_CANE_5"}
+    "ENCHANTED_PAPER": { "material":["SUGAR_CANE", 192],"collection":"SUGAR_CANE_5"},
+    "MINNOW_BAIT": { "material":["RAW_FISH", 2],"collection":"RAW_FISH:1_1"},
+    "FISH_BAIT": { "material":["RAW_FISH", 2, "RAW_FISH:1", 1],"collection":"RAW_FISH:1_6"},
+    "LIGHT_BAIT": { "material":["PRISMARINE_CRYSTALS", 1, "RAW_FISH",1],"collection":"PRISMARINE_CRYSTALS_2"},
+    "DARK_BAIT": { "material":["INK_SACK", 1, "RAW_FISH",1],"collection":"INK_SACK_2"},
+    "SPIKED_BAIT": { "material":["RAW_FISH:3", 1, "RAW_FISH",1],"collection":"RAW_FISH:3_5"},
+    "SPOOKY_BAIT": { "material":["PUMPKIN", 1, "RAW_FISH",1],"collection":"WATER_LILY_1"},
+    "CARROT_BAIT": { "material":["CARROT_ITEM", 1, "RAW_FISH",1],"collection":"CARROT_ITEM_3"},
+    "BLESSED_BAIT": { "material":["GOLD_INGOT", 9, "RAW_FISH",1, "PRISMARINE_CRYSTALS",1],"collection":"PRISMARINE_CRYSTALS_3"},
+    "WHALE_BAIT": { "material":["FISH_BAIT", 1, "LIGHT_BAIT" ,1 , "BLESSED_BAIT", 1,"DARK_BAIT",1 ],"collection":"WATER_LILY_6"},
+    "ICE_BAIT": { "material":["ICE", 1,"RAW_FISH",1],"collection":"ICE_6"},
+    "SHARK_BAIT": { "material":["SHARK_FIN", 2],"collection":"NONE"}
   },
   "craftableItems":[ "ENCHANTED_PUMPKIN" , "ENCHANTED_POTATO" , "ENCHANTED_SLIME_BALL" , "ENCHANTED_RED_MUSHROOM" , "ENCHANTED_CARROT" , "ENCHANTED_OAK_LOG" , "ENCHANTED_BIRCH_LOG"
   , "ENCHANTED_GUNPOWDER" , "ENCHANTED_MELON" , "ENCHANTED_SUGAR" , "ENCHANTED_BLAZE_ROD" , "ENCHANTED_DIAMOND" , "ENCHANTED_BROWN_MUSHROOM" , "ENCHANTED_RAW_SALMON"
