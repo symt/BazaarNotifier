@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+
 
 
 import net.minecraft.client.Minecraft;
@@ -43,19 +43,19 @@ public class Utils {
       apiBit = "?key=" + BazaarNotifier.apiKey;
     }
     HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar" + apiBit);
+            "https://api.hypixel.net/skyblock/bazaar" + apiBit);
     HttpResponse response = client.execute(request);
 
     String result = IOUtils.toString(new BufferedReader
-        (new InputStreamReader(
-            response.getEntity().getContent())));
+            (new InputStreamReader(
+                    response.getEntity().getContent())));
 
     return new JSONObject(result).getJSONObject("products");
   }
 
 
   public static JSONArray unlockedRecipes() throws IOException {
-    if(!BazaarNotifier.apiKey.equals("")) {
+    if (!BazaarNotifier.apiKey.equals("")) {
 
       HttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
@@ -78,25 +78,32 @@ public class Utils {
       long lastSaved = 0;
       int profileIndex = 0;
 
-      for(int i = 0; i < results.getJSONArray("profiles").length(); i++){
-        if(results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save") > lastSaved){
+      for (int i = 0; i < results.getJSONArray("profiles").length(); i++) {
+        if (results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save") > lastSaved) {
           lastSaved = results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save");
           profileIndex = i;
         }
       }
-      JSONArray unlockedCollections =  results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONArray("unlocked_coll_tiers");
+      JSONArray unlockedCollections = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONArray("unlocked_coll_tiers");
       JSONObject slayer = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
-      if (slayer.getJSONObject("zombie").getJSONObject("claimed_levels").has("level_4")){unlockedCollections.put("zombie_4");}
-      if (slayer.getJSONObject("spider").getJSONObject("claimed_levels").has("level_4")){unlockedCollections.put("spider_4");}
-      if (slayer.getJSONObject("wolf").getJSONObject("claimed_levels").has("level_4")){unlockedCollections.put("wolf_4");}
-      if (slayer.getJSONObject("enderman").getJSONObject("claimed_levels").has("level_2")){unlockedCollections.put("enderman_2");}
+      if (slayer.getJSONObject("zombie").getJSONObject("claimed_levels").has("level_4")) {
+        unlockedCollections.put("zombie_4");
+      }
+      if (slayer.getJSONObject("spider").getJSONObject("claimed_levels").has("level_4")) {
+        unlockedCollections.put("spider_4");
+      }
+      if (slayer.getJSONObject("wolf").getJSONObject("claimed_levels").has("level_4")) {
+        unlockedCollections.put("wolf_4");
+      }
+      if (slayer.getJSONObject("enderman").getJSONObject("claimed_levels").has("level_2")) {
+        unlockedCollections.put("enderman_2");
+      }
       return unlockedCollections;
-    }else{
+    } else {
       EnchantedCraftingHandler.collectionCheckDisabled = true;
       return new JSONArray();
     }
   }
-
 
 
   public static boolean isInteger(String s) {
@@ -139,7 +146,7 @@ public class Utils {
         configFile.createNewFile();
       }
       Files.write(Paths.get(configFile.getAbsolutePath()),
-          toSave.getBytes(StandardCharsets.UTF_8));
+              toSave.getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -169,7 +176,7 @@ public class Utils {
 
   public static JSONObject initializeConfig() {
     JSONObject newConfig = new JSONObject().put("api", BazaarNotifier.apiKey)
-        .put("version", BazaarNotifier.VERSION);
+            .put("version", BazaarNotifier.VERSION);
 
     JSONArray modules = new JSONArray();
 
@@ -187,42 +194,42 @@ public class Utils {
 
   public static boolean validateApiKey() throws IOException {
     return new JSONObject(IOUtils.toString(new BufferedReader
-        (new InputStreamReader(
-            HttpClientBuilder.create().build().execute(new HttpGet(
-                "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
-                .getContent())))).getBoolean("success");
+            (new InputStreamReader(
+                    HttpClientBuilder.create().build().execute(new HttpGet(
+                                    "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
+                            .getContent())))).getBoolean("success");
   }
 
 
   /**
-   * @param key order key
-   * @param price price per unit of order
-   * @param i index of order
-   * @param type Buy Order or Sell Offer (sets message color to dark purple vs blue)
+   * @param key          order key
+   * @param price        price per unit of order
+   * @param i            index of order
+   * @param type         Buy Order or Sell Offer (sets message color to dark purple vs blue)
    * @param notification yellow notification message
    * @return ChatComponentText completed message
    */
   public static ChatComponentText chatNotification(String key, double price, int i, String type,
-      String notification) {
+                                                   String notification) {
     EnumChatFormatting messageColor =
-        (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
-            : type.equalsIgnoreCase("Buy Order") ? EnumChatFormatting.DARK_PURPLE
-                : EnumChatFormatting.BLUE);
+            (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
+                    : type.equalsIgnoreCase("Buy Order") ? EnumChatFormatting.DARK_PURPLE
+                    : EnumChatFormatting.BLUE);
     return new ChatComponentText(
-        messageColor + type
-            + EnumChatFormatting.GRAY + " for "
-            + messageColor + BazaarNotifier.dfNoDecimal
-            .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
-            + EnumChatFormatting.GRAY + "x " + messageColor
-            + BazaarNotifier.orders.getJSONObject(i).getString("product")
-            + EnumChatFormatting.YELLOW
-            + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + messageColor + BazaarNotifier.df.format(price)
-            + EnumChatFormatting.GRAY + ")"
+            messageColor + type
+                    + EnumChatFormatting.GRAY + " for "
+                    + messageColor + BazaarNotifier.dfNoDecimal
+                    .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
+                    + EnumChatFormatting.GRAY + "x " + messageColor
+                    + BazaarNotifier.orders.getJSONObject(i).getString("product")
+                    + EnumChatFormatting.YELLOW
+                    + " " + notification + " " + EnumChatFormatting.GRAY + "("
+                    + messageColor + BazaarNotifier.df.format(price)
+                    + EnumChatFormatting.GRAY + ")"
     );
   }
 
-  public static void setScale(float scale){
+  public static void setScale(float scale) {
     BazaarNotifier.scale = scale;
     BazaarNotifier.scale_b = (float) Math.pow(scale, -1);
   }
@@ -230,9 +237,10 @@ public class Utils {
   public static void drawCenteredString(String text, int x, int y, int color) {
     GL11.glScalef(BazaarNotifier.scale, BazaarNotifier.scale, 1);
     Minecraft.getMinecraft().fontRendererObj.drawString(text,
-            (int)((x / BazaarNotifier.scale )- Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)*BazaarNotifier.scale  / 2),
-            (int)(y/BazaarNotifier.scale), color);
+            (int) ((x / BazaarNotifier.scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * BazaarNotifier.scale / 2),
+            (int) (y / BazaarNotifier.scale), color);
 
     GL11.glScalef(BazaarNotifier.scale_b, BazaarNotifier.scale_b, 1);
   }
+}
 
