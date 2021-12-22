@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 public class SuggestionModule extends Module {
 
+
   public SuggestionModule() {
     super();
   }
@@ -39,16 +40,16 @@ public class SuggestionModule extends Module {
         items.add(message);
       }
 
-      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
+      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
 
       boundsX = x + longestXString;
 
     } else {
       Utils.drawCenteredString("Waiting for bazaar data", x + 100,
-          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA);
+          y + (int)((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * 5 * scale), 0xAAAAAA,scale);
       boundsX = x + 200;
     }
-    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.scale * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("suggesterLength") *2* BazaarNotifier.scale-2;
+    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("suggesterLength") *2* scale-2;
     boundsY = (int) Y;
   }
 
@@ -56,6 +57,7 @@ public class SuggestionModule extends Module {
   protected void reset() {
     x = Defaults.SUGGESTION_MODULE_X;
     y = Defaults.SUGGESTION_MODULE_Y;
+    scale = 1;
   }
 
   @Override
@@ -70,15 +72,13 @@ public class SuggestionModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.bazaarDataFormatted.length() - 10;
+    return BazaarNotifier.bazaarDataFormatted.length() - BazaarNotifier.config.getInt("suggesterLength");
   }
 
   @Override
   public JSONObject generateModuleConfig() {
     return super.generateModuleConfig();
   }
-
-
 
 
 }

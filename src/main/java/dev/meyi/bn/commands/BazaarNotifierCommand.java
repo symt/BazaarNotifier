@@ -1,10 +1,7 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
-import dev.meyi.bn.utilities.Suggester;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.utilities.*;
 
 
 import java.io.IOException;
@@ -131,6 +128,14 @@ public class BazaarNotifierCommand extends CommandBase {
           BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared"));
+        }else if (args[1].equalsIgnoreCase("scale") && args.length == 2){
+          BazaarNotifier.resetScale();
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Your scale for every module has been reset"));
+        }else if (args[1].equalsIgnoreCase("bank") && args.length == 2){
+          ProfitCalculator.reset();
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Your bank module has been reset"));
         }
       }else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
         if (args.length == 1) {
@@ -241,18 +246,6 @@ public class BazaarNotifierCommand extends CommandBase {
                   + "Please enter a valid number"));
         }
 
-      }else if(args.length == 2 && args[0].equalsIgnoreCase("scale")) {
-
-        if (Utils.isInteger(args[1]) && Integer.parseInt(args[1])>0 && Integer.parseInt(args[1])<=20){
-            Utils.setScale(Float.parseFloat(args[1]) / 10);
-            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                    + "Set scale to " + args[1]));
-        }else{
-            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                    + "Please enter a number between 1 and 20"));
-        }
-
-
       }else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
@@ -283,7 +276,6 @@ public class BazaarNotifierCommand extends CommandBase {
       arguments.add("craftingModuleConfig");
       arguments.add("discord");
       arguments.add("find");
-      arguments.add("scale");
       arguments.add("setFlippingListLength");
       arguments.add("setCraftingListLength");
       arguments.add("toggle");
@@ -304,6 +296,8 @@ public class BazaarNotifierCommand extends CommandBase {
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("orders");
       arguments.add("all");
+      arguments.add("scale");
+      arguments.add("bank");
       for (String argument : arguments) {
         if (argument.startsWith(args[1].toLowerCase())) {
           sortedArguments.add(argument);
