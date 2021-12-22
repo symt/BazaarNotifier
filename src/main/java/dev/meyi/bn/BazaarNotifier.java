@@ -7,7 +7,6 @@ import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
 import java.io.File;
@@ -36,21 +35,23 @@ public class BazaarNotifier {
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
-  public static DecimalFormat df = new DecimalFormat("#,###.0");
+  public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
 
   public static boolean activeBazaar = true;
   public static boolean inBazaar = false;
+  public static boolean inBank = false;
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
   public static boolean apiKeyDisabled = true;// Change this if an api key is ever required to access the bazaar again.
-  public static float scale = 1f;
-  public static float scale_b = (float)Math.pow(scale, -1);
+  public static boolean sendChatMessages = true;
+
 
   public static JSONArray orders = new JSONArray();
   public static JSONObject bazaarDataRaw = new JSONObject();
   public static JSONObject bazaarCache = new JSONObject();
   public static JSONArray bazaarDataFormatted = new JSONArray();
+  public static JSONObject playerDataFromAPI = new JSONObject();
 
 
   public static JSONObject bazaarConversions = new JSONObject(
@@ -70,7 +71,10 @@ public class BazaarNotifier {
   public static void resetMod() {
     modules.resetAll();
     orders = Defaults.DEFAULT_ORDERS_LAYOUT();
-    BazaarNotifier.scale = Defaults.SCALE;
+  }
+
+  public static void resetScale(){
+    modules.resetScale();
   }
 
   @Mod.EventHandler

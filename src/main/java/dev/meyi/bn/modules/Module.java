@@ -1,13 +1,11 @@
 package dev.meyi.bn.modules;
 
-import java.awt.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import org.json.JSONObject;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
 public abstract class Module {
 
@@ -18,6 +16,7 @@ public abstract class Module {
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
+  protected float scale = 1;
 
   boolean moving = false;
   boolean needsToMove = false;

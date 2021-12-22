@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            name 'JitPack'
+           name 'JitPack'
             url 'https://jitpack.io'
         }
         maven { url = "https://maven.minecraftforge.net/" }

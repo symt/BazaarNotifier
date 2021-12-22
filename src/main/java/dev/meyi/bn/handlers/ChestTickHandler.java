@@ -1,7 +1,8 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.utilities.ProfitCalculator;
+
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -95,9 +96,11 @@ public class ChestTickHandler {
               }
             }
             if (forceRemove) {
-              Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                      BazaarNotifier.prefix + EnumChatFormatting.RED
-                              + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
+              if(BazaarNotifier.sendChatMessages) {
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                        BazaarNotifier.prefix + EnumChatFormatting.RED
+                                + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
+              }
               BazaarNotifier.orders.remove(orderInQuestion);
             } else if (amountLeft > 0) {
               BazaarNotifier.orders.getJSONObject(orderInQuestion)
@@ -128,6 +131,7 @@ public class ChestTickHandler {
         IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
         String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
 
+
         if (chest.hasCustomName() && !lastScreenDisplayName.equalsIgnoreCase(chestName)) {
           if (chestName.equals("confirm buy order") ||
                   chestName.equals("confirm sell offer")) {
@@ -147,7 +151,13 @@ public class ChestTickHandler {
             }
           }
         }
-      } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
+      }else if(BazaarNotifier.inBank && Minecraft.getMinecraft().currentScreen instanceof GuiChest) {
+        IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
+        String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
+        if (chestName.contains("bank account") && !chestName.contains("upgrade")) {
+          ProfitCalculator.extractBankFromItemDescription(((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
+        }
+      }else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
         ChestTickHandler.lastScreenDisplayName = "";
       }
     }

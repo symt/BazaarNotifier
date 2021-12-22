@@ -1,8 +1,10 @@
 package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.lwjgl.input.Keyboard;
@@ -60,6 +62,14 @@ public class ModuleList extends ArrayList<Module> {
       m.drawBounds();
     }
   }
+  public void rescaleCheck(){
+    for (Module m: this){
+      if(m.inMovementBox() && Keyboard.isKeyDown(29)&& !Keyboard.isKeyDown(42)){
+        float newScale = m.scale + (float)MouseHandler.mouseWheelMovement / 10;
+        m.scale = Math.max(newScale, 0.1f);
+      }
+    }
+  }
 
   public void movementCheck() {
     if (Mouse.isButtonDown(0)) {
@@ -90,27 +100,44 @@ public class ModuleList extends ArrayList<Module> {
   }
 
   public void pageFlipCheck() {
-    if (Mouse.isButtonDown(1) && !Mouse.isButtonDown(0)) {
-      for (Module m : this) {
-        if (m.inMovementBox() && m.getMaxShift() > 0) {
-          if (Keyboard.isKeyDown(17) && !Keyboard.isKeyDown(31)) {
-            if (m.shift != 0) {
-              m.shift--;
-            }
-          } else if (Keyboard.isKeyDown(31) && !Keyboard.isKeyDown(17)) {
-            if (m.shift != m.getMaxShift()) {
+    if(!Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
+      if (MouseHandler.mouseWheelMovement != 0) {
+        for (Module m : this) {
+          if (m.inMovementBox() && m.getMaxShift() > 0) {
+          /*if (dWheel < 0){  //this should be compatible with every Mouse if there are problems. m.getDWheel returns different values depending on the Mouse
+            if(m.getMaxShift() > m.shift) {
               m.shift++;
             }
+          }else {
+            if (m.shift > 0) {
+              m.shift--;
+            }
+           }
+           */
+            m.shift += MouseHandler.mouseWheelMovement;
+            if (m.shift > m.getMaxShift()) {
+              m.shift = m.getMaxShift();
+            } else if (m.shift < 0) {
+              m.shift = 0;
+            }
+
+            break;
           }
-          break;
         }
       }
     }
   }
 
+
   public void resetAll() {
     for (Module m : this) {
       m.reset();
+    }
+  }
+
+  public void resetScale(){
+    for(Module m : this){
+      m.scale = 1;
     }
   }
 

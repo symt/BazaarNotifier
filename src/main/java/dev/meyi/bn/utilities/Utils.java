@@ -78,12 +78,14 @@ public class Utils {
       long lastSaved = 0;
       int profileIndex = 0;
 
+
       for (int i = 0; i < results.getJSONArray("profiles").length(); i++) {
         if (results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save") > lastSaved) {
           lastSaved = results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save");
           profileIndex = i;
         }
       }
+      BazaarNotifier.playerDataFromAPI = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID);
       JSONArray unlockedCollections = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONArray("unlocked_coll_tiers");
       JSONObject slayer = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
       if (slayer.getJSONObject("zombie").getJSONObject("claimed_levels").has("level_4")) {
@@ -229,18 +231,11 @@ public class Utils {
     );
   }
 
-  public static void setScale(float scale) {
-    BazaarNotifier.scale = scale;
-    BazaarNotifier.scale_b = (float) Math.pow(scale, -1);
-  }
 
-  public static void drawCenteredString(String text, int x, int y, int color) {
-    GL11.glScalef(BazaarNotifier.scale, BazaarNotifier.scale, 1);
-    Minecraft.getMinecraft().fontRendererObj.drawString(text,
-            (int) ((x / BazaarNotifier.scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * BazaarNotifier.scale / 2),
-            (int) (y / BazaarNotifier.scale), color);
 
-    GL11.glScalef(BazaarNotifier.scale_b, BazaarNotifier.scale_b, 1);
+  public static void drawCenteredString(String text, int x, int y, int color,float moduleScale) {
+    GL11.glScalef(moduleScale, moduleScale, 1);
+    Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
+    GL11.glScalef((float)Math.pow(moduleScale, -1), (float)Math.pow(moduleScale, -1), 1);
   }
 }
-

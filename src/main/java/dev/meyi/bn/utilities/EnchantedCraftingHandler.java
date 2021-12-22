@@ -1,6 +1,8 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONException;
 
@@ -11,8 +13,6 @@ import java.util.*;
 public class EnchantedCraftingHandler {
     private static String unlockedRecipes = "";
     public static boolean collectionCheckDisabled = false;
-    static int i = 0;
-
 
 
     public static ArrayList<ArrayList<String>> getBestEnchantRecipes(){
@@ -24,15 +24,17 @@ public class EnchantedCraftingHandler {
             String itemName = normalKeys.next();
             if(unlockedRecipes.contains(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("collection")) || Objects.equals(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("collection"), "NONE") || collectionCheckDisabled) {
                 if (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").length() > 0 && BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").length() > 0) {
-                    try { // I don´t know why, but it sometimes crashes with org.json.JSONException: JSONArray[0] not found.
+                    if(!BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").isEmpty()){// I don´t know why, but it sometimes crashes with org.json.JSONException: JSONArray[0] not found.
                         String material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("material");
-                        double price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) * 160;
-                        double price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) * 160;
-                        double profitPerMilC = 1000000 / (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") * 160);
-                        double profitPerMil = profitPerMilC * BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") * 160);
+                        try {
+                            double price1 = (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) * 160;
+                            double price2 = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit")) * 160;
+                            double profitPerMilC = 1000000 / (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") * 160);
+                            double profitPerMil = profitPerMilC * BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") - (BazaarNotifier.bazaarDataRaw.getJSONObject(material).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit") * 160);
 
-                        list.add(new ArrayList<>(Arrays.asList(Double.toString(price1), Double.toString(price2), Double.toString(profitPerMil), itemName)));
-                    }catch (JSONException ignored){}
+                            list.add(new ArrayList<>(Arrays.asList(Double.toString(price1), Double.toString(price2), Double.toString(profitPerMil), itemName)));
+                        }catch (Exception ignored){}
+                    }
                 } else {
                     list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
                 }
