@@ -4,9 +4,7 @@ import dev.meyi.bn.BazaarNotifier;
 import java.math.BigDecimal;
 
 import dev.meyi.bn.utilities.ProfitCalculator;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -28,6 +26,9 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
+
+        ProfitCalculator.moneyOnBazaarLeave = ProfitCalculator.calculateProfit();
+
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
               .equals(BazaarNotifier.bazaarConversionsReversed
                       .getString(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
@@ -36,9 +37,9 @@ public class EventHandler {
         verify = null;
         productVerify = new String[2];
       }
-      if(message.startsWith("Sell Offer Setup!") && !BazaarNotifier.inBazaar){
-          ProfitCalculator.moneyNotFromBazaar -= BazaarNotifier.orders.getJSONObject(BazaarNotifier.orders.length()-1).getDouble("orderValue");
-      }
+      //if(message.startsWith("Sell Offer Setup!")){
+        // ProfitCalculator.moneyNotFromBazaar -= BazaarNotifier.orders.getJSONObject(BazaarNotifier.orders.length()-1).getDouble("orderValue");
+      //}
 
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
       String item = message.split("x ", 2)[1].split(" was ")[0];
@@ -55,7 +56,9 @@ public class EventHandler {
                   && order.getInt("startAmount") == amount && order.getString("type").equals("buy")
                   && order.getDouble("pricePerUnit") > edgePrice) {
             if(!BazaarNotifier.inBazaar) {
-              ProfitCalculator.moneyNotFromBazaar =- order.getInt("orderValue");
+              ProfitCalculator.moneyNotFromBazaar += order.getInt("orderValue");
+            }else{
+              ProfitCalculator.moneyNotFromBazaar -= order.getInt("orderValue");
             }
             edgePrice = order.getDouble("pricePerUnit");
             orderToRemove = i;
@@ -69,6 +72,11 @@ public class EventHandler {
           if (order.getString("product").equalsIgnoreCase(item)
                   && order.getInt("startAmount") == amount && order.getString("type").equals("sell")
                   && order.getDouble("pricePerUnit") < edgePrice) {
+            ProfitCalculator.moneyNotFromBazaar -= order.getInt("orderValue");
+            if(!BazaarNotifier.inBazaar) {
+              ProfitCalculator.moneyNotFromBazaar += order.getInt("orderValue");
+            }
+
             edgePrice = order.getDouble("pricePerUnit");
             orderToRemove = i;
             found = true;
