@@ -16,7 +16,7 @@ public abstract class Module {
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
-  protected float scale = 1;
+  protected float scale;
 
   boolean moving = false;
   boolean needsToMove = false;
@@ -28,6 +28,7 @@ public abstract class Module {
   public Module(JSONObject module) {
     x = module.getInt("x");
     y = module.getInt("y");
+    scale = module.getFloat("scale");
   }
 
   protected abstract void draw();
@@ -65,7 +66,7 @@ public abstract class Module {
 
   public JSONObject generateModuleConfig() {
     JSONObject config = new JSONObject();
-    config.put("x", x).put("y", y).put("name", name());
+    config.put("x", x).put("y", y).put("scale", scale).put("name", name());
     return config;
   }
 

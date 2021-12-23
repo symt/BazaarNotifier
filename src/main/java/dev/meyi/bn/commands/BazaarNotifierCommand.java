@@ -1,6 +1,7 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.modules.CraftingModule;
 import dev.meyi.bn.utilities.*;
 
 
@@ -310,7 +311,7 @@ public class BazaarNotifierCommand extends CommandBase {
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("instasell");
       arguments.add("selloffer");
-      arguments.add("profitPerMil");
+      arguments.add("PROFIT_PER_MIL");
       for (String argument : arguments) {
         if (argument.startsWith(args[1].toLowerCase())) {
           sortedArguments.add(argument);

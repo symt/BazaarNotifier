@@ -15,7 +15,6 @@ import java.util.List;
 
 public class BankModule extends Module {
 
-
   public BankModule() {
     super();
   }
@@ -24,7 +23,9 @@ public class BankModule extends Module {
     super(config);
   }
 
-  @Override
+
+
+    @Override
   protected void draw() {
     List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 

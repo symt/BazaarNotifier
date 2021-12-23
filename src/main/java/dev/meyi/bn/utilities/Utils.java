@@ -178,7 +178,14 @@ public class Utils {
 
   public static JSONObject initializeConfig() {
     JSONObject newConfig = new JSONObject().put("api", BazaarNotifier.apiKey)
-            .put("version", BazaarNotifier.VERSION);
+            .put("version", BazaarNotifier.VERSION)
+            .put("craftingListLength", EnchantedCraftingHandler.craftingListLength)
+            .put("suggestionListLength" , Suggester.suggestionListLength)
+            .put("CRAFTING_SORTING_OPTION", EnchantedCraftingHandler.craftingSortingOption)
+            .put("showInstasellProfit", EnchantedCraftingHandler.showInstasellProfit)
+            .put("showSellofferProfit", EnchantedCraftingHandler.showSellofferProfit)
+            .put("showProfitPerMil", EnchantedCraftingHandler.showProfitPerMil)
+            .put("collectionChecking", EnchantedCraftingHandler.collectionCheckDisabled);
 
     JSONArray modules = new JSONArray();
 
@@ -237,5 +244,26 @@ public class Utils {
     GL11.glScalef(moduleScale, moduleScale, 1);
     Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
     GL11.glScalef((float)Math.pow(moduleScale, -1), (float)Math.pow(moduleScale, -1), 1);
+  }
+
+  public static void initialiseConfigValues(){
+    if(BazaarNotifier.config.has("craftingListLength")){
+
+      EnchantedCraftingHandler.craftingListLength = BazaarNotifier.config.getInt("craftingListLength");
+      Suggester.suggestionListLength = BazaarNotifier.config.getInt("suggestionListLength");
+      EnchantedCraftingHandler.craftingSortingOption = BazaarNotifier.config.getInt("CRAFTING_SORTING_OPTION");
+      EnchantedCraftingHandler.showInstasellProfit = BazaarNotifier.config.getBoolean("showInstasellProfit");
+      EnchantedCraftingHandler.showSellofferProfit = BazaarNotifier.config.getBoolean("showSellofferProfit");
+      EnchantedCraftingHandler.showProfitPerMil = BazaarNotifier.config.getBoolean("showProfitPerMil");
+      EnchantedCraftingHandler.collectionCheckDisabled = BazaarNotifier.config.getBoolean("collectionChecking");
+    }else{
+      EnchantedCraftingHandler.craftingListLength = Defaults.CRAFTING_LIST_LENGTH;
+      Suggester.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
+      EnchantedCraftingHandler.craftingSortingOption = Defaults.CRAFTING_SORTING_OPTION;
+      EnchantedCraftingHandler.showInstasellProfit = Defaults.INSTASELL_PROFIT;
+      EnchantedCraftingHandler.showSellofferProfit = Defaults.SELLOFFER_PROFIT;
+      EnchantedCraftingHandler.showProfitPerMil = Defaults.PROFIT_PER_MIL;
+      EnchantedCraftingHandler.collectionCheckDisabled = Defaults.COLLECTION_CHECKING;
+    }
   }
 }

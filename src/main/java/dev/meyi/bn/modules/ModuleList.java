@@ -2,6 +2,8 @@ package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.handlers.MouseHandler;
+import dev.meyi.bn.utilities.EnchantedCraftingHandler;
+import dev.meyi.bn.utilities.Suggester;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
 
@@ -143,7 +145,14 @@ public class ModuleList extends ArrayList<Module> {
 
   public JSONObject generateConfig() {
     JSONObject o = new JSONObject().put("api", BazaarNotifier.apiKey)
-        .put("version", BazaarNotifier.VERSION);
+            .put("version", BazaarNotifier.VERSION)
+            .put("craftingListLength", EnchantedCraftingHandler.craftingListLength)
+            .put("suggestionListLength" , Suggester.suggestionListLength)
+            .put("CRAFTING_SORTING_OPTION", EnchantedCraftingHandler.craftingSortingOption)
+            .put("showInstasellProfit", EnchantedCraftingHandler.showInstasellProfit)
+            .put("showSellofferProfit", EnchantedCraftingHandler.showSellofferProfit)
+            .put("showProfitPerMil", EnchantedCraftingHandler.showProfitPerMil)
+            .put("collectionChecking", EnchantedCraftingHandler.collectionCheckDisabled);
 
     JSONArray modules = new JSONArray();
     for (Module m : this) {

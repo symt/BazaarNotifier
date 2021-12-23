@@ -52,14 +52,13 @@ public class BazaarNotifier {
   public static JSONObject bazaarCache = new JSONObject();
   public static JSONArray bazaarDataFormatted = new JSONArray();
   public static JSONObject playerDataFromAPI = new JSONObject();
+  public static JSONObject config = new JSONObject();
 
 
   public static JSONObject bazaarConversions = new JSONObject(
       new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json"))));
   public static JSONObject bazaarConversionsReversed = new JSONObject(
       new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json"))));
-  public static JSONObject config = new JSONObject(
-          new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/config.json"))));
   public static JSONObject enchantCraftingList = new JSONObject(
           new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/enchantCraftingList.json"))));
 
@@ -93,9 +92,11 @@ public class BazaarNotifier {
     if (config != null && Utils.isValidJSONObject(config)) {
       modules = new ModuleList(
           new JSONObject(config));
+      BazaarNotifier.config = new JSONObject(config);
     } else {
       modules = new ModuleList();
     }
+    Utils.initialiseConfigValues();
   }
 
   @Mod.EventHandler

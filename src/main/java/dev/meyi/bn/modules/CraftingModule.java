@@ -18,8 +18,6 @@ import java.util.List;
 
 public class CraftingModule extends Module{
 
-
-
     private int materialCountWheel = 1;
 
     public CraftingModule() {
@@ -37,11 +35,11 @@ public class CraftingModule extends Module{
     protected void draw() {
         scrollCount();
         list = EnchantedCraftingHandler.getBestEnchantRecipes();
-
+        
 
         if (BazaarNotifier.bazaarDataRaw != null) {
             List<LinkedHashMap<String, Color>> items = new ArrayList<>();
-            for(int i = shift; i<BazaarNotifier.config.getInt("craftingLength") + shift; i++) {
+            for(int i = shift; i<EnchantedCraftingHandler.craftingListLength + shift; i++) {
                 LinkedHashMap<String, Color> message = new LinkedHashMap<>();
                 if(i < list.size()) {
                     if (!list.get(i).isEmpty()) {
@@ -57,19 +55,19 @@ public class CraftingModule extends Module{
                         message.put(". ", Color.MAGENTA);
                         message.put(itemNameConverted, Color.CYAN);
                         message.put(" - ", Color.GRAY);
-                        if (BazaarNotifier.config.getBoolean("instasellProfit")) {
+                        if (EnchantedCraftingHandler.showInstasellProfit) {
                             message.put(BazaarNotifier.df.format(profitInstaSell), getColor(profitInstaSell.intValue()));
                         }
-                        if (BazaarNotifier.config.getBoolean("instasellProfit") && BazaarNotifier.config.getBoolean("sellofferProfit")) {
+                        if (EnchantedCraftingHandler.showInstasellProfit && EnchantedCraftingHandler.showSellofferProfit) {
                             message.put(" / ", Color.GRAY);
                         }
-                        if (BazaarNotifier.config.getBoolean("sellofferProfit")) {
+                        if (EnchantedCraftingHandler.showSellofferProfit) {
                             message.put(BazaarNotifier.df.format(profitSellOffer), getColor(profitSellOffer.intValue()));
                         }
-                        if (BazaarNotifier.config.getBoolean("sellofferProfit") && BazaarNotifier.config.getBoolean("profitPerMil")) {
+                        if (EnchantedCraftingHandler.showSellofferProfit && EnchantedCraftingHandler.showProfitPerMil) {
                             message.put(" /  ", Color.GRAY);
                         }
-                        if (BazaarNotifier.config.getBoolean("profitPerMil")) {
+                        if (EnchantedCraftingHandler.showProfitPerMil) {
                             message.put(BazaarNotifier.df.format(pricePerMil), getColorForMil(pricePerMil.intValue()));
                         }
                     } else {
@@ -83,7 +81,7 @@ public class CraftingModule extends Module{
             this.LongestXString = longestXString;
             renderMaterials(checkHoveredText(),list);
         }
-       float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale* BazaarNotifier.config.getInt("craftingLength") + BazaarNotifier.config.getInt("craftingLength")*2*scale-2;
+       float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale* EnchantedCraftingHandler.craftingListLength + EnchantedCraftingHandler.craftingListLength *2*scale-2;
         boundsY = (int)Y;
     }
 
@@ -107,6 +105,7 @@ public class CraftingModule extends Module{
         x = Defaults.CRAFTING_MODULE_X;
         y = Defaults.CRAFTING_MODULE_Y;
         scale = 1;
+        EnchantedCraftingHandler.craftingListLength  = 10;
     }
 
     @Override
@@ -117,11 +116,11 @@ public class CraftingModule extends Module{
 
     @Override
     protected int getMaxShift() {
-        return list.size() - BazaarNotifier.config.getInt("craftingLength");
+        return list.size() - EnchantedCraftingHandler.craftingListLength ;
     }
 
     protected int checkHoveredText(){
-        float y2 = y+((BazaarNotifier.config.getInt("craftingLength"))*11*scale);
+        float y2 = y+((EnchantedCraftingHandler.craftingListLength )*11*scale);
         int mouseYFormatted = getMouseCoordinateY();
         int mouseXFormatted = getMouseCoordinateX();
         float relativeYMouse = (mouseYFormatted-y)/(11*scale);
@@ -186,5 +185,4 @@ public class CraftingModule extends Module{
         }
         lastHovered = checkHoveredText();
     }
-
 }
