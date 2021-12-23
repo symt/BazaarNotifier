@@ -1,18 +1,26 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Collections;
 
 
 public class EnchantedCraftingHandler {
     private static String unlockedRecipes = "";
-    public static boolean collectionCheckDisabled = false;
+    public static boolean collectionCheckDisabled;
+    public static int craftingSortingOption;
+    public static int craftingListLength;
+    public static boolean showInstasellProfit;
+    public static boolean showSellofferProfit;
+    public static boolean showProfitPerMil;
+
 
 
     public static ArrayList<ArrayList<String>> getBestEnchantRecipes(){
@@ -92,7 +100,7 @@ public class EnchantedCraftingHandler {
             list2.add(Double.valueOf(o2.get(2)));
 
 
-            return list1.get(BazaarNotifier.config.getInt("craftingToggle")).compareTo(list2.get(BazaarNotifier.config.getInt("craftingToggle")));
+            return list1.get(craftingSortingOption).compareTo(list2.get(craftingSortingOption));
         });
         Collections.reverse(list);
         return list;
@@ -100,14 +108,14 @@ public class EnchantedCraftingHandler {
 
 
     public static String toggleCrafting(){
-        if(BazaarNotifier.config.getInt("craftingToggle")==0){
-            BazaarNotifier.config.put("craftingToggle", 1);
+        if(craftingSortingOption == 0){
+            craftingSortingOption = 1;
             return "Toggled crafting to selloffer";
-        }else if(BazaarNotifier.config.getInt("craftingToggle")==1){
-            BazaarNotifier.config.put("craftingToggle", 2);
+        }else if(craftingSortingOption == 1){
+            craftingSortingOption = 2;
             return "Toggled crafting to profit per million";
         }else {
-            BazaarNotifier.config.put("craftingToggle", 0);
+            craftingSortingOption = 0;
             return "Toggled crafting to instasell";
         }
     }
@@ -116,19 +124,19 @@ public class EnchantedCraftingHandler {
         if(length > BazaarNotifier.enchantCraftingList.getJSONObject("normal").length()+BazaarNotifier.enchantCraftingList.getJSONObject("other").length()){
             return length + " is too long";
         }else{
-            BazaarNotifier.config.put("craftingLength" , length);
+            craftingListLength = length;
             return "Item list size set to " + length;
         }
     }
     public static String editCraftingModuleGUI(String craftingValue){
         if(craftingValue.equalsIgnoreCase("instasell")){
-            BazaarNotifier.config.put("instasellProfit", !BazaarNotifier.config.getBoolean("instasellProfit"));
+            showInstasellProfit = !showInstasellProfit;
             return "Toggled (Instant Sell)";
         }else if(craftingValue.equalsIgnoreCase("selloffer")){
-            BazaarNotifier.config.put("sellofferProfit", !BazaarNotifier.config.getBoolean("sellofferProfit"));
+            showSellofferProfit = !showSellofferProfit;
             return "Toggled Profit (Sell Offer)";
-        }else if(craftingValue.equalsIgnoreCase("profitPerMil")){
-            BazaarNotifier.config.put("profitPerMil", !BazaarNotifier.config.getBoolean("profitPerMil"));
+        }else if(craftingValue.equalsIgnoreCase("PROFIT_PER_MIL")){
+            showProfitPerMil = !showProfitPerMil;
             return "Toggled Profit per 1M";
         }else{
             return "This value does not exist";

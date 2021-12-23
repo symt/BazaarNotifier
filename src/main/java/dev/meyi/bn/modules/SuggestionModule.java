@@ -3,6 +3,7 @@ package dev.meyi.bn.modules;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.Suggester;
 import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class SuggestionModule extends Module {
     if (BazaarNotifier.bazaarDataFormatted.length() != 0) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-      for (int i = shift; i < BazaarNotifier.config.getInt("suggesterLength") + shift; i++) {
+      for (int i = shift; i < Suggester.suggestionListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.MAGENTA);
         message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
@@ -49,7 +50,7 @@ public class SuggestionModule extends Module {
           y + (int)((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * 5 * scale), 0xAAAAAA,scale);
       boundsX = x + 200;
     }
-    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("suggesterLength") *2* scale-2;
+    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * Suggester.suggestionListLength + Suggester.suggestionListLength *2* scale-2;
     boundsY = (int) Y;
   }
 
@@ -72,7 +73,7 @@ public class SuggestionModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.bazaarDataFormatted.length() - BazaarNotifier.config.getInt("suggesterLength");
+    return BazaarNotifier.bazaarDataFormatted.length() - Suggester.suggestionListLength;
   }
 
   @Override

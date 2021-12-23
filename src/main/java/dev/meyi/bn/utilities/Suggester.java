@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Suggester {
+  public static int suggestionListLength;
 
   public static void basic() {
     try {
@@ -73,7 +74,7 @@ public class Suggester {
     if(length > BazaarNotifier.bazaarDataRaw.length()){
       return length + " is too long";
     }else{
-      BazaarNotifier.config.put("suggesterLength" , length);
+      suggestionListLength = length;
       return "Item list size set to " + length;
     }
   }
