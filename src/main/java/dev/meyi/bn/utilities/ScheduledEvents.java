@@ -15,9 +15,11 @@ public class ScheduledEvents {
   private ScheduledEvents() {
     outdatedNotification();
     suggestionLoop();
+    collectionLoop();
   }
 
   public static void create() {
+    EnchantedCraftingHandler.getUnlockedRecipes();
     if (instance == null) {
       new ScheduledEvents();
     }
@@ -26,6 +28,10 @@ public class ScheduledEvents {
   public void suggestionLoop() {
     Executors.newScheduledThreadPool(1)
         .scheduleAtFixedRate(Suggester::basic, 5, 5, TimeUnit.SECONDS);
+  }
+
+  public void collectionLoop(){
+    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(EnchantedCraftingHandler::getUnlockedRecipes, 5, 5, TimeUnit.MINUTES);
   }
 
   public void outdatedNotification() {
@@ -52,13 +58,17 @@ public class ScheduledEvents {
                     currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
                         .put("goodOrder", false)
                         .put("currentNotification", "MATCHED");
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Buy Order", "MATCHED"));
+                    if(BazaarNotifier.sendChatMessages) {
+                      Minecraft.getMinecraft().thePlayer
+                              .addChatMessage(
+                                      Utils.chatNotification(key, price, i, "Buy Order", "MATCHED"));
+                    }
                   } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Buy Order", "OUTDATED"));
+                    if(BazaarNotifier.sendChatMessages) {
+                      Minecraft.getMinecraft().thePlayer
+                              .addChatMessage(
+                                      Utils.chatNotification(key, price, i, "Buy Order", "OUTDATED"));
+                    }
                     currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
                         .put("goodOrder", false)
                         .put("currentNotification", "OUTDATED");
@@ -67,8 +77,10 @@ public class ScheduledEvents {
                           .getJSONObject(0).getInt("orders") == 1) {
                     if (currentOrder.getBoolean("outdatedOrder") || currentOrder
                         .getBoolean("matchedOrder")) {
-                      Minecraft.getMinecraft().thePlayer.addChatMessage(
-                          Utils.chatNotification(key, price, i, "Buy Order", "REVIVED"));
+                      if(BazaarNotifier.sendChatMessages) {
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(
+                                Utils.chatNotification(key, price, i, "Buy Order", "REVIVED"));
+                      }
                     }
                     currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
                         .put("goodOrder", true);
@@ -84,23 +96,29 @@ public class ScheduledEvents {
                     currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
                         .put("goodOrder", false)
                         .put("currentNotification", "MATCHED");
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Sell Offer", "MATCHED"));
+                    if(BazaarNotifier.sendChatMessages) {
+                      Minecraft.getMinecraft().thePlayer
+                              .addChatMessage(
+                                      Utils.chatNotification(key, price, i, "Sell Offer", "MATCHED"));
+                    }
                   } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
                     currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
                         .put("goodOrder", false)
                         .put("currentNotification", "OUTDATED");
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
+                    if(BazaarNotifier.sendChatMessages) {
+                      Minecraft.getMinecraft().thePlayer
+                              .addChatMessage(
+                                      Utils.chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
+                    }
                   } else if (diff == 0
                       && BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
                       .getJSONObject(0).getInt("orders") == 1) {
                     if (currentOrder.getBoolean("outdatedOrder") || currentOrder
                         .getBoolean("matchedOrder")) {
-                      Minecraft.getMinecraft().thePlayer.addChatMessage(
-                          Utils.chatNotification(key, price, i, "Sell Offer", "REVIVED"));
+                      if(BazaarNotifier.sendChatMessages) {
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(
+                                Utils.chatNotification(key, price, i, "Sell Offer", "REVIVED"));
+                      }
                     }
                     currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
                         .put("goodOrder", true);

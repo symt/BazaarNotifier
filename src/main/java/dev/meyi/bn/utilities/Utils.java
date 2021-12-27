@@ -15,10 +15,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,8 +29,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.lwjgl.opengl.GL11;
 
 public class Utils {
+
+
+  private static String playerUUID = "";
 
   public static JSONObject getBazaarData() throws IOException {
     HttpClient client = HttpClientBuilder.create().build();
@@ -37,15 +43,70 @@ public class Utils {
       apiBit = "?key=" + BazaarNotifier.apiKey;
     }
     HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar" + apiBit);
+            "https://api.hypixel.net/skyblock/bazaar" + apiBit);
     HttpResponse response = client.execute(request);
 
     String result = IOUtils.toString(new BufferedReader
-        (new InputStreamReader(
-            response.getEntity().getContent())));
+            (new InputStreamReader(
+                    response.getEntity().getContent())));
 
     return new JSONObject(result).getJSONObject("products");
   }
+
+
+  public static JSONArray unlockedRecipes() throws IOException {
+    if (!BazaarNotifier.apiKey.equals("")) {
+
+      HttpClient client = HttpClientBuilder.create().build();
+      if (playerUUID.equals("")) {
+        HttpGet request = new HttpGet(
+                "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft().getSession().getUsername()); //Chance this to your Username
+        HttpResponse response = client.execute(request);
+
+        String uuidResponse = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+
+
+        playerUUID = new JSONObject(uuidResponse).getString("id");
+      }
+
+
+      HttpGet request = new HttpGet("https://api.hypixel.net/skyblock/profiles?key=" + BazaarNotifier.apiKey + "&uuid=" + playerUUID);
+      HttpResponse response = client.execute(request);
+
+      String _results = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+      JSONObject results = new JSONObject(_results);
+      long lastSaved = 0;
+      int profileIndex = 0;
+
+
+      for (int i = 0; i < results.getJSONArray("profiles").length(); i++) {
+        if (results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save") > lastSaved) {
+          lastSaved = results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID).getLong("last_save");
+          profileIndex = i;
+        }
+      }
+      BazaarNotifier.playerDataFromAPI = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID);
+      JSONArray unlockedCollections = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONArray("unlocked_coll_tiers");
+      JSONObject slayer = results.getJSONArray("profiles").getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
+      if (slayer.getJSONObject("zombie").getJSONObject("claimed_levels").has("level_4")) {
+        unlockedCollections.put("zombie_4");
+      }
+      if (slayer.getJSONObject("spider").getJSONObject("claimed_levels").has("level_4")) {
+        unlockedCollections.put("spider_4");
+      }
+      if (slayer.getJSONObject("wolf").getJSONObject("claimed_levels").has("level_4")) {
+        unlockedCollections.put("wolf_4");
+      }
+      if (slayer.getJSONObject("enderman").getJSONObject("claimed_levels").has("level_2")) {
+        unlockedCollections.put("enderman_2");
+      }
+      return unlockedCollections;
+    } else {
+      EnchantedCraftingHandler.collectionCheckDisabled = true;
+      return new JSONArray();
+    }
+  }
+
 
   public static boolean isInteger(String s) {
     return isInteger(s, 10);
@@ -87,7 +148,7 @@ public class Utils {
         configFile.createNewFile();
       }
       Files.write(Paths.get(configFile.getAbsolutePath()),
-          toSave.getBytes(StandardCharsets.UTF_8));
+              toSave.getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -117,7 +178,14 @@ public class Utils {
 
   public static JSONObject initializeConfig() {
     JSONObject newConfig = new JSONObject().put("api", BazaarNotifier.apiKey)
-        .put("version", BazaarNotifier.VERSION);
+            .put("version", BazaarNotifier.VERSION)
+            .put("craftingListLength", EnchantedCraftingHandler.craftingListLength)
+            .put("suggestionListLength" , Suggester.suggestionListLength)
+            .put("CRAFTING_SORTING_OPTION", EnchantedCraftingHandler.craftingSortingOption)
+            .put("showInstasellProfit", EnchantedCraftingHandler.showInstasellProfit)
+            .put("showSellofferProfit", EnchantedCraftingHandler.showSellofferProfit)
+            .put("showProfitPerMil", EnchantedCraftingHandler.showProfitPerMil)
+            .put("collectionChecking", EnchantedCraftingHandler.collectionCheckDisabled);
 
     JSONArray modules = new JSONArray();
 
@@ -135,44 +203,67 @@ public class Utils {
 
   public static boolean validateApiKey() throws IOException {
     return new JSONObject(IOUtils.toString(new BufferedReader
-        (new InputStreamReader(
-            HttpClientBuilder.create().build().execute(new HttpGet(
-                "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
-                .getContent())))).getBoolean("success");
+            (new InputStreamReader(
+                    HttpClientBuilder.create().build().execute(new HttpGet(
+                                    "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
+                            .getContent())))).getBoolean("success");
   }
 
 
   /**
-   * @param key order key
-   * @param price price per unit of order
-   * @param i index of order
-   * @param type Buy Order or Sell Offer (sets message color to dark purple vs blue)
+   * @param key          order key
+   * @param price        price per unit of order
+   * @param i            index of order
+   * @param type         Buy Order or Sell Offer (sets message color to dark purple vs blue)
    * @param notification yellow notification message
    * @return ChatComponentText completed message
    */
   public static ChatComponentText chatNotification(String key, double price, int i, String type,
-      String notification) {
+                                                   String notification) {
     EnumChatFormatting messageColor =
-        (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
-            : type.equalsIgnoreCase("Buy Order") ? EnumChatFormatting.DARK_PURPLE
-                : EnumChatFormatting.BLUE);
+            (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
+                    : type.equalsIgnoreCase("Buy Order") ? EnumChatFormatting.DARK_PURPLE
+                    : EnumChatFormatting.BLUE);
     return new ChatComponentText(
-        messageColor + type
-            + EnumChatFormatting.GRAY + " for "
-            + messageColor + BazaarNotifier.dfNoDecimal
-            .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
-            + EnumChatFormatting.GRAY + "x " + messageColor
-            + BazaarNotifier.orders.getJSONObject(i).getString("product")
-            + EnumChatFormatting.YELLOW
-            + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + messageColor + BazaarNotifier.df.format(price)
-            + EnumChatFormatting.GRAY + ")"
+            messageColor + type
+                    + EnumChatFormatting.GRAY + " for "
+                    + messageColor + BazaarNotifier.dfNoDecimal
+                    .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
+                    + EnumChatFormatting.GRAY + "x " + messageColor
+                    + BazaarNotifier.orders.getJSONObject(i).getString("product")
+                    + EnumChatFormatting.YELLOW
+                    + " " + notification + " " + EnumChatFormatting.GRAY + "("
+                    + messageColor + BazaarNotifier.df.format(price)
+                    + EnumChatFormatting.GRAY + ")"
     );
   }
 
-  public static void drawCenteredString(String text, int x, int y, int color, double scale) {
-    Minecraft.getMinecraft().fontRendererObj.drawString(text,
-        (int) (x / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2,
-        (int) (y / scale), color);
+
+
+  public static void drawCenteredString(String text, int x, int y, int color,float moduleScale) {
+    GL11.glScalef(moduleScale, moduleScale, 1);
+    Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
+    GL11.glScalef((float)Math.pow(moduleScale, -1), (float)Math.pow(moduleScale, -1), 1);
+  }
+
+  public static void initialiseConfigValues(){
+    if(BazaarNotifier.config.has("craftingListLength")){
+
+      EnchantedCraftingHandler.craftingListLength = BazaarNotifier.config.getInt("craftingListLength");
+      Suggester.suggestionListLength = BazaarNotifier.config.getInt("suggestionListLength");
+      EnchantedCraftingHandler.craftingSortingOption = BazaarNotifier.config.getInt("CRAFTING_SORTING_OPTION");
+      EnchantedCraftingHandler.showInstasellProfit = BazaarNotifier.config.getBoolean("showInstasellProfit");
+      EnchantedCraftingHandler.showSellofferProfit = BazaarNotifier.config.getBoolean("showSellofferProfit");
+      EnchantedCraftingHandler.showProfitPerMil = BazaarNotifier.config.getBoolean("showProfitPerMil");
+      EnchantedCraftingHandler.collectionCheckDisabled = BazaarNotifier.config.getBoolean("collectionChecking");
+    }else{
+      EnchantedCraftingHandler.craftingListLength = Defaults.CRAFTING_LIST_LENGTH;
+      Suggester.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
+      EnchantedCraftingHandler.craftingSortingOption = Defaults.CRAFTING_SORTING_OPTION;
+      EnchantedCraftingHandler.showInstasellProfit = Defaults.INSTASELL_PROFIT;
+      EnchantedCraftingHandler.showSellofferProfit = Defaults.SELLOFFER_PROFIT;
+      EnchantedCraftingHandler.showProfitPerMil = Defaults.PROFIT_PER_MIL;
+      EnchantedCraftingHandler.collectionCheckDisabled = Defaults.COLLECTION_CHECKING;
+    }
   }
 }

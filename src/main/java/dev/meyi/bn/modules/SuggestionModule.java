@@ -3,6 +3,7 @@ package dev.meyi.bn.modules;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.Suggester;
 import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import org.json.JSONObject;
 
 public class SuggestionModule extends Module {
+
 
   public SuggestionModule() {
     super();
@@ -26,7 +28,7 @@ public class SuggestionModule extends Module {
     if (BazaarNotifier.bazaarDataFormatted.length() != 0) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-      for (int i = shift; i < BazaarNotifier.config.getInt("suggesterLength") + shift; i++) {
+      for (int i = shift; i < Suggester.suggestionListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.MAGENTA);
         message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
@@ -39,22 +41,24 @@ public class SuggestionModule extends Module {
         items.add(message);
       }
 
-      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
+      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
 
       boundsX = x + longestXString;
 
     } else {
       Utils.drawCenteredString("Waiting for bazaar data", x + 100,
-          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
+          y + (int)((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * 5 * scale), 0xAAAAAA,scale);
       boundsX = x + 200;
     }
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * BazaarNotifier.config.getInt("suggesterLength") + BazaarNotifier.config.getInt("suggesterLength") *2-2;
+    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * Suggester.suggestionListLength + Suggester.suggestionListLength *2* scale-2;
+    boundsY = (int) Y;
   }
 
   @Override
   protected void reset() {
     x = Defaults.SUGGESTION_MODULE_X;
     y = Defaults.SUGGESTION_MODULE_Y;
+    scale = 1;
   }
 
   @Override
@@ -69,15 +73,13 @@ public class SuggestionModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.bazaarDataFormatted.length() - 10;
+    return BazaarNotifier.bazaarDataFormatted.length() - Suggester.suggestionListLength;
   }
 
   @Override
   public JSONObject generateModuleConfig() {
     return super.generateModuleConfig();
   }
-
-
 
 
 }

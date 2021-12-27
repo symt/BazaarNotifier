@@ -57,27 +57,29 @@ public class NotificationModule extends Module {
         items.add(message);
       }
 
-      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y);
+      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + longestXString;
     } else {
-      Utils.drawCenteredString("No orders found", x + 100,
-          y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 16) / 2, 0xAAAAAA, 1F);
-      boundsX = x + 200;
+      Utils.drawCenteredString("No orders found", (int)((x/scale) + 200*scale/scale/4),
+              (int)(y/scale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6)), 0xAAAAAA, scale);
+      float X = x + 200*scale;
+      boundsX = (int)X;
     }
-    boundsY = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 18;
+    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * 10 + 20 * scale -2;
+    boundsY = (int)Y;
   }
 
   @Override
   protected void reset() {
     x = Defaults.NOTIFICATION_MODULE_X;
     y = Defaults.NOTIFICATION_MODULE_Y;
+    scale = 1;
   }
 
   @Override
   protected String name() {
     return ModuleName.NOTIFICATION.name();
   }
-
 
   @Override
   protected boolean shouldDrawBounds() {
@@ -88,5 +90,7 @@ public class NotificationModule extends Module {
   protected int getMaxShift() {
     return BazaarNotifier.orders.length() - 10;
   }
+
+
 
 }

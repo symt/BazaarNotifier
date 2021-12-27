@@ -1,10 +1,10 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
-import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Suggester;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.modules.CraftingModule;
+import dev.meyi.bn.utilities.*;
+
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,9 +74,11 @@ public class BazaarNotifierCommand extends CommandBase {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
-              BazaarNotifier.apiKey = "";
+              BazaarNotifier.apiKey = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
+              EnchantedCraftingHandler.getUnlockedRecipes();
+              EnchantedCraftingHandler.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -100,7 +102,21 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      } else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
+      }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
+        if (EnchantedCraftingHandler.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Only showing unlocked recipes"));
+          EnchantedCraftingHandler.collectionCheckDisabled = false;
+        } else if (EnchantedCraftingHandler.collectionCheckDisabled) {
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Please set an API-Key first.(/bn api)"));
+          EnchantedCraftingHandler.collectionCheckDisabled = true;
+      }else{
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Showing all recipes"));
+          EnchantedCraftingHandler.collectionCheckDisabled = true;
+        }
+      }else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
         if(args.length == 1) {
           BazaarNotifier.resetMod();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -113,8 +129,16 @@ public class BazaarNotifierCommand extends CommandBase {
           BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared"));
+        }else if (args[1].equalsIgnoreCase("scale") && args.length == 2){
+          BazaarNotifier.resetScale();
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Your scale for every module has been reset"));
+        }else if (args[1].equalsIgnoreCase("bank") && args.length == 2){
+          ProfitCalculator.reset();
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Your bank module has been reset"));
         }
-      } else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
+      }else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
         if (args.length == 1) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Use the following format: /bn find (item)"));
@@ -170,7 +194,7 @@ public class BazaarNotifierCommand extends CommandBase {
                             + "Please provide a valid item to find."));
           }
         }
-      } else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
+      }else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
         player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.GREEN
                         + EnchantedCraftingHandler.editCraftingModuleGUI(args[1])));
@@ -180,7 +204,7 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "This command is intended for testing purposes only, use it at your own peril. Forced rendering has been turned "
             + EnumChatFormatting.DARK_RED + (BazaarNotifier.forceRender ? "on" : "off")));
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
+      }else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
         ChatComponentText discordLink = new ChatComponentText(
             EnumChatFormatting.DARK_GREEN + "" + EnumChatFormatting.BOLD
                 + "[DISCORD LINK]");
@@ -202,7 +226,7 @@ public class BazaarNotifierCommand extends CommandBase {
                 new ChatComponentText("\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
-      } else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0].equalsIgnoreCase("tc"))) {
+      }else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0].equalsIgnoreCase("tc"))) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                 + EnchantedCraftingHandler.toggleCrafting()));
       }else if (args.length == 2 && args[0].equalsIgnoreCase("setCraftingListLength")) {
@@ -226,7 +250,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
-      } else {
+      }else {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
             EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
             + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
@@ -249,15 +273,17 @@ public class BazaarNotifierCommand extends CommandBase {
     if (args.length == 1) {
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
-      //arguments.add("api");
-      arguments.add("craftingModuleconfig");
+      arguments.add("api");
+      arguments.add("craftingModuleConfig");
       arguments.add("discord");
       arguments.add("find");
       arguments.add("setFlippingListLength");
       arguments.add("setCraftingListLength");
       arguments.add("toggle");
+      arguments.add("toggleCollectionChecking");
       arguments.add("toggleCrafting");
       arguments.add("reset");
+
 
       for (String argument : arguments) {
         if (argument.startsWith(args[0].toLowerCase())) {
@@ -266,11 +292,13 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length ==2 && args[0].equalsIgnoreCase("reset")){
+    }else if(args.length == 2 && args[0].equalsIgnoreCase("reset")){
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("orders");
       arguments.add("all");
+      arguments.add("scale");
+      arguments.add("bank");
       for (String argument : arguments) {
         if (argument.startsWith(args[1].toLowerCase())) {
           sortedArguments.add(argument);
@@ -278,12 +306,12 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length ==2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
+    }else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleConfig")){
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("instasell");
       arguments.add("selloffer");
-      arguments.add("profitPerMil");
+      arguments.add("PROFIT_PER_MIL");
       for (String argument : arguments) {
         if (argument.startsWith(args[1].toLowerCase())) {
           sortedArguments.add(argument);

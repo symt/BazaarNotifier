@@ -35,27 +35,30 @@ public class BazaarNotifier {
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
-  public static DecimalFormat df = new DecimalFormat("#,###.0");
+  public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
 
   public static boolean activeBazaar = true;
   public static boolean inBazaar = false;
+  public static boolean inBank = false;
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
-  public static boolean apiKeyDisabled = true; // Change this if an api key is ever required to access the bazaar again.
+  public static boolean apiKeyDisabled = true;// Change this if an api key is ever required to access the bazaar again.
+  public static boolean sendChatMessages = true;
+
 
   public static JSONArray orders = new JSONArray();
   public static JSONObject bazaarDataRaw = new JSONObject();
   public static JSONObject bazaarCache = new JSONObject();
   public static JSONArray bazaarDataFormatted = new JSONArray();
+  public static JSONObject playerDataFromAPI = new JSONObject();
+  public static JSONObject config = new JSONObject();
 
 
   public static JSONObject bazaarConversions = new JSONObject(
       new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json"))));
   public static JSONObject bazaarConversionsReversed = new JSONObject(
       new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json"))));
-  public static JSONObject config = new JSONObject(
-          new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/config.json"))));
   public static JSONObject enchantCraftingList = new JSONObject(
           new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/enchantCraftingList.json"))));
 
@@ -67,6 +70,10 @@ public class BazaarNotifier {
   public static void resetMod() {
     modules.resetAll();
     orders = Defaults.DEFAULT_ORDERS_LAYOUT();
+  }
+
+  public static void resetScale(){
+    modules.resetScale();
   }
 
   @Mod.EventHandler
@@ -85,9 +92,11 @@ public class BazaarNotifier {
     if (config != null && Utils.isValidJSONObject(config)) {
       modules = new ModuleList(
           new JSONObject(config));
+      BazaarNotifier.config = new JSONObject(config);
     } else {
       modules = new ModuleList();
     }
+    Utils.initialiseConfigValues();
   }
 
   @Mod.EventHandler
