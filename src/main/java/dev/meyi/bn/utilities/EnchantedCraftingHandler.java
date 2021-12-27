@@ -1,6 +1,7 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.config.Configuration;
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONException;
 
@@ -14,13 +15,6 @@ import java.util.Collections;
 
 public class EnchantedCraftingHandler {
     private static String unlockedRecipes = "";
-    public static boolean collectionCheckDisabled;
-    public static int craftingSortingOption;
-    public static int craftingListLength;
-    public static boolean showInstasellProfit;
-    public static boolean showSellofferProfit;
-    public static boolean showProfitPerMil;
-
 
 
     public static ArrayList<ArrayList<String>> getBestEnchantRecipes(){
@@ -30,7 +24,7 @@ public class EnchantedCraftingHandler {
 
         for (int i = 0; i < BazaarNotifier.enchantCraftingList.getJSONObject("normal").length(); i++) {
             String itemName = normalKeys.next();
-            if(unlockedRecipes.contains(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("collection")) || Objects.equals(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("collection"), "NONE") || collectionCheckDisabled) {
+            if(unlockedRecipes.contains(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("collection")) || Objects.equals(BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("collection"), "NONE") || Configuration.collectionCheckDisabled) {
                 if (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").length() > 0 && BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").length() > 0) {
                     if(!BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").isEmpty()){// I don´t know why, but it sometimes crashes with org.json.JSONException: JSONArray[0] not found.
                         String material = BazaarNotifier.enchantCraftingList.getJSONObject("normal").getJSONObject(itemName).getString("material");
@@ -55,7 +49,7 @@ public class EnchantedCraftingHandler {
 
 
             String itemName = otherKeys.next();
-            if(unlockedRecipes.contains(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getString("collection")) || Objects.equals(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getString("collection"), "NONE") || collectionCheckDisabled) {
+            if(unlockedRecipes.contains(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getString("collection")) || Objects.equals(BazaarNotifier.enchantCraftingList.getJSONObject("other").getJSONObject(itemName).getString("collection"), "NONE") || Configuration.collectionCheckDisabled) {
                 if (BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").length() > 0 && BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("buy_summary").length() > 0) {
                     try {
                         double itemSellPrice = BazaarNotifier.bazaarDataRaw.getJSONObject(itemName).getJSONArray("sell_summary").getJSONObject(0).getDouble("pricePerUnit");
@@ -100,7 +94,8 @@ public class EnchantedCraftingHandler {
             list2.add(Double.valueOf(o2.get(2)));
 
 
-            return list1.get(craftingSortingOption).compareTo(list2.get(craftingSortingOption));
+            return list1.get(Configuration.craftingSortingOption).compareTo(list2.get(
+                Configuration.craftingSortingOption));
         });
         Collections.reverse(list);
         return list;
@@ -108,14 +103,14 @@ public class EnchantedCraftingHandler {
 
 
     public static String toggleCrafting(){
-        if(craftingSortingOption == 0){
-            craftingSortingOption = 1;
+        if(Configuration.craftingSortingOption == 0){
+            Configuration.craftingSortingOption = 1;
             return "Toggled crafting to selloffer";
-        }else if(craftingSortingOption == 1){
-            craftingSortingOption = 2;
+        }else if(Configuration.craftingSortingOption == 1){
+            Configuration.craftingSortingOption = 2;
             return "Toggled crafting to profit per million";
         }else {
-            craftingSortingOption = 0;
+            Configuration.craftingSortingOption = 0;
             return "Toggled crafting to instasell";
         }
     }
@@ -124,19 +119,19 @@ public class EnchantedCraftingHandler {
         if(length > BazaarNotifier.enchantCraftingList.getJSONObject("normal").length()+BazaarNotifier.enchantCraftingList.getJSONObject("other").length()){
             return length + " is too long";
         }else{
-            craftingListLength = length;
+            Configuration.craftingListLength = length;
             return "Item list size set to " + length;
         }
     }
     public static String editCraftingModuleGUI(String craftingValue){
         if(craftingValue.equalsIgnoreCase("instasell")){
-            showInstasellProfit = !showInstasellProfit;
+            Configuration.showInstantSellProfit = !Configuration.showInstantSellProfit;
             return "Toggled (Instant Sell)";
         }else if(craftingValue.equalsIgnoreCase("selloffer")){
-            showSellofferProfit = !showSellofferProfit;
+            Configuration.showSellOfferProfit = !Configuration.showSellOfferProfit;
             return "Toggled Profit (Sell Offer)";
         }else if(craftingValue.equalsIgnoreCase("PROFIT_PER_MIL")){
-            showProfitPerMil = !showProfitPerMil;
+            Configuration.showProfitPerMil = !Configuration.showProfitPerMil;
             return "Toggled Profit per 1M";
         }else{
             return "This value does not exist";

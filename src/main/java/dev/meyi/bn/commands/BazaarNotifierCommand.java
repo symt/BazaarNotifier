@@ -1,7 +1,7 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.modules.CraftingModule;
+import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.utilities.*;
 
 
@@ -78,7 +78,7 @@ public class BazaarNotifierCommand extends CommandBase {
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
               EnchantedCraftingHandler.getUnlockedRecipes();
-              EnchantedCraftingHandler.collectionCheckDisabled = false;
+              Configuration.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -103,18 +103,18 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
       }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
-        if (EnchantedCraftingHandler.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
+        if (Configuration.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Only showing unlocked recipes"));
-          EnchantedCraftingHandler.collectionCheckDisabled = false;
-        } else if (EnchantedCraftingHandler.collectionCheckDisabled) {
+          Configuration.collectionCheckDisabled = false;
+        } else if (Configuration.collectionCheckDisabled) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Please set an API-Key first.(/bn api)"));
-          EnchantedCraftingHandler.collectionCheckDisabled = true;
+          Configuration.collectionCheckDisabled = true;
       }else{
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Showing all recipes"));
-          EnchantedCraftingHandler.collectionCheckDisabled = true;
+          Configuration.collectionCheckDisabled = true;
         }
       }else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
         if(args.length == 1) {

@@ -61,13 +61,13 @@ public class ScheduledEvents {
                     if(BazaarNotifier.sendChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                               .addChatMessage(
-                                      Utils.chatNotification(key, price, i, "Buy Order", "MATCHED"));
+                                      Utils.chatNotification(price, i, "Buy Order", "MATCHED"));
                     }
                   } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
                     if(BazaarNotifier.sendChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                               .addChatMessage(
-                                      Utils.chatNotification(key, price, i, "Buy Order", "OUTDATED"));
+                                      Utils.chatNotification(price, i, "Buy Order", "OUTDATED"));
                     }
                     currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
                         .put("goodOrder", false)
@@ -79,7 +79,7 @@ public class ScheduledEvents {
                         .getBoolean("matchedOrder")) {
                       if(BazaarNotifier.sendChatMessages) {
                         Minecraft.getMinecraft().thePlayer.addChatMessage(
-                                Utils.chatNotification(key, price, i, "Buy Order", "REVIVED"));
+                                Utils.chatNotification(price, i, "Buy Order", "REVIVED"));
                       }
                     }
                     currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
@@ -99,7 +99,7 @@ public class ScheduledEvents {
                     if(BazaarNotifier.sendChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                               .addChatMessage(
-                                      Utils.chatNotification(key, price, i, "Sell Offer", "MATCHED"));
+                                      Utils.chatNotification(price, i, "Sell Offer", "MATCHED"));
                     }
                   } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
                     currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
@@ -108,7 +108,7 @@ public class ScheduledEvents {
                     if(BazaarNotifier.sendChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                               .addChatMessage(
-                                      Utils.chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
+                                      Utils.chatNotification(price, i, "Sell Offer", "OUTDATED"));
                     }
                   } else if (diff == 0
                       && BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
@@ -117,7 +117,7 @@ public class ScheduledEvents {
                         .getBoolean("matchedOrder")) {
                       if(BazaarNotifier.sendChatMessages) {
                         Minecraft.getMinecraft().thePlayer.addChatMessage(
-                                Utils.chatNotification(key, price, i, "Sell Offer", "REVIVED"));
+                                Utils.chatNotification(price, i, "Sell Offer", "REVIVED"));
                       }
                     }
                     currentOrder.put("outdatedOrder", false).put("matchedOrder", false)

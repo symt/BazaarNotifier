@@ -96,7 +96,7 @@ public class BazaarNotifier {
     } else {
       modules = new ModuleList();
     }
-    Utils.initialiseConfigValues();
+    Utils.initializeConfigValues();
   }
 
   @Mod.EventHandler
