@@ -18,14 +18,14 @@ public class Configuration {
 
   public static JSONObject initializeConfig() {
     JSONObject newConfig = new JSONObject().put("api", BazaarNotifier.apiKey)
-            .put("version", BazaarNotifier.VERSION)
-            .put("craftingListLength", craftingListLength)
-            .put("suggestionListLength" , suggestionListLength)
-            .put("craftingSortingOption", craftingSortingOption)
-            .put("showInstantSellProfit", showInstantSellProfit)
-            .put("showSellOfferProfit", showSellOfferProfit)
-            .put("showProfitPerMil", showProfitPerMil)
-            .put("collectionChecking", collectionCheckDisabled);
+        .put("version", BazaarNotifier.VERSION)
+        .put("craftingListLength", craftingListLength)
+        .put("suggestionListLength", suggestionListLength)
+        .put("craftingSortingOption", craftingSortingOption)
+        .put("showInstantSellProfit", showInstantSellProfit)
+        .put("showSellOfferProfit", showSellOfferProfit)
+        .put("showProfitPerMil", showProfitPerMil)
+        .put("collectionChecking", collectionCheckDisabled);
 
     JSONArray modules = new JSONArray();
 

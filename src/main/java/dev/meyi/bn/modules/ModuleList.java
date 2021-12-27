@@ -4,7 +4,6 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.MouseHandler;
 import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.lwjgl.input.Keyboard;
@@ -62,10 +61,11 @@ public class ModuleList extends ArrayList<Module> {
       m.drawBounds();
     }
   }
-  public void rescaleCheck(){
-    for (Module m: this){
-      if(m.inMovementBox() && Keyboard.isKeyDown(29)&& !Keyboard.isKeyDown(42)){
-        float newScale = m.scale + (float)MouseHandler.mouseWheelMovement / 20;
+
+  public void rescaleCheck() {
+    for (Module m : this) {
+      if (m.inMovementBox() && Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
+        float newScale = m.scale + (float) MouseHandler.mouseWheelMovement / 20;
         m.scale = Math.max(newScale, 0.1f);
       }
     }
@@ -100,7 +100,7 @@ public class ModuleList extends ArrayList<Module> {
   }
 
   public void pageFlipCheck() {
-    if(!Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
+    if (!Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
       if (MouseHandler.mouseWheelMovement != 0) {
         for (Module m : this) {
           if (m.inMovementBox() && m.getMaxShift() > 0) {
@@ -125,8 +125,8 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
-  public void resetScale(){
-    for(Module m : this){
+  public void resetScale() {
+    for (Module m : this) {
       m.scale = 1;
     }
   }

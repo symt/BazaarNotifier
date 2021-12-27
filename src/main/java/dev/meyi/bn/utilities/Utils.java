@@ -215,7 +215,8 @@ public class Utils {
       Configuration.craftingListLength = BazaarNotifier.config.getInt("craftingListLength");
       Configuration.suggestionListLength = BazaarNotifier.config.getInt("suggestionListLength");
       Configuration.craftingSortingOption = BazaarNotifier.config.getInt("craftingSortingOption");
-      Configuration.showInstantSellProfit = BazaarNotifier.config.getBoolean("showInstantSellProfit");
+      Configuration.showInstantSellProfit = BazaarNotifier.config
+          .getBoolean("showInstantSellProfit");
       Configuration.showSellOfferProfit = BazaarNotifier.config.getBoolean("showSellOfferProfit");
       Configuration.showProfitPerMil = BazaarNotifier.config.getBoolean("showProfitPerMil");
       Configuration.collectionCheckDisabled = BazaarNotifier.config

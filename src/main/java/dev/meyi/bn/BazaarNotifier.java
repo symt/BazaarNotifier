@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.Objects;
-
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,7 +31,8 @@ public class BazaarNotifier {
   public static final String MODID = "BazaarNotifier";
   public static final String VERSION = "1.5.0";
   public static final String prefix =
-      EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
+      EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
+          + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
   public static DecimalFormat df = new DecimalFormat("#,##0.0");
@@ -56,11 +56,14 @@ public class BazaarNotifier {
 
 
   public static JSONObject bazaarConversions = new JSONObject(
-      new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json"))));
+      new JSONTokener(Objects
+          .requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversions.json"))));
   public static JSONObject bazaarConversionsReversed = new JSONObject(
-      new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json"))));
+      new JSONTokener(Objects.requireNonNull(
+          BazaarNotifier.class.getResourceAsStream("/bazaarConversionsReversed.json"))));
   public static JSONObject enchantCraftingList = new JSONObject(
-          new JSONTokener(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream("/enchantCraftingList.json"))));
+      new JSONTokener(Objects
+          .requireNonNull(BazaarNotifier.class.getResourceAsStream("/enchantCraftingList.json"))));
 
 
   public static File configFile;
@@ -72,7 +75,7 @@ public class BazaarNotifier {
     orders = Defaults.DEFAULT_ORDERS_LAYOUT();
   }
 
-  public static void resetScale(){
+  public static void resetScale() {
     modules.resetScale();
   }
 

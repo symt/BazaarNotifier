@@ -18,11 +18,12 @@ import org.lwjgl.input.Keyboard;
 
 public class CraftingModule extends Module {
 
+  private final LinkedHashMap<String, Color> helperLine = new LinkedHashMap<>();
   int longestXString;
   ArrayList<ArrayList<String>> list;
   int lastHovered = 0;
   private int materialCountWheel = 1;
-  private final LinkedHashMap<String, Color> helperLine = new LinkedHashMap<>();
+
   public CraftingModule() {
     super();
   }
@@ -35,7 +36,8 @@ public class CraftingModule extends Module {
     helperLine.clear();
     helperLine.put("   ", Color.MAGENTA);
     helperLine.put("Profits (Buy Orders)", Color.LIGHT_GRAY);
-    if (Configuration.showProfitPerMil || Configuration.showInstantSellProfit || Configuration.showSellOfferProfit) {
+    if (Configuration.showProfitPerMil || Configuration.showInstantSellProfit
+        || Configuration.showSellOfferProfit) {
       helperLine.put(" - ", Color.GRAY);
     }
     if (Configuration.showInstantSellProfit) {
@@ -78,7 +80,8 @@ public class CraftingModule extends Module {
             message.put(". ", Color.MAGENTA);
             message.put(itemNameConverted, Color.CYAN);
 
-            if (Configuration.showProfitPerMil || Configuration.showInstantSellProfit || Configuration.showSellOfferProfit) {
+            if (Configuration.showProfitPerMil || Configuration.showInstantSellProfit
+                || Configuration.showSellOfferProfit) {
               message.put(" - ", Color.GRAY);
             }
 
@@ -111,7 +114,8 @@ public class CraftingModule extends Module {
       renderMaterials(checkHoveredText(), list);
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * (Configuration.craftingListLength+1) + (Configuration.craftingListLength+1) * 2 * scale - 2;
+        * (Configuration.craftingListLength + 1)
+        + (Configuration.craftingListLength + 1) * 2 * scale - 2;
     boundsY = (int) Y;
   }
 
@@ -119,9 +123,9 @@ public class CraftingModule extends Module {
     if (price <= 0) {
       return Color.RED;
     } else if (price <= 5000) {
-        return Color.YELLOW;
+      return Color.YELLOW;
     } else {
-        return Color.GREEN;
+      return Color.GREEN;
     }
   }
 
@@ -129,9 +133,9 @@ public class CraftingModule extends Module {
     if (price <= 0) {
       return Color.RED;
     } else if (price <= 30000) {
-        return Color.YELLOW;
+      return Color.YELLOW;
     } else {
-        return Color.GREEN;
+      return Color.GREEN;
     }
   }
 

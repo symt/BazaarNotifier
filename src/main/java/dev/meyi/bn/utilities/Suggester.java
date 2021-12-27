@@ -70,10 +70,10 @@ public class Suggester {
     }
   }
 
-  public static String setSuggestionLength(int length){
-    if(length > BazaarNotifier.bazaarDataRaw.length()){
+  public static String setSuggestionLength(int length) {
+    if (length > BazaarNotifier.bazaarDataRaw.length()) {
       return length + " is too long";
-    }else{
+    } else {
       Configuration.suggestionListLength = length;
       return "Item list size set to " + length;
     }

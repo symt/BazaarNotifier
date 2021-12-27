@@ -2,14 +2,14 @@ package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
-import dev.meyi.bn.utilities.*;
-
-
+import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.EnchantedCraftingHandler;
+import dev.meyi.bn.utilities.ProfitCalculator;
+import dev.meyi.bn.utilities.Suggester;
+import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +23,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-
 public class BazaarNotifierCommand extends CommandBase {
 
 
@@ -35,7 +34,6 @@ public class BazaarNotifierCommand extends CommandBase {
       }
     };
   }
-
 
 
   @Override
@@ -102,26 +100,26 @@ public class BazaarNotifierCommand extends CommandBase {
         System.out.println(BazaarNotifier.orders);
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "Orders dumped to the log file"));
-      }else if(args.length ==1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
         if (Configuration.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Only showing unlocked recipes"));
+              + "Only showing unlocked recipes"));
           Configuration.collectionCheckDisabled = false;
         } else if (Configuration.collectionCheckDisabled) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Please set an API-Key first.(/bn api)"));
+              + "Please set an API-Key first.(/bn api)"));
           Configuration.collectionCheckDisabled = true;
-      }else{
+        } else {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Showing all recipes"));
+              + "Showing all recipes"));
           Configuration.collectionCheckDisabled = true;
         }
-      }else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
-        if(args.length == 1) {
+      } else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
+        if (args.length == 1) {
           BazaarNotifier.resetMod();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "All module locations have been reset and the order list has been emptied"));
-        }else if (args[1].equalsIgnoreCase("all")) {
+              + "All module locations have been reset and the order list has been emptied"));
+        } else if (args[1].equalsIgnoreCase("all")) {
           BazaarNotifier.resetMod();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "All module locations have been reset and the order list has been emptied"));
@@ -129,82 +127,87 @@ public class BazaarNotifierCommand extends CommandBase {
           BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared"));
-        }else if (args[1].equalsIgnoreCase("scale") && args.length == 2){
+        } else if (args[1].equalsIgnoreCase("scale") && args.length == 2) {
           BazaarNotifier.resetScale();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Your scale for every module has been reset"));
-        }else if (args[1].equalsIgnoreCase("bank") && args.length == 2){
+              + "Your scale for every module has been reset"));
+        } else if (args[1].equalsIgnoreCase("bank") && args.length == 2) {
           ProfitCalculator.reset();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Your bank module has been reset"));
+              + "Your bank module has been reset"));
         }
-      }else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
+      } else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
         if (args.length == 1) {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Use the following format: /bn find (item)"));
+              + "Use the following format: /bn find (item)"));
         } else {
           String item = String.join(" ", args).substring(5).toLowerCase();
           if (BazaarNotifier.bazaarCache.has(item)) {
             JSONObject data = BazaarNotifier.bazaarCache.getJSONObject(item);
 
-            String itemConv = BazaarNotifier.bazaarConversionsReversed.getString(WordUtils.capitalize(item.toLowerCase()));
-            if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(itemConv) || BazaarNotifier.enchantCraftingList.getJSONObject("other").has(itemConv)) {
+            String itemConv = BazaarNotifier.bazaarConversionsReversed
+                .getString(WordUtils.capitalize(item.toLowerCase()));
+            if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(itemConv)
+                || BazaarNotifier.enchantCraftingList.getJSONObject("other").has(itemConv)) {
               String[] prices = EnchantedCraftingHandler.getEnchantCraft(item);
 
               player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
-                      EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item) + "\n" +
-                      EnumChatFormatting.DARK_RED + "Buy Order: " +
-                      EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("buyOrderPrice")) + "\n" +
-                      EnumChatFormatting.DARK_RED + "Sell Offer: " +
-                      EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("sellOfferPrice")) + "\n" +
-                      EnumChatFormatting.DARK_RED + "Estimated Profit: " +
-                      EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("profitFlowPerMinute")) + "\n" +
-                      EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
-                      EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
-                      EnumChatFormatting.RED + prices[0] + "\n" +
-                      EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
-                      EnumChatFormatting.RED + prices[1] + "\n" +
-                      EnumChatFormatting.DARK_RED + "Profit per 1M: " +
-                      EnumChatFormatting.RED + prices[2] + "\n" +
-                      BazaarNotifier.prefix
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
+                  + "\n" +
+                  EnumChatFormatting.DARK_RED + "Buy Order: " +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("buyOrderPrice"))
+                  + "\n" +
+                  EnumChatFormatting.DARK_RED + "Sell Offer: " +
+                  EnumChatFormatting.RED + BazaarNotifier.df
+                  .format(data.getDouble("sellOfferPrice")) + "\n" +
+                  EnumChatFormatting.DARK_RED + "Estimated Profit: " +
+                  EnumChatFormatting.RED + BazaarNotifier.df
+                  .format(data.getDouble("profitFlowPerMinute")) + "\n" +
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
+                  EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
+                  EnumChatFormatting.RED + prices[0] + "\n" +
+                  EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
+                  EnumChatFormatting.RED + prices[1] + "\n" +
+                  EnumChatFormatting.DARK_RED + "Profit per 1M: " +
+                  EnumChatFormatting.RED + prices[2] + "\n" +
+                  BazaarNotifier.prefix
               ));
             } else {
               player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
-                      EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
-                      + "\n"
-                      + EnumChatFormatting.DARK_RED + "Buy Order: " + EnumChatFormatting.RED +
-                      BazaarNotifier.df.format(data.getDouble("buyOrderPrice")) + "\n"
-                      + EnumChatFormatting.DARK_RED + "Sell Offer: "
-                      + EnumChatFormatting.RED +
-                      BazaarNotifier.df.format(data.getDouble("sellOfferPrice")) + "\n"
-                      + EnumChatFormatting.DARK_RED
-                      + "Estimated Profit: " + EnumChatFormatting.RED +
-                      BazaarNotifier.df.format(data.getDouble("profitFlowPerMinute")) + "\n" +
-                      BazaarNotifier.prefix));
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
+                  + "\n"
+                  + EnumChatFormatting.DARK_RED + "Buy Order: " + EnumChatFormatting.RED +
+                  BazaarNotifier.df.format(data.getDouble("buyOrderPrice")) + "\n"
+                  + EnumChatFormatting.DARK_RED + "Sell Offer: "
+                  + EnumChatFormatting.RED +
+                  BazaarNotifier.df.format(data.getDouble("sellOfferPrice")) + "\n"
+                  + EnumChatFormatting.DARK_RED
+                  + "Estimated Profit: " + EnumChatFormatting.RED +
+                  BazaarNotifier.df.format(data.getDouble("profitFlowPerMinute")) + "\n" +
+                  BazaarNotifier.prefix));
             }
 
 
           } else if (BazaarNotifier.bazaarCache.length() == 0) {
             player.addChatMessage(new ChatComponentText(
-                    BazaarNotifier.prefix + EnumChatFormatting.RED
-                            + "Please wait a moment for the mod to get bazaar information"));
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "Please wait a moment for the mod to get bazaar information"));
           } else {
             player.addChatMessage(new ChatComponentText(
-                    BazaarNotifier.prefix + EnumChatFormatting.RED
-                            + "Please provide a valid item to find."));
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "Please provide a valid item to find."));
           }
         }
-      }else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")){
+      } else if (args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")) {
         player.addChatMessage(new ChatComponentText(
-                BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                        + EnchantedCraftingHandler.editCraftingModuleGUI(args[1])));
-      }
-      else if (args.length == 1 && args[0].equalsIgnoreCase("__force")) {
+            BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                + EnchantedCraftingHandler.editCraftingModuleGUI(args[1])));
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("__force")) {
         BazaarNotifier.forceRender ^= true;
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "This command is intended for testing purposes only, use it at your own peril. Forced rendering has been turned "
             + EnumChatFormatting.DARK_RED + (BazaarNotifier.forceRender ? "on" : "off")));
-      }else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("discord")) {
         ChatComponentText discordLink = new ChatComponentText(
             EnumChatFormatting.DARK_GREEN + "" + EnumChatFormatting.BOLD
                 + "[DISCORD LINK]");
@@ -223,38 +226,43 @@ public class BazaarNotifierCommand extends CommandBase {
         player.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + "\n" + EnumChatFormatting.GREEN + "Join the discord server: ")
             .appendSibling(discordLink).appendSibling(
-                new ChatComponentText("\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
+                new ChatComponentText(
+                    "\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
-      }else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0].equalsIgnoreCase("tc"))) {
+      } else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0]
+          .equalsIgnoreCase("tc"))) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                + EnchantedCraftingHandler.toggleCrafting()));
-      }else if (args.length == 2 && args[0].equalsIgnoreCase("setCraftingListLength")) {
-        if (Utils.isInteger(args[1])){
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                  + EnchantedCraftingHandler.setCraftingLength(Integer.parseInt(args[1]))));
-        }else{
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Please enter a valid number"));
-        }
-
-      }else if (args.length == 2 && args[0].equalsIgnoreCase("setFlippingListLength")) {
+            + EnchantedCraftingHandler.toggleCrafting()));
+      } else if (args.length == 2 && args[0].equalsIgnoreCase("setCraftingListLength")) {
         if (Utils.isInteger(args[1])) {
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                  + Suggester.setSuggestionLength(Integer.parseInt(args[1]))));
-        }else{
+          player
+              .addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                  + EnchantedCraftingHandler.setCraftingLength(Integer.parseInt(args[1]))));
+        } else {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Please enter a valid number"));
+              + "Please enter a valid number"));
         }
 
-      }else if (args.length > 0) {
+      } else if (args.length == 2 && args[0].equalsIgnoreCase("setFlippingListLength")) {
+        if (Utils.isInteger(args[1])) {
+          player
+              .addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                  + Suggester.setSuggestionLength(Integer.parseInt(args[1]))));
+        } else {
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+              + "Please enter a valid number"));
+        }
+
+      } else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
-      }else {
+      } else {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
             EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
             + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
-            + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED + "/bn discord\n"
+            + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED
+            + "/bn discord\n"
             + BazaarNotifier.prefix
         ));
       }
@@ -268,7 +276,6 @@ public class BazaarNotifierCommand extends CommandBase {
 
   @Override
   public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-
 
     if (args.length == 1) {
       List<String> arguments = new ArrayList<>();
@@ -284,7 +291,6 @@ public class BazaarNotifierCommand extends CommandBase {
       arguments.add("toggleCrafting");
       arguments.add("reset");
 
-
       for (String argument : arguments) {
         if (argument.startsWith(args[0].toLowerCase())) {
           sortedArguments.add(argument);
@@ -292,7 +298,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length == 2 && args[0].equalsIgnoreCase("reset")){
+    } else if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("orders");
@@ -306,7 +312,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else if(args.length == 2 && args[0].equalsIgnoreCase("craftingModuleConfig")){
+    } else if (args.length == 2 && args[0].equalsIgnoreCase("craftingModuleConfig")) {
       List<String> arguments = new ArrayList<>();
       List<String> sortedArguments = new ArrayList<>();
       arguments.add("instasell");
@@ -319,7 +325,7 @@ public class BazaarNotifierCommand extends CommandBase {
       }
       return sortedArguments;
 
-    }else {
+    } else {
       return null;
     }
   }

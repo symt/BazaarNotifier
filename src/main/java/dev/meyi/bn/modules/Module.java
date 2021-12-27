@@ -10,14 +10,13 @@ import org.lwjgl.opengl.Display;
 public abstract class Module {
 
 
-  int lastMouseX, lastMouseY;
   protected int x;
   protected int y;
+  protected float scale;
+  int lastMouseX, lastMouseY;
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
-  protected float scale;
-
   boolean moving = false;
   boolean needsToMove = false;
 
