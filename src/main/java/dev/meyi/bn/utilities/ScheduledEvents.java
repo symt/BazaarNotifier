@@ -1,6 +1,8 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.modules.calc.CraftingCalculator;
+import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.client.Minecraft;
@@ -19,7 +21,7 @@ public class ScheduledEvents {
   }
 
   public static void create() {
-    EnchantedCraftingHandler.getUnlockedRecipes();
+    CraftingCalculator.getUnlockedRecipes();
     if (instance == null) {
       new ScheduledEvents();
     }
@@ -27,12 +29,12 @@ public class ScheduledEvents {
 
   public void suggestionLoop() {
     Executors.newScheduledThreadPool(1)
-        .scheduleAtFixedRate(Suggester::basic, 5, 5, TimeUnit.SECONDS);
+        .scheduleAtFixedRate(SuggestionCalculator::basic, 5, 5, TimeUnit.SECONDS);
   }
 
   public void collectionLoop() {
     Executors.newScheduledThreadPool(1)
-        .scheduleAtFixedRate(EnchantedCraftingHandler::getUnlockedRecipes, 5, 5, TimeUnit.MINUTES);
+        .scheduleAtFixedRate(CraftingCalculator::getUnlockedRecipes, 5, 5, TimeUnit.MINUTES);
   }
 
   public void outdatedNotification() {

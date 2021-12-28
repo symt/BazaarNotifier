@@ -1,4 +1,4 @@
-package dev.meyi.bn.utilities;
+package dev.meyi.bn.modules.calc;
 
 
 import com.google.common.collect.Iterables;
@@ -16,7 +16,7 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
 
 
-public class ProfitCalculator {
+public class BankCalculator {
 
   public static double bank = 0;
   public static double moneyNotFromBazaar = 0;

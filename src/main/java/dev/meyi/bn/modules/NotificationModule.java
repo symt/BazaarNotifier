@@ -13,6 +13,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONObject;
 
 public class NotificationModule extends Module {
+  public static final ModuleName type = ModuleName.NOTIFICATION;
 
   public NotificationModule() {
     super();

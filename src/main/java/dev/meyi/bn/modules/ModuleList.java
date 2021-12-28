@@ -50,15 +50,39 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
+  public boolean toggleModule(ModuleName type) {
+    if (type == ModuleName.SUGGESTION) {
+      BazaarNotifier.sendChatMessages ^= true;
+    }
+
+    for (Module m : this) {
+      try {
+        if (m.getClass().getField("type").get(null) == type) {
+          m.active ^= true;
+
+          return m.active;
+        }
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return false;
+  }
+
   public void drawAllModules() {
     for (Module m : this) {
-      m.draw();
+      if (m.active) {
+        m.draw();
+      }
     }
   }
 
   public void drawAllOutlines() {
     for (Module m : this) {
-      m.drawBounds();
+      if (m.active) {
+        m.drawBounds();
+      }
     }
   }
 

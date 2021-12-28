@@ -13,7 +13,7 @@ import net.minecraft.client.Minecraft;
 import org.json.JSONObject;
 
 public class SuggestionModule extends Module {
-
+  public static final ModuleName type = ModuleName.SUGGESTION;
 
   public SuggestionModule() {
     super();

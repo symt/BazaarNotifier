@@ -5,7 +5,7 @@ import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
+import dev.meyi.bn.modules.calc.CraftingCalculator;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.lwjgl.input.Keyboard;
 
 public class CraftingModule extends Module {
+  public static final ModuleName type = ModuleName.CRAFTING;
 
   private final LinkedHashMap<String, Color> helperLine = new LinkedHashMap<>();
   int longestXString;
@@ -60,7 +61,7 @@ public class CraftingModule extends Module {
   @Override
   protected void draw() {
     scrollCount();
-    list = EnchantedCraftingHandler.getBestEnchantRecipes();
+    list = CraftingCalculator.getBestEnchantRecipes();
     if (BazaarNotifier.bazaarDataRaw != null) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
       generateHelperLine();

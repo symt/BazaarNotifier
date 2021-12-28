@@ -2,10 +2,11 @@ package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.modules.calc.BankCalculator;
+import dev.meyi.bn.modules.calc.CraftingCalculator;
+import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
-import dev.meyi.bn.utilities.ProfitCalculator;
-import dev.meyi.bn.utilities.Suggester;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import net.minecraft.event.ClickEvent.Action;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,19 +52,42 @@ public class BazaarNotifierCommand extends CommandBase {
   public void processCommand(ICommandSender ics, String[] args) {
     if (ics instanceof EntityPlayer) {
       EntityPlayer player = (EntityPlayer) ics;
-      if (args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
-        if (!BazaarNotifier.apiKey.equals("") || BazaarNotifier.apiKeyDisabled) {
-          BazaarNotifier.orders = new JSONArray();
-          BazaarNotifier.activeBazaar ^= true;
+      if (args.length >= 1 && args[0].equalsIgnoreCase("toggle")) {
+        if (args.length == 1 || args[1].equalsIgnoreCase("all")) {
+          if (!BazaarNotifier.apiKey.equals("") || BazaarNotifier.apiKeyDisabled) {
+            BazaarNotifier.orders = new JSONArray();
+            BazaarNotifier.activeBazaar ^= true;
+            player.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + (BazaarNotifier.activeBazaar ? EnumChatFormatting.GREEN
+                    : EnumChatFormatting.RED) + "The mod has been toggled " + (
+                    BazaarNotifier.activeBazaar ? EnumChatFormatting.DARK_GREEN + "on"
+                        : EnumChatFormatting.DARK_RED + "off")));
+          } else {
+            player.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "Run /bn api (key) to set your api key. Do /api if you need to get your api key"));
+          }
+        } else if (args.length == 2) {
+          boolean toggle;
+          if (args[1].equalsIgnoreCase("suggester")) {
+            toggle = BazaarNotifier.modules.toggleModule(ModuleName.SUGGESTION);
+          } else if (args[1].equalsIgnoreCase("crafting")) {
+            toggle = BazaarNotifier.modules.toggleModule(ModuleName.CRAFTING);
+          } else if (args[1].equalsIgnoreCase("bank")) {
+            toggle = BazaarNotifier.modules.toggleModule(ModuleName.BANK);
+          } else if (args[1].equalsIgnoreCase("notification")) {
+            toggle = BazaarNotifier.modules.toggleModule(ModuleName.NOTIFICATION);
+          } else {
+            player.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix +
+                    EnumChatFormatting.RED + "That module doesn't exist."));
+            return;
+          }
           player.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + (BazaarNotifier.activeBazaar ? EnumChatFormatting.GREEN
-                  : EnumChatFormatting.RED) + "The mod has been toggled " + (
-                  BazaarNotifier.activeBazaar ? EnumChatFormatting.DARK_GREEN + "on"
+              BazaarNotifier.prefix + (toggle ? EnumChatFormatting.GREEN
+                  : EnumChatFormatting.RED) + "The module has been toggled " + (
+                  toggle ? EnumChatFormatting.DARK_GREEN + "on"
                       : EnumChatFormatting.DARK_RED + "off")));
-        } else {
-          player.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Run /bn api (key) to set your api key. Do /api if you need to get your api key"));
         }
       } else if (args.length >= 1 && args[0].equalsIgnoreCase("api")) {
         if (args.length == 2) {
@@ -75,7 +100,7 @@ public class BazaarNotifierCommand extends CommandBase {
               BazaarNotifier.apiKey = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
-              EnchantedCraftingHandler.getUnlockedRecipes();
+              CraftingCalculator.getUnlockedRecipes();
               Configuration.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
@@ -96,45 +121,117 @@ public class BazaarNotifierCommand extends CommandBase {
                   + "Run /bn api (key) to set your api key. Do /api if you need to get your api key."));
           BazaarNotifier.validApiKey = false;
         }
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("dump")) {
-        System.out.println(BazaarNotifier.orders);
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-            + "Orders dumped to the log file"));
-      } else if (args.length == 1 && args[0].equalsIgnoreCase("toggleCollectionChecking")) {
-        if (Configuration.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Only showing unlocked recipes"));
-          Configuration.collectionCheckDisabled = false;
-        } else if (Configuration.collectionCheckDisabled) {
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Please set an API-Key first.(/bn api)"));
-          Configuration.collectionCheckDisabled = true;
+      } else if (args.length >= 1 && args[0].equalsIgnoreCase("settings")) {
+        ChatComponentText wikiLink = new ChatComponentText(EnumChatFormatting.RED
+            + "" + EnumChatFormatting.BOLD
+            + "Go to the wiki ");
+        IChatComponent help = new ChatComponentText(BazaarNotifier.prefix).appendSibling(wikiLink
+            .setChatStyle(wikiLink.getChatStyle().setChatClickEvent(new ClickEvent(
+                Action.OPEN_URL,
+                "https://github.com/symt/BazaarNotifier/wiki/How-to-use-BazaarNotifier#settings")))).appendSibling(
+            new ChatComponentText(
+                EnumChatFormatting.RED + "for more information on proper usage of this command."));
+        if (args.length == 1) {
+          player.addChatMessage(help);
         } else {
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Showing all recipes"));
-          Configuration.collectionCheckDisabled = true;
+          switch (args[1].toLowerCase()) {
+            case "collection":
+              if (Configuration.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
+                player.addChatMessage(
+                    new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "Only showing unlocked recipes"));
+                Configuration.collectionCheckDisabled = false;
+              } else if (Configuration.collectionCheckDisabled) {
+                player.addChatMessage(
+                    new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "Please set an API-Key first.(/bn api)"));
+                Configuration.collectionCheckDisabled = true;
+              } else {
+                player.addChatMessage(
+                    new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "Showing all recipes"));
+                Configuration.collectionCheckDisabled = true;
+              }
+              break;
+            case "crafting_display":
+              if (args.length == 3) {
+                player.addChatMessage(new ChatComponentText(
+                    BazaarNotifier.prefix
+                        + CraftingCalculator.editCraftingModuleGUI(args[2])));
+              } else {
+                player.addChatMessage(help);
+              }
+              break;
+            case "crafting_sort":
+              if (args.length == 2) {
+                player.addChatMessage(
+                    new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                        + CraftingCalculator.toggleCrafting()));
+              } else {
+                player.addChatMessage(help);
+              }
+              break;
+            case "crafting_length":
+              if (args.length == 3) {
+                if (Utils.isInteger(args[2])) {
+                  player
+                      .addChatMessage(
+                          new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                              + CraftingCalculator
+                              .setCraftingLength(Integer.parseInt(args[2]))));
+                } else {
+                  player.addChatMessage(
+                      new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                          + "Please enter a valid number."));
+                }
+              } else {
+                player.addChatMessage(help);
+              }
+              break;
+            case "suggester_length":
+              if (args.length == 3) {
+                if (Utils.isInteger(args[2])) {
+                  player
+                      .addChatMessage(
+                          new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                              + SuggestionCalculator
+                              .setSuggestionLength(Integer.parseInt(args[2]))));
+                } else {
+                  player.addChatMessage(
+                      new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                          + "Please enter a valid number"));
+                }
+              } else {
+                player.addChatMessage(help);
+              }
+              break;
+            default:
+              player.addChatMessage(new ChatComponentText(
+                  BazaarNotifier.prefix + EnumChatFormatting.RED + "\"" + args[1]
+                      + "\" is an invalid setting."));
+              player.addChatMessage(help);
+          }
         }
       } else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
-        if (args.length == 1) {
+        if (args.length == 1 || args[1].equalsIgnoreCase("all")) {
           BazaarNotifier.resetMod();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "All module locations have been reset and the order list has been emptied"));
-        } else if (args[1].equalsIgnoreCase("all")) {
-          BazaarNotifier.resetMod();
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "All module locations have been reset and the order list has been emptied"));
+              + "All module locations have been reset and the order list has been emptied."));
         } else if (args[1].equalsIgnoreCase("orders") && args.length == 2) {
           BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Your orders have been cleared"));
+              + "Your orders have been cleared."));
         } else if (args[1].equalsIgnoreCase("scale") && args.length == 2) {
           BazaarNotifier.resetScale();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Your scale for every module has been reset"));
+              + "Your scale for every module has been reset."));
         } else if (args[1].equalsIgnoreCase("bank") && args.length == 2) {
-          ProfitCalculator.reset();
+          BankCalculator.reset();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Your bank module has been reset"));
+              + "Your bank module has been reset."));
+        } else {
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+              + "That module doesn't exist."));
         }
       } else if (args.length >= 1 && args[0].equalsIgnoreCase("find")) {
         if (args.length == 1) {
@@ -149,7 +246,7 @@ public class BazaarNotifierCommand extends CommandBase {
                 .getString(WordUtils.capitalize(item.toLowerCase()));
             if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(itemConv)
                 || BazaarNotifier.enchantCraftingList.getJSONObject("other").has(itemConv)) {
-              String[] prices = EnchantedCraftingHandler.getEnchantCraft(item);
+              String[] prices = CraftingCalculator.getEnchantCraft(item);
 
               player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
@@ -198,10 +295,6 @@ public class BazaarNotifierCommand extends CommandBase {
                     + "Please provide a valid item to find."));
           }
         }
-      } else if (args.length == 2 && args[0].equalsIgnoreCase("craftingModuleconfig")) {
-        player.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                + EnchantedCraftingHandler.editCraftingModuleGUI(args[1])));
       } else if (args.length == 1 && args[0].equalsIgnoreCase("__force")) {
         BazaarNotifier.forceRender ^= true;
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -230,40 +323,20 @@ public class BazaarNotifierCommand extends CommandBase {
                     "\n" + EnumChatFormatting.GREEN + "If you want, you can support my work: ")
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
-      } else if (args.length == 1 && (args[0].equalsIgnoreCase("togglecrafting") || args[0]
-          .equalsIgnoreCase("tc"))) {
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-            + EnchantedCraftingHandler.toggleCrafting()));
-      } else if (args.length == 2 && args[0].equalsIgnoreCase("setCraftingListLength")) {
-        if (Utils.isInteger(args[1])) {
-          player
-              .addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                  + EnchantedCraftingHandler.setCraftingLength(Integer.parseInt(args[1]))));
-        } else {
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Please enter a valid number"));
-        }
-
-      } else if (args.length == 2 && args[0].equalsIgnoreCase("setFlippingListLength")) {
-        if (Utils.isInteger(args[1])) {
-          player
-              .addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                  + Suggester.setSuggestionLength(Integer.parseInt(args[1]))));
-        } else {
-          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-              + "Please enter a valid number"));
-        }
 
       } else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
       } else {
-        player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
-            EnumChatFormatting.RED + "/bn dump\n" + EnumChatFormatting.RED + "/bn reset orders\n"
-            + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED + "/bn toggle\n"
-            + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED
-            + "/bn discord\n"
-            + BazaarNotifier.prefix
+        player.addChatMessage(new ChatComponentText(
+            BazaarNotifier.prefix + "\n" + EnumChatFormatting.RED + "/bn reset (value)\n"
+                + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED
+                + "/bn toggle\n"
+                + EnumChatFormatting.RED
+                + "/bn settings (setting) [value]\n"
+                + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED
+                + "/bn discord\n"
+                + BazaarNotifier.prefix
         ));
       }
     }
@@ -276,58 +349,110 @@ public class BazaarNotifierCommand extends CommandBase {
 
   @Override
   public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+    // TODO: When dropping org.json, this should be replaced with a json object that helps generates this automatically.
 
-    if (args.length == 1) {
-      List<String> arguments = new ArrayList<>();
-      List<String> sortedArguments = new ArrayList<>();
-      arguments.add("api");
-      arguments.add("craftingModuleConfig");
-      arguments.add("discord");
-      arguments.add("find");
-      arguments.add("setFlippingListLength");
-      arguments.add("setCraftingListLength");
-      arguments.add("toggle");
-      arguments.add("toggleCollectionChecking");
-      arguments.add("toggleCrafting");
-      arguments.add("reset");
+    /*
+    api
+    discord
+    find
+    reset
+      => all
+      => orders
+      => scale
+      => bank
+    toggle
+      => all
+      => bank
+      => suggester
+      => crafting
+      => notification
+    settings
+      => collection
+      => crafting_display
+        => instant_sell
+        => sell_offer
+        => ppm
+      => crafting_sort
+      => crafting_length
+      => suggester_length
+     */
+    List<String> arguments = new ArrayList<>();
 
-      for (String argument : arguments) {
-        if (argument.startsWith(args[0].toLowerCase())) {
-          sortedArguments.add(argument);
+    if (args.length <= 1) {
+      new ArrayList<String>() {
+        {
+          add("api");
+          add("discord");
+          add("find");
+          add("reset");
+          add("settings");
+          add("toggle");
         }
-      }
-      return sortedArguments;
-
-    } else if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
-      List<String> arguments = new ArrayList<>();
-      List<String> sortedArguments = new ArrayList<>();
-      arguments.add("orders");
-      arguments.add("all");
-      arguments.add("scale");
-      arguments.add("bank");
-      for (String argument : arguments) {
-        if (argument.startsWith(args[1].toLowerCase())) {
-          sortedArguments.add(argument);
+      }.forEach(cmd -> {
+        if (args[0].trim().length() == 0 || cmd.startsWith(args[0].toLowerCase())) {
+          arguments.add(cmd);
         }
-      }
-      return sortedArguments;
-
-    } else if (args.length == 2 && args[0].equalsIgnoreCase("craftingModuleConfig")) {
-      List<String> arguments = new ArrayList<>();
-      List<String> sortedArguments = new ArrayList<>();
-      arguments.add("instasell");
-      arguments.add("selloffer");
-      arguments.add("PROFIT_PER_MIL");
-      for (String argument : arguments) {
-        if (argument.startsWith(args[1].toLowerCase())) {
-          sortedArguments.add(argument);
-        }
-      }
-      return sortedArguments;
-
+      });
     } else {
-      return null;
+      if (args.length <= 2 && args[0].equalsIgnoreCase("reset")) {
+        new ArrayList<String>() {
+          {
+            add("all");
+            add("orders");
+            add("scale");
+            add("bank");
+          }
+        }.forEach(cmd -> {
+          if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {
+            arguments.add(cmd);
+          }
+        });
+      } else if (args.length <= 2 && args[0].equalsIgnoreCase("toggle")) {
+        new ArrayList<String>() {
+          {
+            add("all");
+            add("suggester");
+            add("crafting");
+            add("bank");
+            add("notification");
+          }
+        }.forEach(cmd -> {
+          if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {
+            arguments.add(cmd);
+          }
+        });
+      } else if (args[0].equalsIgnoreCase("settings")) {
+        if (args.length == 2) {
+          new ArrayList<String>() {
+            {
+              add("collection");
+              add("crafting_display");
+              add("crafting_sort");
+              add("crafting_length");
+              add("suggester_length");
+            }
+          }.forEach(cmd -> {
+            if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {
+              arguments.add(cmd);
+            }
+          });
+        } else if (args.length == 3 && args[1].equalsIgnoreCase("crafting_display")) {
+          new ArrayList<String>() {
+            {
+              add("instant_sell");
+              add("sell_offer");
+              add("ppm");
+            }
+          }.forEach(cmd -> {
+            if (args[2].trim().length() == 0 || cmd.startsWith(args[2].toLowerCase())) {
+              arguments.add(cmd);
+            }
+          });
+        }
+
+      }
     }
+    return arguments;
   }
 }
 

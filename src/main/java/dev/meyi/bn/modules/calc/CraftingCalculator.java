@@ -1,18 +1,20 @@
-package dev.meyi.bn.utilities;
+package dev.meyi.bn.modules.calc;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONException;
 
 
-public class EnchantedCraftingHandler {
+public class CraftingCalculator {
 
   private static String unlockedRecipes = "";
 
@@ -143,13 +145,13 @@ public class EnchantedCraftingHandler {
   public static String toggleCrafting() {
     if (Configuration.craftingSortingOption == 0) {
       Configuration.craftingSortingOption = 1;
-      return "Toggled crafting to selloffer";
+      return "Crafting now sorts by sell offer";
     } else if (Configuration.craftingSortingOption == 1) {
       Configuration.craftingSortingOption = 2;
-      return "Toggled crafting to profit per million";
+      return "Crafting now sorts by profit per million";
     } else {
       Configuration.craftingSortingOption = 0;
-      return "Toggled crafting to instasell";
+      return "Crafting now sorts by instant sell";
     }
   }
 
@@ -164,17 +166,21 @@ public class EnchantedCraftingHandler {
   }
 
   public static String editCraftingModuleGUI(String craftingValue) {
-    if (craftingValue.equalsIgnoreCase("instasell")) {
+    if (craftingValue.equalsIgnoreCase("instant_sell")) {
       Configuration.showInstantSellProfit = !Configuration.showInstantSellProfit;
-      return "Toggled (Instant Sell)";
-    } else if (craftingValue.equalsIgnoreCase("selloffer")) {
+      return
+          (Configuration.showInstantSellProfit ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
+              + "Toggled profit column (Instant Sell)";
+    } else if (craftingValue.equalsIgnoreCase("sell_offer")) {
       Configuration.showSellOfferProfit = !Configuration.showSellOfferProfit;
-      return "Toggled Profit (Sell Offer)";
-    } else if (craftingValue.equalsIgnoreCase("PROFIT_PER_MIL")) {
+      return (Configuration.showSellOfferProfit ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
+          + "Toggled profit column (Sell Offer)";
+    } else if (craftingValue.equalsIgnoreCase("ppm")) {
       Configuration.showProfitPerMil = !Configuration.showProfitPerMil;
-      return "Toggled Profit per 1M";
+      return (Configuration.showProfitPerMil ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
+          + "Toggled profit column (Profit per 1M)";
     } else {
-      return "This value does not exist";
+      return EnumChatFormatting.RED + "This value does not exist";
     }
   }
 

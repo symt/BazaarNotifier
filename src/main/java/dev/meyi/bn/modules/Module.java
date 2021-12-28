@@ -18,6 +18,7 @@ public abstract class Module {
   int padding = 3;
   int shift = 0;
   boolean moving = false;
+  boolean active = true;
   boolean needsToMove = false;
 
   public Module() {

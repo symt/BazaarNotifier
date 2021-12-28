@@ -1,7 +1,7 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.ProfitCalculator;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -156,7 +156,7 @@ public class ChestTickHandler {
         IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
         String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
         if (chestName.contains("bank account") && !chestName.contains("upgrade")) {
-          ProfitCalculator.extractBankFromItemDescription(
+          BankCalculator.extractBankFromItemDescription(
               ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
         }
       } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear

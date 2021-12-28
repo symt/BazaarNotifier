@@ -1,12 +1,13 @@
-package dev.meyi.bn.utilities;
+package dev.meyi.bn.modules.calc;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.utilities.Utils;
 import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Suggester {
+public class SuggestionCalculator {
 
   public static void basic() {
     try {
