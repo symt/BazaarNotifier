@@ -1,12 +1,9 @@
 package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.MouseHandler;
-import dev.meyi.bn.utilities.EnchantedCraftingHandler;
-import dev.meyi.bn.utilities.Suggester;
-import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.lwjgl.input.Keyboard;
@@ -17,14 +14,14 @@ public class ModuleList extends ArrayList<Module> {
   Module movingModule = null;
 
   public ModuleList() {
-    this(Utils.initializeConfig());
+    this(Configuration.initializeConfig());
   }
 
   public ModuleList(JSONObject config) {
     BazaarNotifier.apiKey = config.getString("api");
     JSONObject workingConfig;
     if (!config.getString("version").equalsIgnoreCase(BazaarNotifier.VERSION)) {
-      workingConfig = Utils.initializeConfig();
+      workingConfig = Configuration.initializeConfig();
     } else {
       workingConfig = config;
     }
@@ -53,21 +50,46 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
+  public boolean toggleModule(ModuleName type) {
+    if (type == ModuleName.SUGGESTION) {
+      BazaarNotifier.sendChatMessages ^= true;
+    }
+
+    for (Module m : this) {
+      try {
+        if (m.getClass().getField("type").get(null) == type) {
+          m.active ^= true;
+
+          return m.active;
+        }
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return false;
+  }
+
   public void drawAllModules() {
     for (Module m : this) {
-      m.draw();
+      if (m.active) {
+        m.draw();
+      }
     }
   }
 
   public void drawAllOutlines() {
     for (Module m : this) {
-      m.drawBounds();
+      if (m.active) {
+        m.drawBounds();
+      }
     }
   }
-  public void rescaleCheck(){
-    for (Module m: this){
-      if(m.inMovementBox() && Keyboard.isKeyDown(29)&& !Keyboard.isKeyDown(42)){
-        float newScale = m.scale + (float)MouseHandler.mouseWheelMovement / 10;
+
+  public void rescaleCheck() {
+    for (Module m : this) {
+      if (m.inMovementBox() && Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
+        float newScale = m.scale + (float) MouseHandler.mouseWheelMovement / 20;
         m.scale = Math.max(newScale, 0.1f);
       }
     }
@@ -102,20 +124,10 @@ public class ModuleList extends ArrayList<Module> {
   }
 
   public void pageFlipCheck() {
-    if(!Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
+    if (!Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
       if (MouseHandler.mouseWheelMovement != 0) {
         for (Module m : this) {
           if (m.inMovementBox() && m.getMaxShift() > 0) {
-          /*if (dWheel < 0){  //this should be compatible with every Mouse if there are problems. m.getDWheel returns different values depending on the Mouse
-            if(m.getMaxShift() > m.shift) {
-              m.shift++;
-            }
-          }else {
-            if (m.shift > 0) {
-              m.shift--;
-            }
-           }
-           */
             m.shift += MouseHandler.mouseWheelMovement;
             if (m.shift > m.getMaxShift()) {
               m.shift = m.getMaxShift();
@@ -137,27 +149,20 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
-  public void resetScale(){
-    for(Module m : this){
+  public void resetScale() {
+    for (Module m : this) {
       m.scale = 1;
     }
   }
 
   public JSONObject generateConfig() {
-    JSONObject o = new JSONObject().put("api", BazaarNotifier.apiKey)
-            .put("version", BazaarNotifier.VERSION)
-            .put("craftingListLength", EnchantedCraftingHandler.craftingListLength)
-            .put("suggestionListLength" , Suggester.suggestionListLength)
-            .put("CRAFTING_SORTING_OPTION", EnchantedCraftingHandler.craftingSortingOption)
-            .put("showInstasellProfit", EnchantedCraftingHandler.showInstasellProfit)
-            .put("showSellofferProfit", EnchantedCraftingHandler.showSellofferProfit)
-            .put("showProfitPerMil", EnchantedCraftingHandler.showProfitPerMil)
-            .put("collectionChecking", EnchantedCraftingHandler.collectionCheckDisabled);
+    JSONObject o = Configuration.initializeConfig();
 
     JSONArray modules = new JSONArray();
     for (Module m : this) {
       modules.put(m.generateModuleConfig());
     }
+
     return o.put("modules", modules);
   }
 }

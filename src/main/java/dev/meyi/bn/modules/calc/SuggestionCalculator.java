@@ -1,12 +1,13 @@
-package dev.meyi.bn.utilities;
+package dev.meyi.bn.modules.calc;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.utilities.Utils;
 import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Suggester {
-  public static int suggestionListLength;
+public class SuggestionCalculator {
 
   public static void basic() {
     try {
@@ -70,11 +71,11 @@ public class Suggester {
     }
   }
 
-  public static String setSuggestionLength(int length){
-    if(length > BazaarNotifier.bazaarDataRaw.length()){
+  public static String setSuggestionLength(int length) {
+    if (length > BazaarNotifier.bazaarDataRaw.length()) {
       return length + " is too long";
-    }else{
-      suggestionListLength = length;
+    } else {
+      Configuration.suggestionListLength = length;
       return "Item list size set to " + length;
     }
   }

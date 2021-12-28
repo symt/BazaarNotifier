@@ -1,7 +1,7 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -95,9 +95,11 @@ public class ChestTickHandler {
               }
             }
             if (forceRemove) {
-              Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                  BazaarNotifier.prefix + EnumChatFormatting.RED
-                      + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
+              if (BazaarNotifier.sendChatMessages) {
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                    BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
+              }
               BazaarNotifier.orders.remove(orderInQuestion);
             } else if (amountLeft > 0) {
               BazaarNotifier.orders.getJSONObject(orderInQuestion)
@@ -133,7 +135,8 @@ public class ChestTickHandler {
               chestName.equals("confirm sell offer")) {
 
             if (chest.getStackInSlot(13) != null) {
-              lastScreenDisplayName = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText());
+              lastScreenDisplayName = StringUtils
+                  .stripControlCodes(chest.getDisplayName().getUnformattedText());
               orderConfirmation(chest);
             }
 
@@ -142,10 +145,19 @@ public class ChestTickHandler {
                 && Item.itemRegistry
                 .getIDForObject(chest.getStackInSlot(chest.getSizeInventory() - 5).getItem())
                 == 262) {
-              lastScreenDisplayName = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText());
+              lastScreenDisplayName = StringUtils
+                  .stripControlCodes(chest.getDisplayName().getUnformattedText());
               updateBazaarOrders(chest);
             }
           }
+        }
+      } else if (BazaarNotifier.inBank && Minecraft
+          .getMinecraft().currentScreen instanceof GuiChest) {
+        IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
+        String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
+        if (chestName.contains("bank account") && !chestName.contains("upgrade")) {
+          BankCalculator.extractBankFromItemDescription(
+              ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
         }
       } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
         ChestTickHandler.lastScreenDisplayName = "";

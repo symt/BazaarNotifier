@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 
 public class MouseHandler {
+
   public static int mouseWheelMovement = 0;
   int tick = 0;
   boolean inPageFlip = false;
@@ -31,7 +32,7 @@ public class MouseHandler {
     }
   }
 
-  public void mouseWheel(){
-    mouseWheelMovement = (int)Math.round((double) Mouse.getDWheel() * -1 / 100);
+  public void mouseWheel() {
+    mouseWheelMovement = (int) Math.round((double) Mouse.getDWheel() * -1 / 100);
   }
 }

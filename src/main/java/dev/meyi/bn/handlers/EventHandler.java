@@ -1,8 +1,8 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import java.math.BigDecimal;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -25,6 +25,9 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
+
+      BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
+
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConversionsReversed
               .getString(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
@@ -33,6 +36,10 @@ public class EventHandler {
         verify = null;
         productVerify = new String[2];
       }
+      //if(message.startsWith("Sell Offer Setup!")){
+      // ProfitCalculator.moneyNotFromBazaar -= BazaarNotifier.orders.getJSONObject(BazaarNotifier.orders.length()-1).getDouble("orderValue");
+      //}
+
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
       String item = message.split("x ", 2)[1].split(" was ")[0];
       int amount = Integer
@@ -47,6 +54,11 @@ public class EventHandler {
           if (order.getString("product").equalsIgnoreCase(item)
               && order.getInt("startAmount") == amount && order.getString("type").equals("buy")
               && order.getDouble("pricePerUnit") > edgePrice) {
+            if (!BazaarNotifier.inBazaar) {
+              BankCalculator.moneyNotFromBazaar += order.getInt("orderValue");
+            } else {
+              BankCalculator.moneyNotFromBazaar -= order.getInt("orderValue");
+            }
             edgePrice = order.getDouble("pricePerUnit");
             orderToRemove = i;
             found = true;
@@ -59,6 +71,11 @@ public class EventHandler {
           if (order.getString("product").equalsIgnoreCase(item)
               && order.getInt("startAmount") == amount && order.getString("type").equals("sell")
               && order.getDouble("pricePerUnit") < edgePrice) {
+            BankCalculator.moneyNotFromBazaar -= order.getInt("orderValue");
+            if (!BazaarNotifier.inBazaar) {
+              BankCalculator.moneyNotFromBazaar += order.getInt("orderValue");
+            }
+
             edgePrice = order.getDouble("pricePerUnit");
             orderToRemove = i;
             found = true;
@@ -124,16 +141,37 @@ public class EventHandler {
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
+        BankCalculator.moneyNotFromBazaar +=
+            BankCalculator.calculateProfit() - BankCalculator.moneyOnBazaarLeave;
       }
     }
+
     if (e.gui == null && BazaarNotifier.inBazaar) {
       BazaarNotifier.inBazaar = false;
+      BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
+    }
+
+    if (e.gui == null && BazaarNotifier.inBank) {
+      BazaarNotifier.inBank = false;
+    }
+
+    if (e.gui instanceof GuiChest && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() &&
+        StringUtils.stripControlCodes(
+            ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
+            .contains("Bank Account"))) &&
+        !StringUtils.stripControlCodes(
+            ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
+            .contains("Bank Account Upgrades")) {
+      BazaarNotifier.inBank = true;
     }
   }
+
 
   @SubscribeEvent
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
     BazaarNotifier.inBazaar = false;
+    BazaarNotifier.inBank = false;
+    BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
   }
 
   @SubscribeEvent

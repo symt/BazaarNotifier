@@ -17,22 +17,18 @@ apply plugin: 'java'
 apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: 'com.github.johnrengelman.shadow'
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 }
-version = "1.4.7"
+version = "1.5.0"
 group = "dev.meyi.bn"
 archivesBaseName = "BazaarNotifier"
 
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
-    mappings = "stable_20"
+    mappings = "stable_22"
     makeObfSourceJar = false
 }
 
@@ -45,7 +41,6 @@ jar {
         attributes 'FMLAT': 'BazaarNotifier_at.cfg'
     }
 }
-
 
 processResources
         {
@@ -69,4 +64,3 @@ shadowJar {
 
 reobf { shadowJar { mappingType = "SEARGE" } }
 tasks.reobfShadowJar.mustRunAfter shadowJar
-

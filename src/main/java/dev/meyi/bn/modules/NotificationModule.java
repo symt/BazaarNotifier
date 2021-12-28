@@ -13,6 +13,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONObject;
 
 public class NotificationModule extends Module {
+  public static final ModuleName type = ModuleName.NOTIFICATION;
 
   public NotificationModule() {
     super();
@@ -60,13 +61,15 @@ public class NotificationModule extends Module {
       int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + longestXString;
     } else {
-      Utils.drawCenteredString("No orders found", (int)((x/scale) + 200*scale/scale/4),
-              (int)(y/scale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6)), 0xAAAAAA, scale);
-      float X = x + 200*scale;
-      boundsX = (int)X;
+      Utils.drawCenteredString("No orders found", (int) ((x / scale) + 200 * scale / scale / 4),
+          (int) (y / scale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6)), 0xAAAAAA,
+          scale);
+      float X = x + 200 * scale;
+      boundsX = (int) X;
     }
-    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * 10 + 20 * scale -2;
-    boundsY = (int)Y;
+    float Y =
+        y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * 10 + 20 * scale - 2;
+    boundsY = (int) Y;
   }
 
   @Override
@@ -90,7 +93,6 @@ public class NotificationModule extends Module {
   protected int getMaxShift() {
     return BazaarNotifier.orders.length() - 10;
   }
-
 
 
 }
