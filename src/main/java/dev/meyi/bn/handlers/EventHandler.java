@@ -3,6 +3,7 @@ package dev.meyi.bn.handlers;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import java.math.BigDecimal;
+
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -56,8 +57,6 @@ public class EventHandler {
               && order.getDouble("pricePerUnit") > edgePrice) {
             if (!BazaarNotifier.inBazaar) {
               BankCalculator.moneyNotFromBazaar += order.getInt("orderValue");
-            } else {
-              BankCalculator.moneyNotFromBazaar -= order.getInt("orderValue");
             }
             edgePrice = order.getDouble("pricePerUnit");
             orderToRemove = i;
@@ -114,6 +113,7 @@ public class EventHandler {
         } else if (message.endsWith("sell offer!") && order.getString("type").equals("sell")) {
           if (order.getString("product").equalsIgnoreCase(itemRefunded)
               && order.getInt("amountRemaining") == refundAmount) {
+            BankCalculator.moneyNotFromBazaar -= BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
             BazaarNotifier.orders.remove(i);
             break;
           }

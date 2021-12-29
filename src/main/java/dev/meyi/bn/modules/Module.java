@@ -17,6 +17,7 @@ public abstract class Module {
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
+  int mouseWheelShift = 0;
   boolean moving = false;
   boolean active = true;
   boolean needsToMove = false;

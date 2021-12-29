@@ -2,7 +2,6 @@ package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
-import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
@@ -14,16 +13,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.lwjgl.input.Keyboard;
 
 public class CraftingModule extends Module {
   public static final ModuleName type = ModuleName.CRAFTING;
-
   private final LinkedHashMap<String, Color> helperLine = new LinkedHashMap<>();
   int longestXString;
   ArrayList<ArrayList<String>> list;
   int lastHovered = 0;
-  private int materialCountWheel = 1;
+
 
   public CraftingModule() {
     super();
@@ -60,7 +57,6 @@ public class CraftingModule extends Module {
 
   @Override
   protected void draw() {
-    scrollCount();
     list = CraftingCalculator.getBestEnchantRecipes();
     if (BazaarNotifier.bazaarDataRaw != null) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
@@ -182,6 +178,7 @@ public class CraftingModule extends Module {
   }
 
   protected void renderMaterials(int hoveredText, ArrayList<ArrayList<String>> list) {
+    checkMouseMovement();
     List<LinkedHashMap<String, Color>> material = new ArrayList<>();
     LinkedHashMap<String, Color> text = new LinkedHashMap<>();
 
@@ -190,7 +187,7 @@ public class CraftingModule extends Module {
         if (BazaarNotifier.enchantCraftingList.getJSONObject("normal")
             .has(list.get(hoveredText).get(3))) {
           try {
-            text.put(materialCountWheel * 160 + "x ", Color.LIGHT_GRAY);
+            text.put(mouseWheelShift * 160 + "x ", Color.LIGHT_GRAY);
             text.put(BazaarNotifier.bazaarConversions.getString(
                 BazaarNotifier.enchantCraftingList.getJSONObject("normal")
                     .getJSONObject(list.get(hoveredText).get(3)).getString("material")),
@@ -207,7 +204,7 @@ public class CraftingModule extends Module {
             if (b == 0) {
               _material.append((BazaarNotifier.enchantCraftingList.getJSONObject("other")
                   .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)
-                  * materialCountWheel)).append("x ").append(BazaarNotifier.bazaarConversions
+                  * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConversions
                   .getString(BazaarNotifier.enchantCraftingList.getJSONObject("other")
                       .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
                       .getString(0)));
@@ -215,7 +212,7 @@ public class CraftingModule extends Module {
               _material.append(" | ").append(
                   BazaarNotifier.enchantCraftingList.getJSONObject("other")
                       .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                      .getInt(b * 2 + 1) * materialCountWheel).append("x ").append(
+                      .getInt(b * 2 + 1) * mouseWheelShift).append("x ").append(
                   BazaarNotifier.bazaarConversions.getString(
                       BazaarNotifier.enchantCraftingList.getJSONObject("other")
                           .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
@@ -237,19 +234,10 @@ public class CraftingModule extends Module {
     }
   }
 
-  public void scrollCount() {
-    checkMouseMovement();
-    if (MouseHandler.mouseWheelMovement != 0 && Keyboard.isKeyDown(42) && !Keyboard.isKeyDown(29)) {
-      materialCountWheel -= MouseHandler.mouseWheelMovement;
-      if (materialCountWheel < 1) {
-        materialCountWheel = 1;
-      }
-    }
-  }
 
   public void checkMouseMovement() {
     if (lastHovered != checkHoveredText()) {
-      materialCountWheel = 1;
+      mouseWheelShift = 1;
     }
     lastHovered = checkHoveredText();
   }

@@ -95,6 +95,17 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
+  public void shiftSettingCheck(){
+    for (Module m: this) {
+      if (MouseHandler.mouseWheelMovement != 0 && Keyboard.isKeyDown(42) && !Keyboard.isKeyDown(29)) {
+        m.mouseWheelShift -= MouseHandler.mouseWheelMovement;
+        if (m.mouseWheelShift < 1) {
+          m.mouseWheelShift = 1;
+        }
+      }
+    }
+  }
+
   public void movementCheck() {
     if (Mouse.isButtonDown(0)) {
       if (movingModule == null) {
