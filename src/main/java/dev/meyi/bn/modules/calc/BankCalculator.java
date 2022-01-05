@@ -34,7 +34,7 @@ public class BankCalculator {
     if (!BazaarNotifier.orders.isEmpty()) {
       double orderWorth = 0;
       for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        if (BazaarNotifier.orders.getJSONObject(i).getString("type") == "sell") {
+        if (BazaarNotifier.orders.getJSONObject(i).getString("type").equals("sell")) {
           orderWorth += BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
         }
       }
@@ -47,7 +47,7 @@ public class BankCalculator {
     if (!BazaarNotifier.orders.isEmpty()) {
       double orderWorth = 0;
       for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        if (BazaarNotifier.orders.getJSONObject(i).getString("type") == "buy") {
+        if (BazaarNotifier.orders.getJSONObject(i).getString("type").equals("buy")) {
           orderWorth += BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
         }
       }
