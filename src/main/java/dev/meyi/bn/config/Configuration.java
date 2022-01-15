@@ -1,10 +1,11 @@
 package dev.meyi.bn.config;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 public class Configuration {
 
@@ -16,28 +17,31 @@ public class Configuration {
   public static boolean showProfitPerMil;
   public static int suggestionListLength;
 
-  public static JSONObject initializeConfig() {
-    JSONObject newConfig = new JSONObject().put("api", BazaarNotifier.apiKey)
-        .put("version", BazaarNotifier.VERSION)
-        .put("craftingListLength", craftingListLength)
-        .put("suggestionListLength", suggestionListLength)
-        .put("craftingSortingOption", craftingSortingOption)
-        .put("showInstantSellProfit", showInstantSellProfit)
-        .put("showSellOfferProfit", showSellOfferProfit)
-        .put("showProfitPerMil", showProfitPerMil)
-        .put("collectionChecking", collectionCheckDisabled);
+  public static JsonObject initializeConfig() {
+    JsonObject newConfig = new JsonObject();
+    newConfig.addProperty("api", BazaarNotifier.apiKey);
+    newConfig.addProperty("version", BazaarNotifier.VERSION);
+    newConfig.addProperty("craftingListLength", craftingListLength);
+    newConfig.addProperty("suggestionListLength", suggestionListLength);
+    newConfig.addProperty("craftingSortingOption", craftingSortingOption);
+    newConfig.addProperty("showInstantSellProfit", showInstantSellProfit);
+    newConfig.addProperty("showSellOfferProfit", showSellOfferProfit);
+    newConfig.addProperty("showProfitPerMil", showProfitPerMil);
+    newConfig.addProperty("collectionChecking", collectionCheckDisabled);
 
-    JSONArray modules = new JSONArray();
-
+    JsonArray modules = new JsonArray();
+    JsonObject g = new JsonObject();
+    g.addProperty("hi", "hi");
     for (ModuleName value : ModuleName.values()) {
       Module m = value.returnDefaultModule();
       if (m != null) {
-        modules.put(m.generateModuleConfig());
+        modules.add(m.generateModuleConfig());
       }
     }
 
     BazaarNotifier.validApiKey = false;
+    newConfig.add("modules", modules);
 
-    return newConfig.put("modules", modules);
+    return newConfig;
   }
 }

@@ -1,26 +1,26 @@
 package dev.meyi.bn.utilities;
 
 import java.util.Comparator;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-public class JSONComparator implements Comparator<JSONObject> {
+import com.google.gson.JsonObject;
 
-  String key = "";
+public class JSONComparator implements Comparator<JsonObject> {
+
+  String key;
 
   public JSONComparator(String key) {
     this.key = key;
   }
 
   @Override
-  public int compare(JSONObject a, JSONObject b) {
+  public int compare(JsonObject a, JsonObject b) {
     Double valA = 0.0d;
-    Double valB = 0.0d;
+    double valB = 0.0d;
 
     try {
-      valA = a.getDouble(key);
-      valB = b.getDouble(key);
-    } catch (JSONException e) {
+      valA = a.get(key).getAsDouble();
+      valB = b.get(key).getAsDouble();
+    } catch (Exception e) {
       System.err.println("The provided value in " + key + " is not a double.");
     }
 

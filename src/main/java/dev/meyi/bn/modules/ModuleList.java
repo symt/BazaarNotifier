@@ -1,11 +1,11 @@
 package dev.meyi.bn.modules;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.MouseHandler;
 import java.util.ArrayList;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -17,20 +17,21 @@ public class ModuleList extends ArrayList<Module> {
     this(Configuration.initializeConfig());
   }
 
-  public ModuleList(JSONObject config) {
-    BazaarNotifier.apiKey = config.getString("api");
-    JSONObject workingConfig;
-    if (!config.getString("version").equalsIgnoreCase(BazaarNotifier.VERSION)) {
+  public ModuleList(JsonObject config) {
+    BazaarNotifier.apiKey = config.get("api").getAsString();
+    JsonObject workingConfig;
+    if (!config.get("version").getAsString().equalsIgnoreCase(BazaarNotifier.VERSION)) {
       workingConfig = Configuration.initializeConfig();
+      
     } else {
       workingConfig = config;
     }
 
-    JSONArray modules = workingConfig.getJSONArray("modules");
+    JsonArray modules = workingConfig.getAsJsonArray("modules");
 
     for (Object m : modules) {
-      JSONObject module = (JSONObject) m;
-      switch (ModuleName.valueOf(module.getString("name"))) {
+      JsonObject module = (JsonObject) m;
+      switch (ModuleName.valueOf(module.get("name").getAsString())) {
         case SUGGESTION:
           add(new SuggestionModule(module));
           break;
@@ -45,7 +46,7 @@ public class ModuleList extends ArrayList<Module> {
           break;
         default:
           throw new IllegalStateException(
-              "Unexpected value: " + ModuleName.valueOf(module.getString("name")));
+              "Unexpected value: " + ModuleName.valueOf(module.get("name").getAsString()));
       }
     }
   }
@@ -166,14 +167,14 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
-  public JSONObject generateConfig() {
-    JSONObject o = Configuration.initializeConfig();
+  public JsonObject generateConfig() {
+    JsonObject o = Configuration.initializeConfig();
 
-    JSONArray modules = new JSONArray();
+    JsonArray modules = new JsonArray();
     for (Module m : this) {
-      modules.put(m.generateModuleConfig());
+      modules.add(m.generateModuleConfig());
     }
-
-    return o.put("modules", modules);
+    o.add("modules", modules);
+    return o;
   }
 }

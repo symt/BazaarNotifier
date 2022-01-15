@@ -1,8 +1,10 @@
 package dev.meyi.bn.modules;
 
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -10,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.text.WordUtils;
-import org.json.JSONObject;
 
 public class NotificationModule extends Module {
   public static final ModuleName type = ModuleName.NOTIFICATION;
@@ -19,7 +20,7 @@ public class NotificationModule extends Module {
     super();
   }
 
-  public NotificationModule(JSONObject module) {
+  public NotificationModule(JsonObject module) {
     super(module);
   }
 
@@ -29,30 +30,30 @@ public class NotificationModule extends Module {
 
     List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-    if (BazaarNotifier.orders.length() != 0) {
+    if (BazaarNotifier.newOrders.size() != 0) {
 
-      int size = Math.min(shift + 10, BazaarNotifier.orders.length());
+      int size = Math.min(shift + 10, BazaarNotifier.newOrders.size());
 
       for (int i = shift; i < size; i++) {
-        JSONObject currentOrder = BazaarNotifier.orders.getJSONObject(i);
+        Order currentOrder = BazaarNotifier.newOrders.get(i);
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
 
-        Color typeSpecificColor = currentOrder.getBoolean("goodOrder") ? new Color(0x55FF55)
-            : currentOrder.getString("type").equals("buy") ? new Color(0xFF55FF)
+        Color typeSpecificColor = currentOrder.goodOrder ? new Color(0x55FF55)
+            : currentOrder.type.equals("buy") ? new Color(0xFF55FF)
                 : new Color(0x55FFFF);
 
-        String notification = currentOrder.getBoolean("goodOrder") ? "BEST" :
-            currentOrder.getBoolean("matchedOrder") ? "MATCHED" : "OUTDATED";
-        message.put(WordUtils.capitalizeFully(currentOrder.getString("type")), typeSpecificColor);
+        String notification = currentOrder.goodOrder ? "BEST" :
+            currentOrder.matchedOrder ? "MATCHED" : "OUTDATED";
+        message.put(WordUtils.capitalizeFully(currentOrder.type), typeSpecificColor);
         message.put(" - ", new Color(0xAAAAAA));
         message.put(notification + " ", new Color(0xFFFF55));
         message.put("(", new Color(0xAAAAAA));
-        message.put(BazaarNotifier.dfNoDecimal.format(currentOrder.getInt("startAmount")),
+        message.put(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount),
             typeSpecificColor);
         message.put("x ", new Color(0xAAAAAA));
-        message.put(currentOrder.getString("product"), typeSpecificColor);
+        message.put(currentOrder.product, typeSpecificColor);
         message.put(", ", new Color(0xAAAAAA));
-        message.put(BazaarNotifier.df.format(currentOrder.getDouble("pricePerUnit")),
+        message.put(BazaarNotifier.df.format(currentOrder.pricePerUnit),
             typeSpecificColor);
         message.put(")", new Color(0xAAAAAA));
         items.add(message);
@@ -91,7 +92,7 @@ public class NotificationModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.orders.length() - 10;
+    return BazaarNotifier.newOrders.size() - 10;
   }
 
 

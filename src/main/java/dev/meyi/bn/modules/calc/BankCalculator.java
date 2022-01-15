@@ -23,6 +23,7 @@ public class BankCalculator {
   public static double moneyOnBazaarLeave = 0;
   private static double moneyOnStartup =
       moneyStoredInSellOffers() + moneyStoredInBuyOrders() + getPurse();
+  public static double bazaarProfit = 0;
 
   public static double calculateProfit() {
     return getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank
@@ -31,11 +32,11 @@ public class BankCalculator {
 
 
   public static double moneyStoredInSellOffers() {
-    if (!BazaarNotifier.orders.isEmpty()) {
+    if (BazaarNotifier.newOrders.size() != 0) {
       double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        if (BazaarNotifier.orders.getJSONObject(i).getString("type") == "sell") {
-          orderWorth += BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
+      for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
+        if (BazaarNotifier.newOrders.get(i).type.equals("sell")) {
+          orderWorth += BazaarNotifier.newOrders.get(i).orderValue;
         }
       }
       return orderWorth;
@@ -44,11 +45,11 @@ public class BankCalculator {
   }
 
   public static double moneyStoredInBuyOrders() {
-    if (!BazaarNotifier.orders.isEmpty()) {
+    if (BazaarNotifier.newOrders.size() != 0) {
       double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        if (BazaarNotifier.orders.getJSONObject(i).getString("type") == "buy") {
-          orderWorth += BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
+      for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
+        if (BazaarNotifier.newOrders.get(i).type.equals("buy")) {
+          orderWorth += BazaarNotifier.newOrders.get(i).orderValue;
         }
       }
       return orderWorth;
@@ -65,8 +66,8 @@ public class BankCalculator {
   }
 
   public static double getPurseFromAPI() {
-    if (!BazaarNotifier.playerDataFromAPI.isEmpty()) {
-      return BazaarNotifier.playerDataFromAPI.getDouble("coin_purse");
+    if (BazaarNotifier.playerDataFromAPI.entrySet().size() != 0) {
+      return BazaarNotifier.playerDataFromAPI.get("coin_purse").getAsDouble();
     }
     return -1;
   }

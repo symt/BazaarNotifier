@@ -4,6 +4,7 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import java.math.BigDecimal;
 
+import dev.meyi.bn.utilities.Order;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -11,35 +12,34 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
-import org.json.JSONObject;
 import org.lwjgl.opengl.GL11;
 
 public class EventHandler {
 
-  static JSONObject verify = null;
+  static Order verify = null;
   static String[] productVerify = new String[2];
-
+  
   @SubscribeEvent
   public void bazaarChatHandler(ClientChatReceivedEvent e) {
+
     if (!BazaarNotifier.activeBazaar) {
       return;
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
+
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
 
       BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
 
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConversionsReversed
-              .getString(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
+              .get(message.split("x ", 2)[1].split(" for ")[0]).getAsString()) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
-        BazaarNotifier.orders.put(verify);
+        BazaarNotifier.newOrders.add(verify);
         verify = null;
         productVerify = new String[2];
       }
-      //if(message.startsWith("Sell Offer Setup!")){
-      // ProfitCalculator.moneyNotFromBazaar -= BazaarNotifier.orders.getJSONObject(BazaarNotifier.orders.length()-1).getDouble("orderValue");
-      //}
+
 
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
       String item = message.split("x ", 2)[1].split(" was ")[0];
@@ -50,39 +50,39 @@ public class EventHandler {
       double edgePrice;
       if (message.startsWith("[Bazaar] Your Buy Order")) {
         edgePrice = Double.MIN_VALUE;
-        for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-          JSONObject order = BazaarNotifier.orders.getJSONObject(i);
-          if (order.getString("product").equalsIgnoreCase(item)
-              && order.getInt("startAmount") == amount && order.getString("type").equals("buy")
-              && order.getDouble("pricePerUnit") > edgePrice) {
+        for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
+          Order order = BazaarNotifier.newOrders.get(i);
+          if (order.product.equalsIgnoreCase(item)
+              && order.startAmount == amount && order.type.equals("buy")
+              && order.pricePerUnit > edgePrice) {
             if (!BazaarNotifier.inBazaar) {
-              BankCalculator.moneyNotFromBazaar += order.getInt("orderValue");
+              BankCalculator.moneyNotFromBazaar += order.orderValue;
             }
-            edgePrice = order.getDouble("pricePerUnit");
+            edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
+            BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(orderToRemove).startAmount * BazaarNotifier.newOrders.get(orderToRemove).pricePerUnit;
           }
         }
       } else if (message.startsWith("[Bazaar] Your Sell Offer")) {
         edgePrice = Double.MAX_VALUE;
-        for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-          JSONObject order = BazaarNotifier.orders.getJSONObject(i);
-          if (order.getString("product").equalsIgnoreCase(item)
-              && order.getInt("startAmount") == amount && order.getString("type").equals("sell")
-              && order.getDouble("pricePerUnit") < edgePrice) {
-            BankCalculator.moneyNotFromBazaar -= order.getInt("orderValue");
-            if (!BazaarNotifier.inBazaar) {
-              BankCalculator.moneyNotFromBazaar += order.getInt("orderValue");
-            }
+        for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
+          Order order = BazaarNotifier.newOrders.get(i);
+          if (order.product.equalsIgnoreCase(item)
+              && order.startAmount == amount && order.type.equals("sell")
+              && order.pricePerUnit < edgePrice) {
 
-            edgePrice = order.getDouble("pricePerUnit");
+
+            edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
+            BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(orderToRemove).startAmount * BazaarNotifier.newOrders.get(orderToRemove).pricePerUnit;
           }
         }
       }
       if (found) {
-        BazaarNotifier.orders.remove(orderToRemove);
+
+        BazaarNotifier.newOrders.remove(orderToRemove);
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
@@ -100,21 +100,22 @@ public class EventHandler {
         refundAmount = Integer
             .parseInt(message.split("Refunded ")[1].split("x ", 2)[0].replaceAll(",", ""));
         itemRefunded = message.split("x ", 2)[1].split(" from")[0];
+
       }
-      for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        JSONObject order = BazaarNotifier.orders.getJSONObject(i);
-        if (message.endsWith("buy order!") && order.getString("type").equals("buy")) {
-          if (BigDecimal.valueOf(refund >= 10000 ? Math.round(order.getDouble("orderValue"))
-              : order.getDouble("orderValue"))
+      for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
+        Order order = BazaarNotifier.newOrders.get(i);
+        if (message.endsWith("buy order!") && order.type.equals("buy")) {
+          if (BigDecimal.valueOf(refund >= 10000 ? Math.round(order.orderValue)
+              : order.orderValue)
               .compareTo(BigDecimal.valueOf(refund)) == 0) {
-            BazaarNotifier.orders.remove(i);
+            BankCalculator.bazaarProfit -= (order.startAmount -order.amountRemaining)*order.pricePerUnit;
             break;
           }
-        } else if (message.endsWith("sell offer!") && order.getString("type").equals("sell")) {
-          if (order.getString("product").equalsIgnoreCase(itemRefunded)
-              && order.getInt("amountRemaining") == refundAmount) {
-            BankCalculator.moneyNotFromBazaar -= BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
-            BazaarNotifier.orders.remove(i);
+        } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
+          if (order.product.equalsIgnoreCase(itemRefunded)
+              && order.amountRemaining == refundAmount) {
+            BankCalculator.bazaarProfit += (order.startAmount -order.amountRemaining)*order.pricePerUnit;
+            BazaarNotifier.newOrders.remove(i);
             break;
           }
         }
@@ -123,6 +124,11 @@ public class EventHandler {
       ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
+    }else if (message.startsWith("Bazaar! Bought")){
+      BankCalculator.bazaarProfit -=  Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+
+    }else if (message.startsWith("Bazaar! Sold")){
+      BankCalculator.bazaarProfit +=  Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
     }
   }
 

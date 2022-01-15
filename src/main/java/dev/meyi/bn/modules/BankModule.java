@@ -1,5 +1,6 @@
 package dev.meyi.bn.modules;
 
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import org.json.JSONObject;
 
 public class BankModule extends Module {
   public static final ModuleName type = ModuleName.BANK;
@@ -18,7 +18,7 @@ public class BankModule extends Module {
     super();
   }
 
-  public BankModule(JSONObject config) {
+  public BankModule(JsonObject config) {
     super(config);
   }
 
@@ -37,6 +37,9 @@ public class BankModule extends Module {
             .format((int) (BankCalculator.calculateProfit() - BankCalculator.moneyNotFromBazaar)),
         Color.WHITE);
     items.add(message2);
+    LinkedHashMap<String, Color> message3 = new LinkedHashMap<>();
+    message3.put(BazaarNotifier.df.format(BankCalculator.bazaarProfit) , Color.MAGENTA);
+    items.add(message3);
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;

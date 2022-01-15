@@ -1,6 +1,8 @@
 package dev.meyi.bn.utilities;
 
-import org.json.JSONArray;
+import com.google.gson.JsonArray;
+
+import java.util.List;
 
 public class Defaults {
 
@@ -20,7 +22,5 @@ public class Defaults {
   public static final boolean PROFIT_PER_MIL = true;
   public static final boolean COLLECTION_CHECKING = false;
 
-  public static JSONArray DEFAULT_ORDERS_LAYOUT() {
-    return new JSONArray();
-  }
+
 }

@@ -4,6 +4,8 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.meyi.bn.utilities.Order;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
@@ -15,7 +17,7 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import org.json.JSONObject;
+
 
 public class ChestTickHandler {
 
@@ -23,7 +25,7 @@ public class ChestTickHandler {
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
 
   public static void updateBazaarOrders(IInventory chest) {
-    int[] verifiedOrders = new int[BazaarNotifier.orders.length()];
+    int[] verifiedOrders = new int[BazaarNotifier.newOrders.size()];
     for (int i = 0; i < chest.getSizeInventory(); i++) {
       if (chest.getStackInSlot(i) != null
           && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 160    // Glass
@@ -63,10 +65,10 @@ public class ChestTickHandler {
             price = Double.parseDouble(priceString);
           }
           int orderInQuestion = -1;
-          for (int j = 0; j < BazaarNotifier.orders.length(); j++) {
-            JSONObject order = BazaarNotifier.orders.getJSONObject(j);
-            if (priceString.equalsIgnoreCase(order.getString("priceString")) && type
-                .equals(order.getString("type"))) {
+          for (int j = 0; j < BazaarNotifier.newOrders.size(); j++) {
+            Order order = BazaarNotifier.newOrders.get(j);
+            if (priceString.equalsIgnoreCase(order.priceString) && type
+                .equals(order.type)) {
               orderInQuestion = j;
               break;
             }
@@ -74,8 +76,7 @@ public class ChestTickHandler {
           if (orderInQuestion != -1) {
             verifiedOrders[orderInQuestion] = 1;
             boolean forceRemove = false;
-            int totalAmount = BazaarNotifier.orders.getJSONObject(orderInQuestion)
-                .getInt("startAmount");
+            int totalAmount = BazaarNotifier.newOrders.get(orderInQuestion).startAmount;
             if (lore.get(3).startsWith("Filled:")) {
               if (lore.get(3).split(" ")[2].equals("100%")) {
                 amountLeft = 0;
@@ -100,14 +101,24 @@ public class ChestTickHandler {
                     BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
               }
-              BazaarNotifier.orders.remove(orderInQuestion);
+              if(BazaarNotifier.newOrders.get(i).type.equals("sell")) {
+                BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(i).orderValue;
+              }else if (BazaarNotifier.newOrders.get(i).type.equals("buy")){
+                BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(i).orderValue;
+              }
+              BazaarNotifier.newOrders.remove(orderInQuestion);
             } else if (amountLeft > 0) {
-              BazaarNotifier.orders.getJSONObject(orderInQuestion)
-                  .put("amountRemaining", amountLeft).put("orderValue", price * amountLeft);
+              BazaarNotifier.newOrders.get(orderInQuestion).amountRemaining = amountLeft;
+              BazaarNotifier.newOrders.get(orderInQuestion).orderValue = amountLeft * price;
+              if(BazaarNotifier.newOrders.get(orderInQuestion).type.equals("sell")) {
+                BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
+              }else if (BazaarNotifier.newOrders.get(orderInQuestion).type.equals("buy")){
+                BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
+              }
             }
           }
         } else {
-          System.out.println(BazaarNotifier.orders);
+          System.out.println(BazaarNotifier.newOrders);
           System.err.println("Some orders weren't found! Bad display name: " + displayName);
           return;
         }
@@ -116,7 +127,7 @@ public class ChestTickHandler {
 
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
-        BazaarNotifier.orders.remove(i);
+        BazaarNotifier.newOrders.remove(i);
       }
     }
   }
@@ -186,7 +197,7 @@ public class ChestTickHandler {
 
       } else {
         String productName = BazaarNotifier.bazaarConversionsReversed
-            .getString(product);
+            .get(product).getAsString();
         String productWithAmount = StringUtils.stripControlCodes(
             chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
                 .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1];
@@ -198,18 +209,9 @@ public class ChestTickHandler {
 
         EventHandler.productVerify[0] = productName;
         EventHandler.productVerify[1] = productWithAmount;
-        EventHandler.verify = new JSONObject()
-            .put("product", product)
-            .put("startAmount", amount)
-            .put("amountRemaining", amount)
-            .put("pricePerUnit", price)
-            .put("priceString", priceString)
-            .put("outdatedOrder", false)
-            .put("matchedOrder", false)
-            .put("goodOrder", true)
-            .put("orderValue", amount * price)
-            .put("type", StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
-                .equalsIgnoreCase("Confirm Sell Offer") ? "sell" : "buy");
+        String type = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+                .equalsIgnoreCase("Confirm Sell Offer") ? "sell" : "buy";
+        EventHandler.verify = new Order(product,amount,price,priceString,type);
       }
     }
   }

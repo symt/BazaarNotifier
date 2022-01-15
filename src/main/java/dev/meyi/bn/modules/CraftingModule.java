@@ -1,5 +1,6 @@
 package dev.meyi.bn.modules;
 
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.utilities.ColorUtils;
@@ -11,8 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class CraftingModule extends Module {
   public static final ModuleName type = ModuleName.CRAFTING;
@@ -26,7 +25,7 @@ public class CraftingModule extends Module {
     super();
   }
 
-  public CraftingModule(JSONObject module) {
+  public CraftingModule(JsonObject module) {
     super(module);
   }
 
@@ -72,7 +71,7 @@ public class CraftingModule extends Module {
             Double pricePerMil = Double.valueOf(list.get(i).get(2));
             String itemName = list.get(i).get(3);
 
-            String itemNameConverted = BazaarNotifier.bazaarConversions.getString(itemName);
+            String itemNameConverted = BazaarNotifier.bazaarConversions.get(itemName).getAsString();
             message.put(String.valueOf(i + 1), Color.MAGENTA);
             message.put(". ", Color.MAGENTA);
             message.put(itemNameConverted, Color.CYAN);
@@ -184,39 +183,39 @@ public class CraftingModule extends Module {
 
     if (hoveredText > -1) {
       if (hoveredText < list.size()) {
-        if (BazaarNotifier.enchantCraftingList.getJSONObject("normal")
+        if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
             .has(list.get(hoveredText).get(3))) {
           try {
             text.put(mouseWheelShift * 160 + "x ", Color.LIGHT_GRAY);
-            text.put(BazaarNotifier.bazaarConversions.getString(
-                BazaarNotifier.enchantCraftingList.getJSONObject("normal")
-                    .getJSONObject(list.get(hoveredText).get(3)).getString("material")),
+            text.put(BazaarNotifier.bazaarConversions.get(
+                BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
+                    .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()).getAsString(),
                 Color.LIGHT_GRAY);
-          } catch (JSONException e) {
+          } catch (Exception e) {
             text.put("Error", Color.RED);
           }
         } else {
           int materialCount;
           StringBuilder _material = new StringBuilder();
-          materialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other")
-              .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();
+          materialCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+              .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").size();
           for (int b = 0; b < materialCount / 2; b++) {
             if (b == 0) {
-              _material.append((BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                  .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)
+              _material.append((BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                  .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").get(1).getAsInt()
                   * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConversions
-                  .getString(BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                      .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                      .getString(0)));
+                  .get(BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                      .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
+                      .get(0).getAsString()).getAsString());
             } else {
               _material.append(" | ").append(
-                  BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                      .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                      .getInt(b * 2 + 1) * mouseWheelShift).append("x ").append(
-                  BazaarNotifier.bazaarConversions.getString(
-                      BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                          .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                          .getString(b * 2)));
+                  BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                      .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
+                      .get(b * 2 + 1).getAsInt() * mouseWheelShift).append("x ").append(
+                  BazaarNotifier.bazaarConversions.get(
+                      BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                          .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
+                          .get(b * 2).getAsString()).getAsString());
             }
           }
           text.put(_material.toString(), Color.LIGHT_GRAY);

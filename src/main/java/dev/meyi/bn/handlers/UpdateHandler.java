@@ -1,5 +1,7 @@
 package dev.meyi.bn.handlers;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
 import java.io.BufferedReader;
@@ -17,7 +19,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.JSONObject;
 
 public class UpdateHandler {
 
@@ -29,12 +30,12 @@ public class UpdateHandler {
       firstJoin = false;
       new ScheduledThreadPoolExecutor(1).schedule(() -> {
         try {
-          JSONObject json = new JSONObject(IOUtils.toString(new BufferedReader
-              (new InputStreamReader(
-                  HttpClientBuilder.create().build().execute(new HttpGet(
-                      "https://api.github.com/repos/symt/BazaarNotifier/releases/latest"))
-                      .getEntity().getContent()))));
-          String[] latestTag = json.getString("tag_name").split("\\.");
+          JsonObject json = new JsonParser().parse(IOUtils.toString(new BufferedReader
+                  (new InputStreamReader(
+                          HttpClientBuilder.create().build().execute(new HttpGet(
+                                          "https://api.github.com/repos/symt/BazaarNotifier/releases/latest"))
+                                  .getEntity().getContent())))).getAsJsonObject();
+          String[] latestTag = json.get("tag_name").getAsString().split("\\.");
           String[] currentTag = BazaarNotifier.VERSION.split("\\.");
 
           if (latestTag.length == 3 && currentTag.length == 3) {

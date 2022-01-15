@@ -1,5 +1,6 @@
 package dev.meyi.bn.utilities;
 
+import com.google.gson.*;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
 import java.io.BufferedReader;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -19,9 +21,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.lwjgl.opengl.GL11;
 
 public class Utils {
@@ -29,7 +28,7 @@ public class Utils {
 
   private static String playerUUID = "";
 
-  public static JSONObject getBazaarData() throws IOException {
+  public static JsonObject getBazaarData() throws IOException {
     HttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
     if (!BazaarNotifier.apiKeyDisabled) {
@@ -43,11 +42,11 @@ public class Utils {
         (new InputStreamReader(
             response.getEntity().getContent())));
 
-    return new JSONObject(result).getJSONObject("products");
+    return new JsonParser().parse(result).getAsJsonObject().get("products").getAsJsonObject();
   }
 
 
-  public static JSONArray unlockedRecipes() throws IOException {
+  public static JsonArray unlockedRecipes() throws IOException {
     if (!BazaarNotifier.apiKey.equals("")) {
 
       HttpClient client = HttpClientBuilder.create().build();
@@ -60,7 +59,7 @@ public class Utils {
         String uuidResponse = IOUtils
             .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
 
-        playerUUID = new JSONObject(uuidResponse).getString("id");
+        playerUUID = new JsonParser().parse(uuidResponse).getAsJsonObject().get("id").getAsString();
       }
 
       HttpGet request = new HttpGet(
@@ -70,40 +69,40 @@ public class Utils {
 
       String _results = IOUtils
           .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-      JSONObject results = new JSONObject(_results);
+      JsonObject results = new JsonParser().parse(_results).getAsJsonObject();
       long lastSaved = 0;
       int profileIndex = 0;
 
-      for (int i = 0; i < results.getJSONArray("profiles").length(); i++) {
-        if (results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members")
-            .getJSONObject(playerUUID).getLong("last_save") > lastSaved) {
-          lastSaved = results.getJSONArray("profiles").getJSONObject(i).getJSONObject("members")
-              .getJSONObject(playerUUID).getLong("last_save");
+      for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
+        if (results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
+            .get(playerUUID).getAsJsonObject().get("last_save").getAsLong() > lastSaved) {
+          lastSaved = results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
+              .get(playerUUID).getAsJsonObject().get("last_save").getAsLong();
           profileIndex = i;
         }
       }
-      BazaarNotifier.playerDataFromAPI = results.getJSONArray("profiles")
-          .getJSONObject(profileIndex).getJSONObject("members").getJSONObject(playerUUID);
-      JSONArray unlockedCollections = results.getJSONArray("profiles").getJSONObject(profileIndex)
-          .getJSONObject("members").getJSONObject(playerUUID).getJSONArray("unlocked_coll_tiers");
-      JSONObject slayer = results.getJSONArray("profiles").getJSONObject(profileIndex)
-          .getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
-      if (slayer.getJSONObject("zombie").getJSONObject("claimed_levels").has("level_4")) {
-        unlockedCollections.put("zombie_4");
+      BazaarNotifier.playerDataFromAPI = results.get("profiles").getAsJsonArray()
+          .get(profileIndex).getAsJsonObject().get("members").getAsJsonObject().get(playerUUID).getAsJsonObject();
+      JsonArray unlockedCollections = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
+          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("unlocked_coll_tiers").getAsJsonArray();
+      JsonObject slayer = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
+          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("slayer_bosses").getAsJsonObject();
+      if (slayer.getAsJsonObject("zombie").getAsJsonObject("claimed_levels").has("level_4")) {
+        unlockedCollections.add(new JsonPrimitive("zombie_4"));
       }
-      if (slayer.getJSONObject("spider").getJSONObject("claimed_levels").has("level_4")) {
-        unlockedCollections.put("spider_4");
+      if (slayer.getAsJsonObject("spider").getAsJsonObject("claimed_levels").has("level_4")) {
+        unlockedCollections.add(new JsonPrimitive("spider_4"));
       }
-      if (slayer.getJSONObject("wolf").getJSONObject("claimed_levels").has("level_4")) {
-        unlockedCollections.put("wolf_4");
+      if (slayer.getAsJsonObject("wolf").getAsJsonObject("claimed_levels").has("level_4")) {
+        unlockedCollections.add(new JsonPrimitive("wolf_4"));
       }
-      if (slayer.getJSONObject("enderman").getJSONObject("claimed_levels").has("level_2")) {
-        unlockedCollections.put("enderman_2");
+      if (slayer.getAsJsonObject("enderman").getAsJsonObject("claimed_levels").has("level_2")) {
+        unlockedCollections.add(new JsonPrimitive("enderman_2"));
       }
       return unlockedCollections;
     } else {
       Configuration.collectionCheckDisabled = true;
-      return new JSONArray();
+      return new JsonArray();
     }
   }
 
@@ -144,34 +143,34 @@ public class Utils {
     }
   }
 
-  public static JSONArray sortJSONArray(JSONArray jsonArr, String key) {
-    List<JSONObject> jsonValues = new ArrayList<>();
-    for (int i = 0; i < jsonArr.length(); i++) {
-      jsonValues.add(jsonArr.getJSONObject(i));
+  public static JsonArray sortJSONArray(JsonArray jsonArr, String key) {
+    List<JsonObject> jsonValues = new ArrayList<>();
+    for (int i = 0; i < jsonArr.size(); i++) {
+      jsonValues.add(jsonArr.get(i).getAsJsonObject());
     }
     jsonValues.sort(new JSONComparator(key));
-    JSONArray sortedJsonArray = new JSONArray();
-    for (int i = 0; i < jsonArr.length(); i++) {
-      sortedJsonArray.put(jsonValues.get(i));
+    JsonArray sortedJsonArray = new JsonArray();
+    for (int i = 0; i < jsonArr.size(); i++) {
+      sortedJsonArray.add(jsonValues.get(i));
     }
     return sortedJsonArray;
   }
 
   public static boolean isValidJSONObject(String json) {
     try {
-      new JSONObject(json);
-    } catch (JSONException e) {
+      new JsonParser().parse(json);
+    } catch (JsonParseException e) {
       return false;
     }
     return true;
   }
 
   public static boolean validateApiKey() throws IOException {
-    return new JSONObject(IOUtils.toString(new BufferedReader
+    return new JsonParser().parse(IOUtils.toString(new BufferedReader
         (new InputStreamReader(
             HttpClientBuilder.create().build().execute(new HttpGet(
                 "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
-                .getContent())))).getBoolean("success");
+                .getContent())))).getAsJsonObject().get("success").getAsBoolean();
   }
 
 
@@ -192,9 +191,9 @@ public class Utils {
         messageColor + type
             + EnumChatFormatting.GRAY + " for "
             + messageColor + BazaarNotifier.dfNoDecimal
-            .format(BazaarNotifier.orders.getJSONObject(i).getInt("startAmount"))
+            .format(BazaarNotifier.newOrders.get(i).startAmount)
             + EnumChatFormatting.GRAY + "x " + messageColor
-            + BazaarNotifier.orders.getJSONObject(i).getString("product")
+            + BazaarNotifier.newOrders.get(i).product
             + EnumChatFormatting.YELLOW
             + " " + notification + " " + EnumChatFormatting.GRAY + "("
             + messageColor + BazaarNotifier.df.format(price)
@@ -212,15 +211,15 @@ public class Utils {
   public static void initializeConfigValues() {
     if (BazaarNotifier.config.has("craftingListLength")) {
 
-      Configuration.craftingListLength = BazaarNotifier.config.getInt("craftingListLength");
-      Configuration.suggestionListLength = BazaarNotifier.config.getInt("suggestionListLength");
-      Configuration.craftingSortingOption = BazaarNotifier.config.getInt("craftingSortingOption");
+      Configuration.craftingListLength = BazaarNotifier.config.get("craftingListLength").getAsInt();
+      Configuration.suggestionListLength = BazaarNotifier.config.get("suggestionListLength").getAsInt();
+      Configuration.craftingSortingOption = BazaarNotifier.config.get("craftingSortingOption").getAsInt();
       Configuration.showInstantSellProfit = BazaarNotifier.config
-          .getBoolean("showInstantSellProfit");
-      Configuration.showSellOfferProfit = BazaarNotifier.config.getBoolean("showSellOfferProfit");
-      Configuration.showProfitPerMil = BazaarNotifier.config.getBoolean("showProfitPerMil");
+          .get("showInstantSellProfit").getAsBoolean();
+      Configuration.showSellOfferProfit = BazaarNotifier.config.get("showSellOfferProfit").getAsBoolean();
+      Configuration.showProfitPerMil = BazaarNotifier.config.get("showProfitPerMil").getAsBoolean();
       Configuration.collectionCheckDisabled = BazaarNotifier.config
-          .getBoolean("collectionChecking");
+          .get("collectionChecking").getAsBoolean();
     } else {
       Configuration.craftingListLength = Defaults.CRAFTING_LIST_LENGTH;
       Configuration.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
