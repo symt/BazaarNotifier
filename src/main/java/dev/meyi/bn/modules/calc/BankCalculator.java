@@ -19,8 +19,6 @@ import net.minecraft.util.StringUtils;
 public class BankCalculator {
 
   public static double bank = 0;
-  public static double moneyNotFromBazaar = 0;
-  public static double moneyOnBazaarLeave = 0;
   private static double moneyOnStartup =
       moneyStoredInSellOffers() + moneyStoredInBuyOrders() + getPurse();
   public static double bazaarProfit = 0;
@@ -140,7 +138,6 @@ public class BankCalculator {
 
   public static void reset() {
     moneyOnStartup = getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank;
-    moneyNotFromBazaar = 0;
-    moneyOnBazaarLeave = 0;
+    bazaarProfit = 0;
   }
 }

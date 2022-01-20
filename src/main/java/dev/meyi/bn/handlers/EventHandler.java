@@ -28,9 +28,6 @@ public class EventHandler {
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
-
-      BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
-
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConversionsReversed
               .get(message.split("x ", 2)[1].split(" for ")[0]).getAsString()) && productVerify[1]
@@ -39,8 +36,6 @@ public class EventHandler {
         verify = null;
         productVerify = new String[2];
       }
-
-
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
       String item = message.split("x ", 2)[1].split(" was ")[0];
       int amount = Integer
@@ -55,9 +50,6 @@ public class EventHandler {
           if (order.product.equalsIgnoreCase(item)
               && order.startAmount == amount && order.type.equals("buy")
               && order.pricePerUnit > edgePrice) {
-            if (!BazaarNotifier.inBazaar) {
-              BankCalculator.moneyNotFromBazaar += order.orderValue;
-            }
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
@@ -109,6 +101,7 @@ public class EventHandler {
               : order.orderValue)
               .compareTo(BigDecimal.valueOf(refund)) == 0) {
             BankCalculator.bazaarProfit -= (order.startAmount -order.amountRemaining)*order.pricePerUnit;
+            BazaarNotifier.newOrders.remove(i);
             break;
           }
         } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
@@ -147,14 +140,11 @@ public class EventHandler {
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
-        BankCalculator.moneyNotFromBazaar +=
-            BankCalculator.calculateProfit() - BankCalculator.moneyOnBazaarLeave;
       }
     }
 
     if (e.gui == null && BazaarNotifier.inBazaar) {
       BazaarNotifier.inBazaar = false;
-      BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
     }
 
     if (e.gui == null && BazaarNotifier.inBank) {
@@ -177,7 +167,6 @@ public class EventHandler {
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
     BazaarNotifier.inBazaar = false;
     BazaarNotifier.inBank = false;
-    BankCalculator.moneyOnBazaarLeave = BankCalculator.calculateProfit();
   }
 
   @SubscribeEvent

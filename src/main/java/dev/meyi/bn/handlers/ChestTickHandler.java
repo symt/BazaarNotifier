@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -26,12 +27,18 @@ public class ChestTickHandler {
 
   public static void updateBazaarOrders(IInventory chest) {
     int[] verifiedOrders = new int[BazaarNotifier.newOrders.size()];
-    for (int i = 0; i < chest.getSizeInventory(); i++) {
-      if (chest.getStackInSlot(i) != null
-          && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 160    // Glass
-          && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 102    // Glass
-          && Item.itemRegistry.getIDForObject(chest.getStackInSlot(i).getItem()) != 262) { // Arrow
-        NBTTagList lorePreFilter = chest.getStackInSlot(i).getTagCompound()
+    ItemStack[] items = new ItemStack[chest.getSizeInventory() +1];
+    for(int i = 0; i < chest.getSizeInventory(); i++){
+      items[i] = chest.getStackInSlot(i);
+    }
+    items[items.length-1] = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+
+    for (int i = 0; i < items.length; i++) {
+      if (items[i] != null
+          && Item.itemRegistry.getIDForObject(items[i].getItem()) != 160    // Glass
+          && Item.itemRegistry.getIDForObject(items[i].getItem()) != 102    // Glass
+          && Item.itemRegistry.getIDForObject(items[i].getItem()) != 262) { // Arrow
+        NBTTagList lorePreFilter = items[i].getTagCompound()
             .getCompoundTag("display")
             .getTagList("Lore", 8);
 
@@ -42,9 +49,9 @@ public class ChestTickHandler {
         }
 
         String displayName = StringUtils
-            .stripControlCodes(chest.getStackInSlot(i).getDisplayName().split(": ")[1]);
+            .stripControlCodes(items[i].getDisplayName().split(": ")[1]);
         String type = StringUtils.stripControlCodes(
-            chest.getStackInSlot(i).getDisplayName().split(": ")[0].toLowerCase());
+                items[i].getDisplayName().split(": ")[0].toLowerCase());
 
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
@@ -110,11 +117,6 @@ public class ChestTickHandler {
             } else if (amountLeft > 0) {
               BazaarNotifier.newOrders.get(orderInQuestion).amountRemaining = amountLeft;
               BazaarNotifier.newOrders.get(orderInQuestion).orderValue = amountLeft * price;
-              if(BazaarNotifier.newOrders.get(orderInQuestion).type.equals("sell")) {
-                BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
-              }else if (BazaarNotifier.newOrders.get(orderInQuestion).type.equals("buy")){
-                BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
-              }
             }
           }
         } else {

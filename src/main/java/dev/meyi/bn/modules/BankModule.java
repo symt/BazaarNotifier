@@ -33,13 +33,8 @@ public class BankModule extends Module {
     items.add(message);
     LinkedHashMap<String, Color> message2 = new LinkedHashMap<>();
     message2.put("Bazaar profit: ", Color.CYAN);
-    message2.put(BazaarNotifier.df
-            .format((int) (BankCalculator.calculateProfit() - BankCalculator.moneyNotFromBazaar)),
-        Color.WHITE);
+    message2.put(BazaarNotifier.df.format(BankCalculator.bazaarProfit) , Color.MAGENTA);
     items.add(message2);
-    LinkedHashMap<String, Color> message3 = new LinkedHashMap<>();
-    message3.put(BazaarNotifier.df.format(BankCalculator.bazaarProfit) , Color.MAGENTA);
-    items.add(message3);
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;

@@ -72,6 +72,9 @@ public class Utils {
       JsonObject results = new JsonParser().parse(_results).getAsJsonObject();
       long lastSaved = 0;
       int profileIndex = 0;
+      if(!results.get("success").getAsBoolean()){
+        return new JsonArray();
+      }
 
       for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
         if (results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
@@ -83,6 +86,11 @@ public class Utils {
       }
       BazaarNotifier.playerDataFromAPI = results.get("profiles").getAsJsonArray()
           .get(profileIndex).getAsJsonObject().get("members").getAsJsonObject().get(playerUUID).getAsJsonObject();
+      if(!BazaarNotifier.playerDataFromAPI.has("unlocked_coll_tiers")){
+        System.out.println("could not load unlocked collection tiers from API");
+        return new JsonArray();
+      }
+
       JsonArray unlockedCollections = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
           .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("unlocked_coll_tiers").getAsJsonArray();
       JsonObject slayer = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
