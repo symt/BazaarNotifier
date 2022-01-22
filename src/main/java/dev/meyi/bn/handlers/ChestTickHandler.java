@@ -55,21 +55,21 @@ public class ChestTickHandler {
 
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
-          double price;
+          //double price;
           String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "")
                 .split(" ")[3];
-            price = Double.parseDouble(priceString);
+            //price = Double.parseDouble(priceString);
           } else if (lore.get(5).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "")
                 .split(" ")[3];
-            price = Double.parseDouble(priceString);
+            //price = Double.parseDouble(priceString);
           } else {
             priceString = StringUtils.stripControlCodes(
                 lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
                     .split(" ")[3]);
-            price = Double.parseDouble(priceString);
+            //price = Double.parseDouble(priceString);
           }
           int orderInQuestion = -1;
           for (int j = 0; j < BazaarNotifier.newOrders.size(); j++) {
@@ -108,15 +108,24 @@ public class ChestTickHandler {
                     BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
               }
-              if(BazaarNotifier.newOrders.get(i).type.equals("sell")) {
-                BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(i).orderValue;
-              }else if (BazaarNotifier.newOrders.get(i).type.equals("buy")){
-                BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(i).orderValue;
+              if(BazaarNotifier.newOrders.get(orderInQuestion).type.equals("sell")) {
+                BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
+              }else if (BazaarNotifier.newOrders.get(orderInQuestion).type.equals("buy")){
+                BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
               }
               BazaarNotifier.newOrders.remove(orderInQuestion);
             } else if (amountLeft > 0) {
-              BazaarNotifier.newOrders.get(orderInQuestion).amountRemaining = amountLeft;
-              BazaarNotifier.newOrders.get(orderInQuestion).orderValue = amountLeft * price;
+
+              if(BazaarNotifier.newOrders.get(orderInQuestion).getAmountRemaining() > amountLeft){
+                if(BazaarNotifier.newOrders.get(orderInQuestion).type.equals("sell")) {
+                  BankCalculator.bazaarProfit += (BazaarNotifier.newOrders.get(orderInQuestion).getAmountRemaining()
+                          - amountLeft) * BazaarNotifier.newOrders.get(orderInQuestion).pricePerUnit;
+                }else if (BazaarNotifier.newOrders.get(orderInQuestion).type.equals("buy")){
+                  BankCalculator.bazaarProfit -= (BazaarNotifier.newOrders.get(orderInQuestion).getAmountRemaining()
+                          - amountLeft) * BazaarNotifier.newOrders.get(orderInQuestion).pricePerUnit;
+                }
+              }
+              BazaarNotifier.newOrders.get(orderInQuestion).setAmountRemaining(amountLeft);
             }
           }
         } else {
