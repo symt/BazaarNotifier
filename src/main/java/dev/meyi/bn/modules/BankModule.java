@@ -2,6 +2,7 @@ package dev.meyi.bn.modules;
 
 import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.modules.calc.BankCalculator;
@@ -18,7 +19,7 @@ public class BankModule extends Module {
     super();
   }
 
-  public BankModule(JsonObject config) {
+  public BankModule(ModuleConfig config) {
     super(config);
   }
 

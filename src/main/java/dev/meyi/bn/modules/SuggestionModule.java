@@ -1,8 +1,7 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
@@ -19,7 +18,7 @@ public class SuggestionModule extends Module {
     super();
   }
 
-  public SuggestionModule(JsonObject module) {
+  public SuggestionModule(ModuleConfig module) {
     super(module);
   }
 
@@ -28,7 +27,7 @@ public class SuggestionModule extends Module {
     if (BazaarNotifier.bazaarDataFormatted.size() != 0) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-      for (int i = shift; i < Configuration.suggestionListLength + shift; i++) {
+      for (int i = shift; i < BazaarNotifier.config.suggestionListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.MAGENTA);
         message.put(BazaarNotifier.bazaarDataFormatted.get(i).getAsJsonObject().get("productId").getAsString(),
@@ -52,7 +51,7 @@ public class SuggestionModule extends Module {
       boundsX = x + 200;
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * Configuration.suggestionListLength + Configuration.suggestionListLength * 2 * scale - 2;
+        * BazaarNotifier.config.suggestionListLength + BazaarNotifier.config.suggestionListLength * 2 * scale - 2;
     boundsY = (int) Y;
   }
 
@@ -61,6 +60,7 @@ public class SuggestionModule extends Module {
     x = Defaults.SUGGESTION_MODULE_X;
     y = Defaults.SUGGESTION_MODULE_Y;
     scale = 1;
+    BazaarNotifier.config.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
   }
 
   @Override
@@ -75,11 +75,11 @@ public class SuggestionModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.bazaarDataFormatted.size() - Configuration.suggestionListLength;
+    return BazaarNotifier.bazaarDataFormatted.size() - BazaarNotifier.config.suggestionListLength;
   }
 
   @Override
-  public JsonObject generateModuleConfig() {
+  public ModuleConfig generateModuleConfig() {
     return super.generateModuleConfig();
   }
 

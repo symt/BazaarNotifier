@@ -2,7 +2,6 @@ package dev.meyi.bn.commands;
 
 import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
@@ -54,7 +53,7 @@ public class BazaarNotifierCommand extends CommandBase {
       if (args.length >= 1 && args[0].equalsIgnoreCase("toggle")) {
         if (args.length == 1 || args[1].equalsIgnoreCase("all")) {
           if (!BazaarNotifier.apiKey.equals("") || BazaarNotifier.apiKeyDisabled) {
-            BazaarNotifier.newOrders = new LinkedList<>();
+            BazaarNotifier.orders = new LinkedList<>();
             BazaarNotifier.activeBazaar ^= true;
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + (BazaarNotifier.activeBazaar ? EnumChatFormatting.GREEN
@@ -97,10 +96,11 @@ public class BazaarNotifierCommand extends CommandBase {
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
               BazaarNotifier.apiKey = args[1];
+              BazaarNotifier.config.api = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
               CraftingCalculator.getUnlockedRecipes();
-              Configuration.collectionCheckDisabled = false;
+              BazaarNotifier.config.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -135,21 +135,21 @@ public class BazaarNotifierCommand extends CommandBase {
         } else {
           switch (args[1].toLowerCase()) {
             case "collection":
-              if (Configuration.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
+              if (BazaarNotifier.config.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Only showing unlocked recipes"));
-                Configuration.collectionCheckDisabled = false;
-              } else if (Configuration.collectionCheckDisabled) {
+                BazaarNotifier.config.collectionCheckDisabled = false;
+              } else if (BazaarNotifier.config.collectionCheckDisabled) {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Please set an API-Key first.(/bn api)"));
-                Configuration.collectionCheckDisabled = true;
+                BazaarNotifier.config.collectionCheckDisabled = true;
               } else {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Showing all recipes"));
-                Configuration.collectionCheckDisabled = true;
+                BazaarNotifier.config.collectionCheckDisabled = true;
               }
               break;
             case "crafting_display":
@@ -217,7 +217,7 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "All module locations have been reset and the order list has been emptied."));
         } else if (args[1].equalsIgnoreCase("orders") && args.length == 2) {
-          BazaarNotifier.newOrders = new LinkedList<>();
+          BazaarNotifier.orders = new LinkedList<>();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared."));
         } else if (args[1].equalsIgnoreCase("scale") && args.length == 2) {

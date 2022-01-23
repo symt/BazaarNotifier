@@ -2,7 +2,6 @@ package dev.meyi.bn.modules.calc;
 
 import com.google.gson.JsonElement;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.*;
@@ -25,7 +24,7 @@ public class CraftingCalculator {
               BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").getAsJsonObject(itemName)
                       .get("collection").getAsString()) || Objects.equals(
               BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").getAsJsonObject(itemName)
-                      .get("collection").getAsString(), "NONE") || Configuration.collectionCheckDisabled) {
+                      .get("collection").getAsString(), "NONE") || BazaarNotifier.config.collectionCheckDisabled) {
         if (BazaarNotifier.bazaarDataRaw.getAsJsonObject(itemName).getAsJsonArray("sell_summary")
                 .size() > 0 &&
                 BazaarNotifier.bazaarDataRaw.getAsJsonObject(itemName).getAsJsonArray("buy_summary")
@@ -77,7 +76,7 @@ public class CraftingCalculator {
           BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
               .get("collection").getAsString()) || Objects.equals(
           BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-              .get("collection").getAsString(), "NONE") || Configuration.collectionCheckDisabled) {
+              .get("collection").getAsString(), "NONE") || BazaarNotifier.config.collectionCheckDisabled) {
         if (BazaarNotifier.bazaarDataRaw.getAsJsonObject(itemName).getAsJsonArray("sell_summary")
             .size() > 0 &&
             BazaarNotifier.bazaarDataRaw.getAsJsonObject(itemName).getAsJsonArray("buy_summary")
@@ -130,8 +129,8 @@ public class CraftingCalculator {
       list2.add(Double.valueOf(o2.get(1)));
       list2.add(Double.valueOf(o2.get(2)));
 
-      return list1.get(Configuration.craftingSortingOption).compareTo(list2.get(
-          Configuration.craftingSortingOption));
+      return list1.get(BazaarNotifier.config.craftingSortingOption).compareTo(list2.get(
+          BazaarNotifier.config.craftingSortingOption));
     });
     Collections.reverse(list);
     return list;
@@ -139,14 +138,14 @@ public class CraftingCalculator {
 
 
   public static String toggleCrafting() {
-    if (Configuration.craftingSortingOption == 0) {
-      Configuration.craftingSortingOption = 1;
+    if (BazaarNotifier.config.craftingSortingOption == 0) {
+      BazaarNotifier.config.craftingSortingOption = 1;
       return "Crafting now sorts by sell offer";
-    } else if (Configuration.craftingSortingOption == 1) {
-      Configuration.craftingSortingOption = 2;
+    } else if (BazaarNotifier.config.craftingSortingOption == 1) {
+      BazaarNotifier.config.craftingSortingOption = 2;
       return "Crafting now sorts by profit per million";
     } else {
-      Configuration.craftingSortingOption = 0;
+      BazaarNotifier.config.craftingSortingOption = 0;
       return "Crafting now sorts by instant sell";
     }
   }
@@ -156,24 +155,24 @@ public class CraftingCalculator {
         + BazaarNotifier.enchantCraftingList.getAsJsonObject("other").entrySet().size()) {
       return length + " is too long";
     } else {
-      Configuration.craftingListLength = length;
+      BazaarNotifier.config.craftingListLength = length;
       return "Item list size set to " + length;
     }
   }
 
   public static String editCraftingModuleGUI(String craftingValue) {
     if (craftingValue.equalsIgnoreCase("instant_sell")) {
-      Configuration.showInstantSellProfit = !Configuration.showInstantSellProfit;
+      BazaarNotifier.config.showInstantSellProfit = !BazaarNotifier.config.showInstantSellProfit;
       return
-          (Configuration.showInstantSellProfit ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
+          (BazaarNotifier.config.showInstantSellProfit ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
               + "Toggled profit column (Instant Sell)";
     } else if (craftingValue.equalsIgnoreCase("sell_offer")) {
-      Configuration.showSellOfferProfit = !Configuration.showSellOfferProfit;
-      return (Configuration.showSellOfferProfit ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
+      BazaarNotifier.config.showSellOfferProfit = !BazaarNotifier.config.showSellOfferProfit;
+      return (BazaarNotifier.config.showSellOfferProfit ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
           + "Toggled profit column (Sell Offer)";
     } else if (craftingValue.equalsIgnoreCase("ppm")) {
-      Configuration.showProfitPerMil = !Configuration.showProfitPerMil;
-      return (Configuration.showProfitPerMil ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
+      BazaarNotifier.config.showProfitPerMil = !BazaarNotifier.config.showProfitPerMil;
+      return (BazaarNotifier.config.showProfitPerMil ? EnumChatFormatting.GREEN : EnumChatFormatting.RED)
           + "Toggled profit column (Profit per 1M)";
     } else {
       return EnumChatFormatting.RED + "This value does not exist";

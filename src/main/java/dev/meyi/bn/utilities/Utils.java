@@ -2,14 +2,10 @@ package dev.meyi.bn.utilities;
 
 import com.google.gson.*;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +105,7 @@ public class Utils {
       }
       return unlockedCollections;
     } else {
-      Configuration.collectionCheckDisabled = true;
+      BazaarNotifier.config.collectionCheckDisabled = true;
       return new JsonArray();
     }
   }
@@ -138,18 +134,6 @@ public class Utils {
     return true;
   }
 
-  @SuppressWarnings("ResultOfMethodCallIgnored")
-  public static void saveConfigFile(File configFile, String toSave) {
-    try {
-      if (!configFile.isFile()) {
-        configFile.createNewFile();
-      }
-      Files.write(Paths.get(configFile.getAbsolutePath()),
-          toSave.getBytes(StandardCharsets.UTF_8));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
   public static JsonArray sortJSONArray(JsonArray jsonArr, String key) {
     List<JsonObject> jsonValues = new ArrayList<>();
@@ -199,9 +183,9 @@ public class Utils {
         messageColor + type
             + EnumChatFormatting.GRAY + " for "
             + messageColor + BazaarNotifier.dfNoDecimal
-            .format(BazaarNotifier.newOrders.get(i).startAmount)
+            .format(BazaarNotifier.orders.get(i).startAmount)
             + EnumChatFormatting.GRAY + "x " + messageColor
-            + BazaarNotifier.newOrders.get(i).product
+            + BazaarNotifier.orders.get(i).product
             + EnumChatFormatting.YELLOW
             + " " + notification + " " + EnumChatFormatting.GRAY + "("
             + messageColor + BazaarNotifier.df.format(price)
@@ -216,26 +200,6 @@ public class Utils {
     GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
   }
 
-  public static void initializeConfigValues() {
-    if (BazaarNotifier.config.has("craftingListLength")) {
 
-      Configuration.craftingListLength = BazaarNotifier.config.get("craftingListLength").getAsInt();
-      Configuration.suggestionListLength = BazaarNotifier.config.get("suggestionListLength").getAsInt();
-      Configuration.craftingSortingOption = BazaarNotifier.config.get("craftingSortingOption").getAsInt();
-      Configuration.showInstantSellProfit = BazaarNotifier.config
-          .get("showInstantSellProfit").getAsBoolean();
-      Configuration.showSellOfferProfit = BazaarNotifier.config.get("showSellOfferProfit").getAsBoolean();
-      Configuration.showProfitPerMil = BazaarNotifier.config.get("showProfitPerMil").getAsBoolean();
-      Configuration.collectionCheckDisabled = BazaarNotifier.config
-          .get("collectionChecking").getAsBoolean();
-    } else {
-      Configuration.craftingListLength = Defaults.CRAFTING_LIST_LENGTH;
-      Configuration.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
-      Configuration.craftingSortingOption = Defaults.CRAFTING_SORTING_OPTION;
-      Configuration.showInstantSellProfit = Defaults.INSTANT_SELL_PROFIT;
-      Configuration.showSellOfferProfit = Defaults.SELL_OFFER_PROFIT;
-      Configuration.showProfitPerMil = Defaults.PROFIT_PER_MIL;
-      Configuration.collectionCheckDisabled = Defaults.COLLECTION_CHECKING;
-    }
-  }
+
 }

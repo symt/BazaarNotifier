@@ -32,7 +32,7 @@ public class EventHandler {
           .equals(BazaarNotifier.bazaarConversionsReversed
               .get(message.split("x ", 2)[1].split(" for ")[0]).getAsString()) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
-        BazaarNotifier.newOrders.add(verify);
+        BazaarNotifier.orders.add(verify);
         verify = null;
         productVerify = new String[2];
       }
@@ -45,21 +45,21 @@ public class EventHandler {
       double edgePrice;
       if (message.startsWith("[Bazaar] Your Buy Order")) {
         edgePrice = Double.MIN_VALUE;
-        for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
-          Order order = BazaarNotifier.newOrders.get(i);
+        for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+          Order order = BazaarNotifier.orders.get(i);
           if (order.product.equalsIgnoreCase(item)
               && order.startAmount == amount && order.type.equals("buy")
               && order.pricePerUnit > edgePrice) {
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
-            BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(orderToRemove).orderValue;
+            BankCalculator.bazaarProfit -= BazaarNotifier.orders.get(orderToRemove).orderValue;
           }
         }
       } else if (message.startsWith("[Bazaar] Your Sell Offer")) {
         edgePrice = Double.MAX_VALUE;
-        for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
-          Order order = BazaarNotifier.newOrders.get(i);
+        for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+          Order order = BazaarNotifier.orders.get(i);
           if (order.product.equalsIgnoreCase(item)
               && order.startAmount == amount && order.type.equals("sell")
               && order.pricePerUnit < edgePrice) {
@@ -68,13 +68,13 @@ public class EventHandler {
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
-            BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(orderToRemove).orderValue;
+            BankCalculator.bazaarProfit += BazaarNotifier.orders.get(orderToRemove).orderValue;
           }
         }
       }
       if (found) {
 
-        BazaarNotifier.newOrders.remove(orderToRemove);
+        BazaarNotifier.orders.remove(orderToRemove);
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
@@ -94,21 +94,21 @@ public class EventHandler {
         itemRefunded = message.split("x ", 2)[1].split(" from")[0];
 
       }
-      for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
-        Order order = BazaarNotifier.newOrders.get(i);
+      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+        Order order = BazaarNotifier.orders.get(i);
         if (message.endsWith("buy order!") && order.type.equals("buy")) {
           if (BigDecimal.valueOf(refund >= 10000 ? Math.round(order.orderValue)
               : order.orderValue)
               .compareTo(BigDecimal.valueOf(refund)) == 0) {
             //BankCalculator.bazaarProfit -= (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
-            BazaarNotifier.newOrders.remove(i);
+            BazaarNotifier.orders.remove(i);
             break;
           }
         } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
           if (order.product.equalsIgnoreCase(itemRefunded)
               && order.getAmountRemaining() == refundAmount) {
             //BankCalculator.bazaarProfit += (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
-            BazaarNotifier.newOrders.remove(i);
+            BazaarNotifier.orders.remove(i);
             break;
           }
         }

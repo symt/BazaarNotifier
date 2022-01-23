@@ -1,8 +1,5 @@
 package dev.meyi.bn.utilities;
 
-import com.google.gson.JsonArray;
-
-import java.util.List;
 
 public class Defaults {
 

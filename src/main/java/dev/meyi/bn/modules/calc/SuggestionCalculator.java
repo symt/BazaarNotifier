@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.utilities.Utils;
 import java.util.Iterator;
 import java.util.Map;
@@ -80,7 +79,7 @@ public class SuggestionCalculator {
     if (length > BazaarNotifier.bazaarDataRaw.entrySet().size()) {
       return length + " is too long";
     } else {
-      Configuration.suggestionListLength = length;
+      BazaarNotifier.config.suggestionListLength = length;
       return "Item list size set to " + length;
     }
   }

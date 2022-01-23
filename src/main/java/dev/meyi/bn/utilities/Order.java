@@ -1,7 +1,6 @@
 package dev.meyi.bn.utilities;
 
 
-
 public class Order {
     public String product;
     public int startAmount;

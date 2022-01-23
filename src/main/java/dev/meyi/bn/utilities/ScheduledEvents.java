@@ -1,6 +1,5 @@
 package dev.meyi.bn.utilities;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
@@ -45,9 +44,9 @@ public class ScheduledEvents {
           if (BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey
               || BazaarNotifier.apiKeyDisabled)) {
             BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
-            if (BazaarNotifier.newOrders.size() > 0) {
-              for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
-                Order currentOrder = BazaarNotifier.newOrders.get(i);
+            if (BazaarNotifier.orders.size() > 0) {
+              for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+                Order currentOrder = BazaarNotifier.orders.get(i);
                 String key = BazaarNotifier.bazaarConversionsReversed
                     .get(currentOrder.product).getAsString();
                 double price = currentOrder.pricePerUnit;

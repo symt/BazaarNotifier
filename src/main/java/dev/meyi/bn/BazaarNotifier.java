@@ -2,15 +2,14 @@ package dev.meyi.bn;
 
 import com.google.gson.*;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
+import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.ChestTickHandler;
 import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.modules.ModuleList;
-import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.ScheduledEvents;
-import dev.meyi.bn.utilities.Utils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +19,7 @@ import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -50,12 +50,13 @@ public class BazaarNotifier {
   public static boolean sendChatMessages = true;
 
 
-  public static List<Order> newOrders = new LinkedList<>();
+  public static List<Order> orders = new LinkedList<>();
   public static JsonObject bazaarDataRaw = new JsonObject();
   public static JsonObject bazaarCache = new JsonObject();
   public static JsonArray bazaarDataFormatted = new JsonArray();
   public static JsonObject playerDataFromAPI = new JsonObject();
-  public static JsonObject config = new JsonObject();
+  public static ModuleList modules;
+  public static Configuration config;
 
 
 
@@ -72,11 +73,10 @@ public class BazaarNotifier {
 
   public static File configFile;
 
-  public static ModuleList modules;
 
   public static void resetMod() {
     modules.resetAll();
-    newOrders = new LinkedList<>();
+    orders = new LinkedList<>();
   }
 
   public static void resetScale() {
@@ -86,24 +86,26 @@ public class BazaarNotifier {
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
     configFile = event.getSuggestedConfigurationFile();
-    String config = null;
-
+    String configString = null;
+    Gson gson = new Gson();
     try {
       if (configFile.isFile()) {
-        config = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
+        configString = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
+        config = gson.fromJson(configString, Configuration.class);
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-    if (config != null && Utils.isValidJSONObject(config)) {
-      modules = new ModuleList((JsonObject) new JsonParser().parse(config));
-      BazaarNotifier.config = (JsonObject) new JsonParser().parse(config);
-    } else {
+    if (configString == null) {
+      config = Configuration.createDefaultConfig();
       modules = new ModuleList();
+      modules.resetAll();
+    }else {
+      modules = new ModuleList(config);
+      BazaarNotifier.apiKey = config.api;
     }
-    Utils.initializeConfigValues();
   }
+
 
   @Mod.EventHandler
   public void init(FMLInitializationEvent event) {
@@ -117,6 +119,7 @@ public class BazaarNotifier {
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                () -> Utils.saveConfigFile(configFile, modules.generateConfig().toString())));
+                    () -> config.saveConfig(configFile , config)));
+
   }
 }

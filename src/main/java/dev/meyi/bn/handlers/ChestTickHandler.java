@@ -26,21 +26,21 @@ public class ChestTickHandler {
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
 
   public static void updateBazaarOrders(IInventory chest) {
-    int[] verifiedOrders = new int[BazaarNotifier.newOrders.size()];
+    int[] verifiedOrders = new int[BazaarNotifier.orders.size()];
     ItemStack[] items = new ItemStack[chest.getSizeInventory() +1];
     for(int i = 0; i < chest.getSizeInventory(); i++){
       items[i] = chest.getStackInSlot(i);
     }
     items[items.length-1] = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
 
-    for (int i = 0; i < items.length; i++) {
-      if (items[i] != null
-          && Item.itemRegistry.getIDForObject(items[i].getItem()) != 160    // Glass
-          && Item.itemRegistry.getIDForObject(items[i].getItem()) != 102    // Glass
-          && Item.itemRegistry.getIDForObject(items[i].getItem()) != 262) { // Arrow
-        NBTTagList lorePreFilter = items[i].getTagCompound()
-            .getCompoundTag("display")
-            .getTagList("Lore", 8);
+    for (ItemStack item : items) {
+      if (item != null
+              && Item.itemRegistry.getIDForObject(item.getItem()) != 160    // Glass
+              && Item.itemRegistry.getIDForObject(item.getItem()) != 102    // Glass
+              && Item.itemRegistry.getIDForObject(item.getItem()) != 262) { // Arrow
+        NBTTagList lorePreFilter = item.getTagCompound()
+                .getCompoundTag("display")
+                .getTagList("Lore", 8);
 
         List<String> lore = new ArrayList<>();
 
@@ -49,9 +49,9 @@ public class ChestTickHandler {
         }
 
         String displayName = StringUtils
-            .stripControlCodes(items[i].getDisplayName().split(": ")[1]);
+                .stripControlCodes(item.getDisplayName().split(": ")[1]);
         String type = StringUtils.stripControlCodes(
-                items[i].getDisplayName().split(": ")[0].toLowerCase());
+                item.getDisplayName().split(": ")[0].toLowerCase());
 
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
@@ -59,23 +59,23 @@ public class ChestTickHandler {
           String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "")
-                .split(" ")[3];
+                    .split(" ")[3];
             //price = Double.parseDouble(priceString);
           } else if (lore.get(5).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "")
-                .split(" ")[3];
+                    .split(" ")[3];
             //price = Double.parseDouble(priceString);
           } else {
             priceString = StringUtils.stripControlCodes(
-                lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
-                    .split(" ")[3]);
+                    lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
+                            .split(" ")[3]);
             //price = Double.parseDouble(priceString);
           }
           int orderInQuestion = -1;
-          for (int j = 0; j < BazaarNotifier.newOrders.size(); j++) {
-            Order order = BazaarNotifier.newOrders.get(j);
+          for (int j = 0; j < BazaarNotifier.orders.size(); j++) {
+            Order order = BazaarNotifier.orders.get(j);
             if (priceString.equalsIgnoreCase(order.priceString) && type
-                .equals(order.type)) {
+                    .equals(order.type)) {
               orderInQuestion = j;
               break;
             }
@@ -83,7 +83,7 @@ public class ChestTickHandler {
           if (orderInQuestion != -1) {
             verifiedOrders[orderInQuestion] = 1;
             boolean forceRemove = false;
-            int totalAmount = BazaarNotifier.newOrders.get(orderInQuestion).startAmount;
+            int totalAmount = BazaarNotifier.orders.get(orderInQuestion).startAmount;
             if (lore.get(3).startsWith("Filled:")) {
               if (lore.get(3).split(" ")[2].equals("100%")) {
                 amountLeft = 0;
@@ -97,7 +97,7 @@ public class ChestTickHandler {
                     break;
                   }
                   amountFulfilled += Integer.parseInt(
-                      lore.get(j).replaceAll(",", "").split("x ")[0].substring(2));
+                          lore.get(j).replaceAll(",", "").split("x ")[0].substring(2));
                 }
                 amountLeft = totalAmount - amountFulfilled;
               }
@@ -105,31 +105,31 @@ public class ChestTickHandler {
             if (forceRemove) {
               if (BazaarNotifier.sendChatMessages) {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                    BazaarNotifier.prefix + EnumChatFormatting.RED
-                        + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
+                        BazaarNotifier.prefix + EnumChatFormatting.RED
+                                + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
               }
-              if(BazaarNotifier.newOrders.get(orderInQuestion).type.equals("sell")) {
-                BankCalculator.bazaarProfit += BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
-              }else if (BazaarNotifier.newOrders.get(orderInQuestion).type.equals("buy")){
-                BankCalculator.bazaarProfit -= BazaarNotifier.newOrders.get(orderInQuestion).orderValue;
+              if (BazaarNotifier.orders.get(orderInQuestion).type.equals("sell")) {
+                BankCalculator.bazaarProfit += BazaarNotifier.orders.get(orderInQuestion).orderValue;
+              } else if (BazaarNotifier.orders.get(orderInQuestion).type.equals("buy")) {
+                BankCalculator.bazaarProfit -= BazaarNotifier.orders.get(orderInQuestion).orderValue;
               }
-              BazaarNotifier.newOrders.remove(orderInQuestion);
+              BazaarNotifier.orders.remove(orderInQuestion);
             } else if (amountLeft > 0) {
 
-              if(BazaarNotifier.newOrders.get(orderInQuestion).getAmountRemaining() > amountLeft){
-                if(BazaarNotifier.newOrders.get(orderInQuestion).type.equals("sell")) {
-                  BankCalculator.bazaarProfit += (BazaarNotifier.newOrders.get(orderInQuestion).getAmountRemaining()
-                          - amountLeft) * BazaarNotifier.newOrders.get(orderInQuestion).pricePerUnit;
-                }else if (BazaarNotifier.newOrders.get(orderInQuestion).type.equals("buy")){
-                  BankCalculator.bazaarProfit -= (BazaarNotifier.newOrders.get(orderInQuestion).getAmountRemaining()
-                          - amountLeft) * BazaarNotifier.newOrders.get(orderInQuestion).pricePerUnit;
+              if (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining() > amountLeft) {
+                if (BazaarNotifier.orders.get(orderInQuestion).type.equals("sell")) {
+                  BankCalculator.bazaarProfit += (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining()
+                          - amountLeft) * BazaarNotifier.orders.get(orderInQuestion).pricePerUnit;
+                } else if (BazaarNotifier.orders.get(orderInQuestion).type.equals("buy")) {
+                  BankCalculator.bazaarProfit -= (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining()
+                          - amountLeft) * BazaarNotifier.orders.get(orderInQuestion).pricePerUnit;
                 }
               }
-              BazaarNotifier.newOrders.get(orderInQuestion).setAmountRemaining(amountLeft);
+              BazaarNotifier.orders.get(orderInQuestion).setAmountRemaining(amountLeft);
             }
           }
         } else {
-          System.out.println(BazaarNotifier.newOrders);
+          System.out.println(BazaarNotifier.orders);
           System.err.println("Some orders weren't found! Bad display name: " + displayName);
           return;
         }
@@ -138,7 +138,7 @@ public class ChestTickHandler {
 
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
-        BazaarNotifier.newOrders.remove(i);
+        BazaarNotifier.orders.remove(i);
       }
     }
   }

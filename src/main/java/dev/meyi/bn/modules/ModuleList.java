@@ -1,37 +1,28 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.handlers.MouseHandler;
 import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class ModuleList extends ArrayList<Module> {
+  public ModuleList() {
+    this(Configuration.createDefaultConfig());
+  }
 
   Module movingModule = null;
 
-  public ModuleList() {
-    this(Configuration.initializeConfig());
-  }
+  public ModuleList(Configuration config) {
 
-  public ModuleList(JsonObject config) {
-    BazaarNotifier.apiKey = config.get("api").getAsString();
-    JsonObject workingConfig;
-    if (!config.get("version").getAsString().equalsIgnoreCase(BazaarNotifier.VERSION)) {
-      workingConfig = Configuration.initializeConfig();
-      
-    } else {
-      workingConfig = config;
-    }
+    ModuleConfig[] modules = config.modules;
 
-    JsonArray modules = workingConfig.getAsJsonArray("modules");
-
-    for (Object m : modules) {
-      JsonObject module = (JsonObject) m;
-      switch (ModuleName.valueOf(module.get("name").getAsString())) {
+    for (ModuleConfig module : modules) {
+      switch (ModuleName.valueOf(module.name)) {
         case SUGGESTION:
           add(new SuggestionModule(module));
           break;
@@ -46,7 +37,7 @@ public class ModuleList extends ArrayList<Module> {
           break;
         default:
           throw new IllegalStateException(
-              "Unexpected value: " + ModuleName.valueOf(module.get("name").getAsString()));
+              "Unexpected value: " + ModuleName.valueOf(module.name));
       }
     }
   }
@@ -166,15 +157,12 @@ public class ModuleList extends ArrayList<Module> {
       m.scale = 1;
     }
   }
-
-  public JsonObject generateConfig() {
-    JsonObject o = Configuration.initializeConfig();
-
-    JsonArray modules = new JsonArray();
-    for (Module m : this) {
-      modules.add(m.generateModuleConfig());
+  public ModuleConfig[] generateConfig(){
+    ModuleConfig[] config = new ModuleConfig[BazaarNotifier.modules.size()];
+    for(int i = 0; i < BazaarNotifier.modules.size(); i++) {
+      config[i] = this.get(i).generateModuleConfig();
     }
-    o.add("modules", modules);
-    return o;
+    return config;
   }
+
 }

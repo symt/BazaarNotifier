@@ -30,11 +30,11 @@ public class BankCalculator {
 
 
   public static double moneyStoredInSellOffers() {
-    if (BazaarNotifier.newOrders.size() != 0) {
+    if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
-        if (BazaarNotifier.newOrders.get(i).type.equals("sell")) {
-          orderWorth += BazaarNotifier.newOrders.get(i).orderValue;
+      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+        if (BazaarNotifier.orders.get(i).type.equals("sell")) {
+          orderWorth += BazaarNotifier.orders.get(i).orderValue;
         }
       }
       return orderWorth;
@@ -43,11 +43,11 @@ public class BankCalculator {
   }
 
   public static double moneyStoredInBuyOrders() {
-    if (BazaarNotifier.newOrders.size() != 0) {
+    if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.newOrders.size(); i++) {
-        if (BazaarNotifier.newOrders.get(i).type.equals("buy")) {
-          orderWorth += BazaarNotifier.newOrders.get(i).orderValue;
+      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+        if (BazaarNotifier.orders.get(i).type.equals("buy")) {
+          orderWorth += BazaarNotifier.orders.get(i).orderValue;
         }
       }
       return orderWorth;

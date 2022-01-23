@@ -1,7 +1,7 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Order;
@@ -20,7 +20,7 @@ public class NotificationModule extends Module {
     super();
   }
 
-  public NotificationModule(JsonObject module) {
+  public NotificationModule(ModuleConfig module) {
     super(module);
   }
 
@@ -30,12 +30,12 @@ public class NotificationModule extends Module {
 
     List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-    if (BazaarNotifier.newOrders.size() != 0) {
+    if (BazaarNotifier.orders.size() != 0) {
 
-      int size = Math.min(shift + 10, BazaarNotifier.newOrders.size());
+      int size = Math.min(shift + 10, BazaarNotifier.orders.size());
 
       for (int i = shift; i < size; i++) {
-        Order currentOrder = BazaarNotifier.newOrders.get(i);
+        Order currentOrder = BazaarNotifier.orders.get(i);
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
 
         Color typeSpecificColor = currentOrder.goodOrder ? new Color(0x55FF55)
@@ -92,7 +92,7 @@ public class NotificationModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.newOrders.size() - 10;
+    return BazaarNotifier.orders.size() - 10;
   }
 
 

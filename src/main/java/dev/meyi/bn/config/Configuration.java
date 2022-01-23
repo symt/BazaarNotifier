@@ -1,47 +1,74 @@
 package dev.meyi.bn.config;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.utilities.Defaults;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Configuration {
 
-  public static boolean collectionCheckDisabled;
-  public static int craftingSortingOption;
-  public static int craftingListLength;
-  public static boolean showInstantSellProfit;
-  public static boolean showSellOfferProfit;
-  public static boolean showProfitPerMil;
-  public static int suggestionListLength;
+  public boolean collectionCheckDisabled;
+  public int craftingSortingOption;
+  public int craftingListLength;
+  public boolean showInstantSellProfit;
+  public boolean showSellOfferProfit;
+  public boolean showProfitPerMil;
+  public int suggestionListLength;
+  public String api;
+  public String version;
+  public ModuleConfig[] modules;
 
-  public static JsonObject initializeConfig() {
-    JsonObject newConfig = new JsonObject();
-    newConfig.addProperty("api", BazaarNotifier.apiKey);
-    newConfig.addProperty("version", BazaarNotifier.VERSION);
-    newConfig.addProperty("craftingListLength", craftingListLength);
-    newConfig.addProperty("suggestionListLength", suggestionListLength);
-    newConfig.addProperty("craftingSortingOption", craftingSortingOption);
-    newConfig.addProperty("showInstantSellProfit", showInstantSellProfit);
-    newConfig.addProperty("showSellOfferProfit", showSellOfferProfit);
-    newConfig.addProperty("showProfitPerMil", showProfitPerMil);
-    newConfig.addProperty("collectionChecking", collectionCheckDisabled);
 
-    JsonArray modules = new JsonArray();
-    JsonObject g = new JsonObject();
-    g.addProperty("hi", "hi");
-    for (ModuleName value : ModuleName.values()) {
-      Module m = value.returnDefaultModule();
+
+  public Configuration(boolean collectionCheckDisabled, int craftingSortingOption, int craftingListLength,
+                       boolean showInstantSellProfit,boolean showSellOfferProfit, boolean showProfitPerMil,
+                       int suggestionListLength, ModuleConfig[] modules){
+    this.collectionCheckDisabled = collectionCheckDisabled;
+    this.craftingSortingOption = craftingSortingOption;
+    this.craftingListLength = craftingListLength;
+    this.showInstantSellProfit = showInstantSellProfit;
+    this.showSellOfferProfit = showSellOfferProfit;
+    this.showProfitPerMil = showProfitPerMil;
+    this.suggestionListLength = suggestionListLength;
+    this.api = BazaarNotifier.apiKey;
+    this.version = BazaarNotifier.VERSION;
+    this.modules = modules;
+  }
+
+
+
+
+  public void saveConfig(File file, Configuration config) {
+    Gson gson = new Gson();
+    modules = BazaarNotifier.modules.generateConfig();
+    try {
+    if (!file.isFile()) {
+      file.createNewFile();
+    }
+      Files.write(Paths.get(file.getAbsolutePath()),
+              gson.toJson(config).getBytes(StandardCharsets.UTF_8));
+    }catch (Exception ignored){
+      System.out.println("Error while saving config file");
+    }
+  }
+
+  public static Configuration createDefaultConfig() {
+    ModuleConfig[] c = new ModuleConfig[4];
+    for (int i = 0; i < ModuleName.values().length; i++) {
+      Module m = ModuleName.values()[i].returnDefaultModule();
       if (m != null) {
-        modules.add(m.generateModuleConfig());
+        c[i] = (m.generateModuleConfig());
       }
     }
-
-    BazaarNotifier.validApiKey = false;
-    newConfig.add("modules", modules);
-
-    return newConfig;
+    return new Configuration(Defaults.COLLECTION_CHECKING,
+            Defaults.CRAFTING_SORTING_OPTION ,Defaults.CRAFTING_LIST_LENGTH,Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
+            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,c);
   }
+
 }
