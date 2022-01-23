@@ -49,7 +49,7 @@
     "ENCHANTED_PRISMARINE_SHARD": { "material": "PRISMARINE_SHARD","collection":"PRISMARINE_SHARD_3"},
     "ENCHANTED_IRON_BLOCK": { "material":"ENCHANTED_IRON","collection":"IRON_7"},
    "ENCHANTED_PORK": { "material":"PORK","collection":"PORK_4"},
-    "POLISHED_PUMPKIN": {"material":"ENCHANTED_PUMPKIN","collection":"PUMPKIN_3"},
+    "POLISHED_PUMPKIN": {"material":"ENCHANTED_PUMPKIN","collection":"PUMPKIN_10"},
     "ENCHANTED_DARK_OAK_LOG": { "material":"LOG_2:1","collection":"LOG_2:1_5"},
     "ENCHANTED_CLOWNFISH": { "material":"RAW_FISH:2","collection":"NONE"},
    "ENCHANTED_GOLD": { "material":"GOLD_INGOT","collection":"GOLD_INGOT_5"},
