@@ -89,7 +89,10 @@ public class Utils {
       }
       BazaarNotifier.playerDataFromAPI = results.get("profiles").getAsJsonArray()
           .get(profileIndex).getAsJsonObject().get("members").getAsJsonObject().get(playerUUID).getAsJsonObject();
-      if(!BazaarNotifier.playerDataFromAPI.has("unlocked_coll_tiers")){
+      if(! results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
+              .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().has("unlocked_coll_tiers")
+              || !results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
+              .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().has("slayer_bosses")){
         System.out.println("could not load unlocked collection tiers from API");
         return new JsonArray();
       }
