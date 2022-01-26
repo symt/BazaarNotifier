@@ -43,7 +43,10 @@ public class Utils {
 
 
   public static JsonArray unlockedRecipes() throws IOException {
-    if (!BazaarNotifier.apiKey.equals("")) {
+    if(!BazaarNotifier.validApiKey){
+      BazaarNotifier.validApiKey = validateApiKey();
+    }
+    if (!BazaarNotifier.apiKey.equals("") && BazaarNotifier.validApiKey) {
 
       HttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
@@ -55,7 +58,11 @@ public class Utils {
         String uuidResponse = IOUtils
             .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
 
-        playerUUID = new JsonParser().parse(uuidResponse).getAsJsonObject().get("id").getAsString();
+        try {
+          playerUUID = new JsonParser().parse(uuidResponse).getAsJsonObject().get("id").getAsString();
+        }catch (Exception e){
+          return new JsonArray();
+        }
       }
 
       HttpGet request = new HttpGet(
@@ -68,7 +75,7 @@ public class Utils {
       JsonObject results = new JsonParser().parse(_results).getAsJsonObject();
       long lastSaved = 0;
       int profileIndex = 0;
-      if(!results.get("success").getAsBoolean()){
+      if(!results.get("success").getAsBoolean() || !results.has("profiles")){
         return new JsonArray();
       }
 
