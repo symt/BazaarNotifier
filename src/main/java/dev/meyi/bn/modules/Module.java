@@ -32,6 +32,7 @@ public abstract class Module {
     x = module.x;
     y = module.y;
     scale = module.scale;
+    active = module.active;
   }
 
   protected abstract void draw();
