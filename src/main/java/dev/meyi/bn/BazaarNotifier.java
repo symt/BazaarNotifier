@@ -47,7 +47,6 @@ public class BazaarNotifier {
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
   public static boolean apiKeyDisabled = true;// Change this if an api key is ever required to access the bazaar again.
-  public static boolean sendChatMessages = true;
 
 
   public static List<Order> orders = new LinkedList<>();

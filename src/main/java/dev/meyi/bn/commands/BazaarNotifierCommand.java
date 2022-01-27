@@ -204,6 +204,14 @@ public class BazaarNotifierCommand extends CommandBase {
                 player.addChatMessage(help);
               }
               break;
+            case ("show_chat_messages"):
+              BazaarNotifier.config.showChatMessages = !BazaarNotifier.config.showChatMessages;
+              if(BazaarNotifier.config.showChatMessages){
+                player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN + "Chat messages are now enabled "));
+              }else{
+                player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN + "Chat messages are now disabled "));
+              }
+              break;
             default:
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED + "\"" + args[1]
@@ -429,6 +437,7 @@ public class BazaarNotifierCommand extends CommandBase {
               add("crafting_sort");
               add("crafting_length");
               add("suggester_length");
+              add("show_chat_messages");
             }
           }.forEach(cmd -> {
             if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {

@@ -44,7 +44,7 @@ public class ModuleList extends ArrayList<Module> {
 
   public boolean toggleModule(ModuleName type) {
     if (type == ModuleName.SUGGESTION) {
-      BazaarNotifier.sendChatMessages ^= true;
+      BazaarNotifier.config.showChatMessages ^= true;
     }
 
     for (Module m : this) {
