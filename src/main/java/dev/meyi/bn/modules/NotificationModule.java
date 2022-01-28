@@ -78,6 +78,7 @@ public class NotificationModule extends Module {
     x = Defaults.NOTIFICATION_MODULE_X;
     y = Defaults.NOTIFICATION_MODULE_Y;
     scale = 1;
+    active = true;
   }
 
   @Override

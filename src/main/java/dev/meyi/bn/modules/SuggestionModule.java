@@ -60,6 +60,7 @@ public class SuggestionModule extends Module {
     x = Defaults.SUGGESTION_MODULE_X;
     y = Defaults.SUGGESTION_MODULE_Y;
     scale = 1;
+    active = true;
     BazaarNotifier.config.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
   }
 

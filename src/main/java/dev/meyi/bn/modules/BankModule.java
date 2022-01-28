@@ -47,6 +47,7 @@ public class BankModule extends Module {
     x = Defaults.BANK_MODULE_X;
     y = Defaults.BANK_MODULE_Y;
     scale = 1;
+    active = true;
   }
 
   @Override

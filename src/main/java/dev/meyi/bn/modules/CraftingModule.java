@@ -139,6 +139,7 @@ public class CraftingModule extends Module {
     x = Defaults.CRAFTING_MODULE_X;
     y = Defaults.CRAFTING_MODULE_Y;
     scale = 1;
+    active = true;
     BazaarNotifier.config.craftingListLength = Defaults.CRAFTING_LIST_LENGTH;
   }
 
