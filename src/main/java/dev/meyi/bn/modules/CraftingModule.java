@@ -1,7 +1,7 @@
 package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
@@ -11,8 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class CraftingModule extends Module {
   public static final ModuleName type = ModuleName.CRAFTING;
@@ -26,7 +24,7 @@ public class CraftingModule extends Module {
     super();
   }
 
-  public CraftingModule(JSONObject module) {
+  public CraftingModule(ModuleConfig module) {
     super(module);
   }
 
@@ -34,23 +32,23 @@ public class CraftingModule extends Module {
     helperLine.clear();
     helperLine.put("   ", Color.MAGENTA);
     helperLine.put("Profits (Buy Orders)", Color.LIGHT_GRAY);
-    if (Configuration.showProfitPerMil || Configuration.showInstantSellProfit
-        || Configuration.showSellOfferProfit) {
+    if (BazaarNotifier.config.showProfitPerMil || BazaarNotifier.config.showInstantSellProfit
+        || BazaarNotifier.config.showSellOfferProfit) {
       helperLine.put(" - ", Color.GRAY);
     }
-    if (Configuration.showInstantSellProfit) {
+    if (BazaarNotifier.config.showInstantSellProfit) {
       helperLine.put(" Instant Sell", Color.LIGHT_GRAY);
-      if (Configuration.showSellOfferProfit) {
+      if (BazaarNotifier.config.showSellOfferProfit) {
         helperLine.put(" /", Color.GRAY);
       }
     }
-    if (Configuration.showSellOfferProfit) {
+    if (BazaarNotifier.config.showSellOfferProfit) {
       helperLine.put(" Sell Offer", Color.LIGHT_GRAY);
-      if (Configuration.showProfitPerMil) {
+      if (BazaarNotifier.config.showProfitPerMil) {
         helperLine.put(" / ", Color.GRAY);
       }
     }
-    if (Configuration.showProfitPerMil) {
+    if (BazaarNotifier.config.showProfitPerMil) {
       helperLine.put("1m Instant", Color.LIGHT_GRAY);
     }
   }
@@ -62,7 +60,7 @@ public class CraftingModule extends Module {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
       generateHelperLine();
       items.add(helperLine);
-      for (int i = shift; i < Configuration.craftingListLength + shift; i++) {
+      for (int i = shift; i < BazaarNotifier.config.craftingListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         if (i < list.size()) {
           if (!list.get(i).isEmpty()) {
@@ -72,31 +70,31 @@ public class CraftingModule extends Module {
             Double pricePerMil = Double.valueOf(list.get(i).get(2));
             String itemName = list.get(i).get(3);
 
-            String itemNameConverted = BazaarNotifier.bazaarConversions.getString(itemName);
+            String itemNameConverted = BazaarNotifier.bazaarConversions.get(itemName).getAsString();
             message.put(String.valueOf(i + 1), Color.MAGENTA);
             message.put(". ", Color.MAGENTA);
             message.put(itemNameConverted, Color.CYAN);
 
-            if (Configuration.showProfitPerMil || Configuration.showInstantSellProfit
-                || Configuration.showSellOfferProfit) {
+            if (BazaarNotifier.config.showProfitPerMil || BazaarNotifier.config.showInstantSellProfit
+                || BazaarNotifier.config.showSellOfferProfit) {
               message.put(" - ", Color.GRAY);
             }
 
-            if (Configuration.showInstantSellProfit) {
+            if (BazaarNotifier.config.showInstantSellProfit) {
               message.put(BazaarNotifier.df.format(profitInstaSell),
                   getColor(profitInstaSell.intValue()));
             }
-            if (Configuration.showInstantSellProfit && Configuration.showSellOfferProfit) {
+            if (BazaarNotifier.config.showInstantSellProfit && BazaarNotifier.config.showSellOfferProfit) {
               message.put(" / ", Color.GRAY);
             }
-            if (Configuration.showSellOfferProfit) {
+            if (BazaarNotifier.config.showSellOfferProfit) {
               message.put(BazaarNotifier.df.format(profitSellOffer),
                   getColor(profitSellOffer.intValue()));
             }
-            if (Configuration.showSellOfferProfit && Configuration.showProfitPerMil) {
+            if (BazaarNotifier.config.showSellOfferProfit && BazaarNotifier.config.showProfitPerMil) {
               message.put(" /  ", Color.GRAY);
             }
-            if (Configuration.showProfitPerMil) {
+            if (BazaarNotifier.config.showProfitPerMil) {
               message.put(BazaarNotifier.df.format(pricePerMil),
                   getColorForMil(pricePerMil.intValue()));
             }
@@ -111,8 +109,8 @@ public class CraftingModule extends Module {
       renderMaterials(checkHoveredText(), list);
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * (Configuration.craftingListLength + 1)
-        + (Configuration.craftingListLength + 1) * 2 * scale - 2;
+        * (BazaarNotifier.config.craftingListLength + 1)
+        + (BazaarNotifier.config.craftingListLength + 1) * 2 * scale - 2;
     boundsY = (int) Y;
   }
 
@@ -141,7 +139,8 @@ public class CraftingModule extends Module {
     x = Defaults.CRAFTING_MODULE_X;
     y = Defaults.CRAFTING_MODULE_Y;
     scale = 1;
-    Configuration.craftingListLength = 10;
+    active = true;
+    BazaarNotifier.config.craftingListLength = Defaults.CRAFTING_LIST_LENGTH;
   }
 
   @Override
@@ -156,12 +155,12 @@ public class CraftingModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return list.size() - Configuration.craftingListLength;
+    return list.size() - BazaarNotifier.config.craftingListLength;
   }
 
   protected int checkHoveredText() {
     float _y = y + 11 * scale;
-    float y2 = _y + ((Configuration.craftingListLength) * 11 * scale);
+    float y2 = _y + ((BazaarNotifier.config.craftingListLength) * 11 * scale);
     int mouseYFormatted = getMouseCoordinateY();
     int mouseXFormatted = getMouseCoordinateX();
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
@@ -184,39 +183,39 @@ public class CraftingModule extends Module {
 
     if (hoveredText > -1) {
       if (hoveredText < list.size()) {
-        if (BazaarNotifier.enchantCraftingList.getJSONObject("normal")
+        if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
             .has(list.get(hoveredText).get(3))) {
           try {
             text.put(mouseWheelShift * 160 + "x ", Color.LIGHT_GRAY);
-            text.put(BazaarNotifier.bazaarConversions.getString(
-                BazaarNotifier.enchantCraftingList.getJSONObject("normal")
-                    .getJSONObject(list.get(hoveredText).get(3)).getString("material")),
+            text.put(BazaarNotifier.bazaarConversions.get(
+                BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
+                    .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()).getAsString(),
                 Color.LIGHT_GRAY);
-          } catch (JSONException e) {
+          } catch (Exception e) {
             text.put("Error", Color.RED);
           }
         } else {
           int materialCount;
           StringBuilder _material = new StringBuilder();
-          materialCount = BazaarNotifier.enchantCraftingList.getJSONObject("other")
-              .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").length();
+          materialCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+              .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").size();
           for (int b = 0; b < materialCount / 2; b++) {
             if (b == 0) {
-              _material.append((BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                  .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material").getInt(1)
+              _material.append((BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                  .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").get(1).getAsInt()
                   * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConversions
-                  .getString(BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                      .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                      .getString(0)));
+                  .get(BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                      .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
+                      .get(0).getAsString()).getAsString());
             } else {
               _material.append(" | ").append(
-                  BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                      .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                      .getInt(b * 2 + 1) * mouseWheelShift).append("x ").append(
-                  BazaarNotifier.bazaarConversions.getString(
-                      BazaarNotifier.enchantCraftingList.getJSONObject("other")
-                          .getJSONObject(list.get(hoveredText).get(3)).getJSONArray("material")
-                          .getString(b * 2)));
+                  BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                      .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
+                      .get(b * 2 + 1).getAsInt() * mouseWheelShift).append("x ").append(
+                  BazaarNotifier.bazaarConversions.get(
+                      BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                          .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
+                          .get(b * 2).getAsString()).getAsString());
             }
           }
           text.put(_material.toString(), Color.LIGHT_GRAY);

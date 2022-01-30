@@ -1,7 +1,7 @@
 package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import org.json.JSONObject;
 
 public class SuggestionModule extends Module {
   public static final ModuleName type = ModuleName.SUGGESTION;
@@ -19,25 +18,25 @@ public class SuggestionModule extends Module {
     super();
   }
 
-  public SuggestionModule(JSONObject module) {
+  public SuggestionModule(ModuleConfig module) {
     super(module);
   }
 
   @Override
   protected void draw() {
-    if (BazaarNotifier.bazaarDataFormatted.length() != 0) {
+    if (BazaarNotifier.bazaarDataFormatted.size() != 0) {
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
-      for (int i = shift; i < Configuration.suggestionListLength + shift; i++) {
+      for (int i = shift; i < BazaarNotifier.config.suggestionListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.MAGENTA);
-        message.put(BazaarNotifier.bazaarDataFormatted.getJSONObject(i).getString("productId"),
+        message.put(BazaarNotifier.bazaarDataFormatted.get(i).getAsJsonObject().get("productId").getAsString(),
             Color.CYAN);
         message.put(" - ", Color.GRAY);
         message.put("EP: ", Color.RED);
         message.put("" + BazaarNotifier.df.format(
-            BazaarNotifier.bazaarDataFormatted.getJSONObject(i)
-                .getDouble("profitFlowPerMinute")), Color.ORANGE);
+            BazaarNotifier.bazaarDataFormatted.get(i).getAsJsonObject()
+                .get("profitFlowPerMinute").getAsDouble()), Color.ORANGE);
         items.add(message);
       }
 
@@ -52,7 +51,7 @@ public class SuggestionModule extends Module {
       boundsX = x + 200;
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * Configuration.suggestionListLength + Configuration.suggestionListLength * 2 * scale - 2;
+        * BazaarNotifier.config.suggestionListLength + BazaarNotifier.config.suggestionListLength * 2 * scale - 2;
     boundsY = (int) Y;
   }
 
@@ -61,6 +60,8 @@ public class SuggestionModule extends Module {
     x = Defaults.SUGGESTION_MODULE_X;
     y = Defaults.SUGGESTION_MODULE_Y;
     scale = 1;
+    active = true;
+    BazaarNotifier.config.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
   }
 
   @Override
@@ -75,11 +76,11 @@ public class SuggestionModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return BazaarNotifier.bazaarDataFormatted.length() - Configuration.suggestionListLength;
+    return BazaarNotifier.bazaarDataFormatted.size() - BazaarNotifier.config.suggestionListLength;
   }
 
   @Override
-  public JSONObject generateModuleConfig() {
+  public ModuleConfig generateModuleConfig() {
     return super.generateModuleConfig();
   }
 

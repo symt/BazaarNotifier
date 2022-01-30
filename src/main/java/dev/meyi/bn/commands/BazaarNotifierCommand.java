@@ -1,15 +1,15 @@
 package dev.meyi.bn.commands;
 
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
-import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -21,8 +21,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.text.WordUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 
 public class BazaarNotifierCommand extends CommandBase {
@@ -55,7 +53,7 @@ public class BazaarNotifierCommand extends CommandBase {
       if (args.length >= 1 && args[0].equalsIgnoreCase("toggle")) {
         if (args.length == 1 || args[1].equalsIgnoreCase("all")) {
           if (!BazaarNotifier.apiKey.equals("") || BazaarNotifier.apiKeyDisabled) {
-            BazaarNotifier.orders = new JSONArray();
+            BazaarNotifier.orders = new LinkedList<>();
             BazaarNotifier.activeBazaar ^= true;
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + (BazaarNotifier.activeBazaar ? EnumChatFormatting.GREEN
@@ -98,10 +96,11 @@ public class BazaarNotifierCommand extends CommandBase {
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
               BazaarNotifier.apiKey = args[1];
+              BazaarNotifier.config.api = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
               CraftingCalculator.getUnlockedRecipes();
-              Configuration.collectionCheckDisabled = false;
+              BazaarNotifier.config.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
@@ -136,21 +135,21 @@ public class BazaarNotifierCommand extends CommandBase {
         } else {
           switch (args[1].toLowerCase()) {
             case "collection":
-              if (Configuration.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
+              if (BazaarNotifier.config.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Only showing unlocked recipes"));
-                Configuration.collectionCheckDisabled = false;
-              } else if (Configuration.collectionCheckDisabled) {
+                BazaarNotifier.config.collectionCheckDisabled = false;
+              } else if (BazaarNotifier.config.collectionCheckDisabled) {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Please set an API-Key first.(/bn api)"));
-                Configuration.collectionCheckDisabled = true;
+                BazaarNotifier.config.collectionCheckDisabled = true;
               } else {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Showing all recipes"));
-                Configuration.collectionCheckDisabled = true;
+                BazaarNotifier.config.collectionCheckDisabled = true;
               }
               break;
             case "crafting_display":
@@ -205,6 +204,14 @@ public class BazaarNotifierCommand extends CommandBase {
                 player.addChatMessage(help);
               }
               break;
+            case ("show_chat_messages"):
+              BazaarNotifier.config.showChatMessages = !BazaarNotifier.config.showChatMessages;
+              if(BazaarNotifier.config.showChatMessages){
+                player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN + "Chat messages are now enabled "));
+              }else{
+                player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN + "Chat messages are now disabled "));
+              }
+              break;
             default:
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED + "\"" + args[1]
@@ -218,7 +225,7 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "All module locations have been reset and the order list has been emptied."));
         } else if (args[1].equalsIgnoreCase("orders") && args.length == 2) {
-          BazaarNotifier.orders = Defaults.DEFAULT_ORDERS_LAYOUT();
+          BazaarNotifier.orders = new LinkedList<>();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared."));
         } else if (args[1].equalsIgnoreCase("scale") && args.length == 2) {
@@ -240,26 +247,26 @@ public class BazaarNotifierCommand extends CommandBase {
         } else {
           String item = String.join(" ", args).substring(5).toLowerCase();
           if (BazaarNotifier.bazaarCache.has(item)) {
-            JSONObject data = BazaarNotifier.bazaarCache.getJSONObject(item);
+            JsonObject data = BazaarNotifier.bazaarCache.getAsJsonObject(item);
 
             String itemConv = BazaarNotifier.bazaarConversionsReversed
-                .getString(WordUtils.capitalize(item.toLowerCase()));
-            if (BazaarNotifier.enchantCraftingList.getJSONObject("normal").has(itemConv)
-                || BazaarNotifier.enchantCraftingList.getJSONObject("other").has(itemConv)) {
+                .get(WordUtils.capitalize(item.toLowerCase())).getAsString();
+            if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemConv)
+                || BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemConv)) {
               String[] prices = CraftingCalculator.getEnchantCraft(item);
 
               player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
                   + "\n" +
                   EnumChatFormatting.DARK_RED + "Buy Order: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(data.getDouble("buyOrderPrice"))
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(data.get("buyOrderPrice").getAsDouble())
                   + "\n" +
                   EnumChatFormatting.DARK_RED + "Sell Offer: " +
                   EnumChatFormatting.RED + BazaarNotifier.df
-                  .format(data.getDouble("sellOfferPrice")) + "\n" +
+                  .format(data.get("sellOfferPrice").getAsDouble()) + "\n" +
                   EnumChatFormatting.DARK_RED + "Estimated Profit: " +
                   EnumChatFormatting.RED + BazaarNotifier.df
-                  .format(data.getDouble("profitFlowPerMinute")) + "\n" +
+                  .format(data.get("profitFlowPerMinute").getAsDouble()) + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
                   EnumChatFormatting.RED + prices[0] + "\n" +
@@ -274,18 +281,18 @@ public class BazaarNotifierCommand extends CommandBase {
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
                   + "\n"
                   + EnumChatFormatting.DARK_RED + "Buy Order: " + EnumChatFormatting.RED +
-                  BazaarNotifier.df.format(data.getDouble("buyOrderPrice")) + "\n"
+                  BazaarNotifier.df.format(data.get("buyOrderPrice").getAsDouble()) + "\n"
                   + EnumChatFormatting.DARK_RED + "Sell Offer: "
                   + EnumChatFormatting.RED +
-                  BazaarNotifier.df.format(data.getDouble("sellOfferPrice")) + "\n"
+                  BazaarNotifier.df.format(data.get("sellOfferPrice").getAsDouble()) + "\n"
                   + EnumChatFormatting.DARK_RED
                   + "Estimated Profit: " + EnumChatFormatting.RED +
-                  BazaarNotifier.df.format(data.getDouble("profitFlowPerMinute")) + "\n" +
+                  BazaarNotifier.df.format(data.get("profitFlowPerMinute").getAsDouble()) + "\n" +
                   BazaarNotifier.prefix));
             }
 
 
-          } else if (BazaarNotifier.bazaarCache.length() == 0) {
+          } else if (BazaarNotifier.bazaarCache.entrySet().size() == 0) {
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.RED
                     + "Please wait a moment for the mod to get bazaar information"));
@@ -430,6 +437,7 @@ public class BazaarNotifierCommand extends CommandBase {
               add("crafting_sort");
               add("crafting_length");
               add("suggester_length");
+              add("show_chat_messages");
             }
           }.forEach(cmd -> {
             if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {

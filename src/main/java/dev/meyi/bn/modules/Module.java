@@ -1,9 +1,9 @@
 package dev.meyi.bn.modules;
 
+import dev.meyi.bn.config.ModuleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import org.json.JSONObject;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
@@ -23,13 +23,16 @@ public abstract class Module {
   boolean needsToMove = false;
 
   public Module() {
-    reset();
+    x = 0;
+    y = 0;
+    scale = 1;
   }
 
-  public Module(JSONObject module) {
-    x = module.getInt("x");
-    y = module.getInt("y");
-    scale = module.getFloat("scale");
+  public Module(ModuleConfig module) {
+    x = module.x;
+    y = module.y;
+    scale = module.scale;
+    active = module.active;
   }
 
   protected abstract void draw();
@@ -65,10 +68,8 @@ public abstract class Module {
         && getMouseCoordinateY() <= boundsY);
   }
 
-  public JSONObject generateModuleConfig() {
-    JSONObject config = new JSONObject();
-    config.put("x", x).put("y", y).put("scale", scale).put("name", name());
-    return config;
+  public ModuleConfig generateModuleConfig() {
+    return new ModuleConfig(name(),x,y,scale,active);
   }
 
   protected int getMouseCoordinateX() {

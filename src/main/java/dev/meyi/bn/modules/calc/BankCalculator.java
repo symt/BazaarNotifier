@@ -19,23 +19,22 @@ import net.minecraft.util.StringUtils;
 public class BankCalculator {
 
   public static double bank = 0;
-  public static double moneyNotFromBazaar = 0;
-  public static double moneyOnBazaarLeave = 0;
   private static double moneyOnStartup =
-      moneyStoredInSellOffers() + moneyStoredInBuyOrders() + getPurse();
+          moneyStoredInSellOffers() + moneyStoredInBuyOrders() + getPurse();
+  public static double bazaarProfit = 0;
 
   public static double calculateProfit() {
     return getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank
-        - moneyOnStartup;
+            - moneyOnStartup;
   }
 
 
   public static double moneyStoredInSellOffers() {
-    if (!BazaarNotifier.orders.isEmpty()) {
+    if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        if (BazaarNotifier.orders.getJSONObject(i).getString("type").equals("sell")) {
-          orderWorth += BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
+      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+        if (BazaarNotifier.orders.get(i).type.equals("sell")) {
+          orderWorth += BazaarNotifier.orders.get(i).orderValue;
         }
       }
       return orderWorth;
@@ -44,11 +43,11 @@ public class BankCalculator {
   }
 
   public static double moneyStoredInBuyOrders() {
-    if (!BazaarNotifier.orders.isEmpty()) {
+    if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-        if (BazaarNotifier.orders.getJSONObject(i).getString("type").equals("buy")) {
-          orderWorth += BazaarNotifier.orders.getJSONObject(i).getInt("orderValue");
+      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+        if (BazaarNotifier.orders.get(i).type.equals("buy")) {
+          orderWorth += BazaarNotifier.orders.get(i).orderValue;
         }
       }
       return orderWorth;
@@ -65,8 +64,8 @@ public class BankCalculator {
   }
 
   public static double getPurseFromAPI() {
-    if (!BazaarNotifier.playerDataFromAPI.isEmpty()) {
-      return BazaarNotifier.playerDataFromAPI.getDouble("coin_purse");
+    if (BazaarNotifier.playerDataFromAPI.entrySet().size() != 0) {
+      return BazaarNotifier.playerDataFromAPI.get("coin_purse").getAsDouble();
     }
     return -1;
   }
@@ -85,8 +84,8 @@ public class BankCalculator {
 
     Collection<Score> scores = scoreboard.getSortedScores(objective);
     List<Score> list = scores.stream()
-        .filter(input -> input != null && input.getPlayerName() != null && !input.getPlayerName()
-            .startsWith("#")).collect(Collectors.toList());
+            .filter(input -> input != null && input.getPlayerName() != null && !input.getPlayerName()
+                    .startsWith("#")).collect(Collectors.toList());
 
     if (list.size() > 15) {
       scores = Lists.newArrayList(Iterables.skip(list, scores.size() - 15));
@@ -98,17 +97,17 @@ public class BankCalculator {
       ScorePlayerTeam team = scoreboard.getPlayersTeam(score.getPlayerName());
       if (ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()).contains("Purse")) {
         if (ScorePlayerTeam.formatPlayerName(team, score.getPlayerName())
-            .contains(")")) {// coins get added to your purse
+                .contains(")")) {// coins get added to your purse
           String purse = StringUtils
-              .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()));
+                  .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()));
           int i = purse.indexOf("(");
           String s = purse.substring(i + 1, purse.length() - 1);
           purse = purse.replace(s, "").replaceAll("[^0-9 .]", "");
           return Float.parseFloat(purse);
         } else {
           String purse = StringUtils
-              .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()))
-              .replaceAll("[^0-9 +.]", "");
+                  .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()))
+                  .replaceAll("[^0-9 +.]", "");
           return Float.parseFloat(purse);
         }
       }
@@ -123,15 +122,15 @@ public class BankCalculator {
         if (chest.getStackInSlot(11).getDisplayName().toLowerCase().contains("deposit coins")) {
           if (bank == 0) {
             bank = Double.parseDouble(StringUtils.stripControlCodes(
-                chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                    .getTagList("Lore", 8)
-                    .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
+                    chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
+                            .getTagList("Lore", 8)
+                            .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
             moneyOnStartup += bank;
           }
           bank = Double.parseDouble(StringUtils.stripControlCodes(
-              chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                  .getTagList("Lore", 8)
-                  .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
+                  chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
+                          .getTagList("Lore", 8)
+                          .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
         }
       }
     }
@@ -139,7 +138,6 @@ public class BankCalculator {
 
   public static void reset() {
     moneyOnStartup = getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank;
-    moneyNotFromBazaar = 0;
-    moneyOnBazaarLeave = 0;
+    bazaarProfit = 0;
   }
 }

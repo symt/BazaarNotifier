@@ -1,36 +1,28 @@
 package dev.meyi.bn.modules;
 
+
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.Configuration;
+import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.handlers.MouseHandler;
 import java.util.ArrayList;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class ModuleList extends ArrayList<Module> {
+  public ModuleList() {
+    this(Configuration.createDefaultConfig());
+  }
 
   Module movingModule = null;
 
-  public ModuleList() {
-    this(Configuration.initializeConfig());
-  }
+  public ModuleList(Configuration config) {
 
-  public ModuleList(JSONObject config) {
-    BazaarNotifier.apiKey = config.getString("api");
-    JSONObject workingConfig;
-    if (!config.getString("version").equalsIgnoreCase(BazaarNotifier.VERSION)) {
-      workingConfig = Configuration.initializeConfig();
-    } else {
-      workingConfig = config;
-    }
+    ModuleConfig[] modules = config.modules;
 
-    JSONArray modules = workingConfig.getJSONArray("modules");
-
-    for (Object m : modules) {
-      JSONObject module = (JSONObject) m;
-      switch (ModuleName.valueOf(module.getString("name"))) {
+    for (ModuleConfig module : modules) {
+      switch (ModuleName.valueOf(module.name)) {
         case SUGGESTION:
           add(new SuggestionModule(module));
           break;
@@ -45,14 +37,14 @@ public class ModuleList extends ArrayList<Module> {
           break;
         default:
           throw new IllegalStateException(
-              "Unexpected value: " + ModuleName.valueOf(module.getString("name")));
+              "Unexpected value: " + ModuleName.valueOf(module.name));
       }
     }
   }
 
   public boolean toggleModule(ModuleName type) {
     if (type == ModuleName.SUGGESTION) {
-      BazaarNotifier.sendChatMessages ^= true;
+      BazaarNotifier.config.showChatMessages ^= true;
     }
 
     for (Module m : this) {
@@ -165,15 +157,12 @@ public class ModuleList extends ArrayList<Module> {
       m.scale = 1;
     }
   }
-
-  public JSONObject generateConfig() {
-    JSONObject o = Configuration.initializeConfig();
-
-    JSONArray modules = new JSONArray();
-    for (Module m : this) {
-      modules.put(m.generateModuleConfig());
+  public ModuleConfig[] generateConfig(){
+    ModuleConfig[] config = new ModuleConfig[BazaarNotifier.modules.size()];
+    for(int i = 0; i < BazaarNotifier.modules.size(); i++) {
+      config[i] = this.get(i).generateModuleConfig();
     }
-
-    return o.put("modules", modules);
+    return config;
   }
+
 }

@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
            name 'JitPack'
             url 'https://jitpack.io'
@@ -33,7 +33,7 @@ minecraft {
 }
 
 dependencies {
-    compile group: 'org.json', name: 'json', version: '20200518'
+
 }
 
 jar {
@@ -58,8 +58,6 @@ processResources
 
 shadowJar {
     classifier = ""
-
-    relocate "org.json", "dev.meyi.repack.org.json"
 }
 
 reobf { shadowJar { mappingType = "SEARGE" } }
