@@ -1,6 +1,7 @@
 package dev.meyi.bn.config;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
@@ -24,6 +25,7 @@ public class Configuration {
   public String api;
   public String version;
   public ModuleConfig[] modules;
+  public JsonObject resources;
 
 
 
@@ -64,9 +66,8 @@ public class Configuration {
     ModuleConfig[] c = new ModuleConfig[4];
     for (int i = 0; i < ModuleName.values().length; i++) {
       Module m = ModuleName.values()[i].returnDefaultModule();
-      if (m != null) {
-        c[i] = (m.generateModuleConfig());
-      }
+      assert m != null;
+      c[i] = m.generateDefaultConfig();
     }
     return new Configuration(Defaults.COLLECTION_CHECKING,
             Defaults.CRAFTING_SORTING_OPTION ,Defaults.CRAFTING_LIST_LENGTH,Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,

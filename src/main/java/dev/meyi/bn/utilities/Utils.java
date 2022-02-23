@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.meyi.bn.config.Configuration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -209,7 +210,19 @@ public class Utils {
     Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
     GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
   }
-
-
+  public static void updateResources() throws IOException{
+    String result;
+    HttpGet request;
+    HttpResponse response;
+    HttpClient client = HttpClientBuilder.create().build();
+    request = new HttpGet(
+            "https://raw.githubusercontent.com/Detlev1/BazaarNotifier/master/src/main/resources/resources.json");
+    response = client.execute(request);
+    result = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+    BazaarNotifier.config.resources =  new JsonParser().parse(result).getAsJsonObject();
+    BazaarNotifier.bazaarConversions = BazaarNotifier.config.resources.getAsJsonObject("bazaarConversions");
+    BazaarNotifier.bazaarConversionsReversed =  BazaarNotifier.config.resources.getAsJsonObject("bazaarConversionsReversed");
+    BazaarNotifier.enchantCraftingList =  BazaarNotifier.config.resources.getAsJsonObject("enchantCraftingList");
+  }
 
 }

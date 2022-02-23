@@ -12,14 +12,13 @@ import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.ScheduledEvents;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
+import dev.meyi.bn.utilities.Utils;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -57,17 +56,9 @@ public class BazaarNotifier {
   public static ModuleList modules;
   public static Configuration config;
 
-
-
-  public static JsonObject bazaarConversions = new JsonParser().parse(
-          new InputStreamReader(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream
-                  ("/bazaarConversions.json")), StandardCharsets.UTF_8)).getAsJsonObject();
-  public static JsonObject bazaarConversionsReversed = new JsonParser().parse(
-          new InputStreamReader(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream
-                  ("/bazaarConversionsReversed.json")), StandardCharsets.UTF_8)).getAsJsonObject();
-  public static JsonObject enchantCraftingList = new JsonParser().parse(
-          new InputStreamReader(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream
-                  ("/enchantCraftingList.json")), StandardCharsets.UTF_8)).getAsJsonObject();
+  public static JsonObject bazaarConversions;
+  public static JsonObject bazaarConversionsReversed;
+  public static JsonObject enchantCraftingList;
 
 
   public static File configFile;
@@ -96,6 +87,7 @@ public class BazaarNotifier {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
     if (configString == null) {
       config = Configuration.createDefaultConfig();
       modules = new ModuleList();
@@ -103,6 +95,20 @@ public class BazaarNotifier {
     }else {
       modules = new ModuleList(config);
       BazaarNotifier.apiKey = config.api;
+    }
+
+    try{
+      Utils.updateResources();
+    }catch (IOException e){
+      System.out.println("Error while getting resources from GitHub");
+      if(configString != null){
+        JsonObject resources = config.resources;
+        bazaarConversions = resources.getAsJsonObject("bazaarConversions");
+        bazaarConversionsReversed = resources.getAsJsonObject("bazaarConversionsReversed");
+        enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
+      }//else{
+        //Todo Mod is not functional
+      //}
     }
   }
 

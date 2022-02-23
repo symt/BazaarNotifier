@@ -9,6 +9,7 @@ import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import net.minecraft.command.CommandBase;
@@ -24,7 +25,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 
 public class BazaarNotifierCommand extends CommandBase {
-
+  private static Date date = new Date();
 
   @Override
   public List<String> getCommandAliases() {
@@ -331,10 +332,26 @@ public class BazaarNotifierCommand extends CommandBase {
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
 
-      } else if (args.length > 0) {
+      }else if (args.length == 1 && args[0].equalsIgnoreCase("update")){
+        if(date.getTime() < new Date().getTime() - (10*60*1000)) {
+          try {
+            Utils.updateResources();
+            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "Successfully updated required resources from GitHub"));
+            date = new Date();
+          } catch (IOException ignored) {
+            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "There was an error when updating your resources. Try again later"));
+            date = new Date();
+          }
+        }else{
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Please wait 10 minutes before running that command again"));
+        }
+      }else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
-      } else {
+      }else {
         player.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + "\n" + EnumChatFormatting.RED + "/bn reset (value)\n"
                 + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED
@@ -394,6 +411,7 @@ public class BazaarNotifierCommand extends CommandBase {
           add("reset");
           add("settings");
           add("toggle");
+          add("update");
         }
       }.forEach(cmd -> {
         if (args[0].trim().length() == 0 || cmd.startsWith(args[0].toLowerCase())) {
