@@ -33,6 +33,7 @@ public class EventHandler {
               .get(message.split("x ", 2)[1].split(" for ")[0]).getAsString()) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
+        BankCalculator.get_bazaarProfit();
         verify = null;
         productVerify = new String[2];
       }
@@ -75,6 +76,8 @@ public class EventHandler {
       if (found) {
 
         BazaarNotifier.orders.remove(orderToRemove);
+
+
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
@@ -100,15 +103,17 @@ public class EventHandler {
           if (BigDecimal.valueOf(refund >= 10000 ? Math.round(order.orderValue)
               : order.orderValue)
               .compareTo(BigDecimal.valueOf(refund)) == 0) {
-            //BankCalculator.bazaarProfit -= (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
             BazaarNotifier.orders.remove(i);
+
+
             break;
           }
         } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
           if (order.product.equalsIgnoreCase(itemRefunded)
               && order.getAmountRemaining() == refundAmount) {
-            //BankCalculator.bazaarProfit += (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
             BazaarNotifier.orders.remove(i);
+
+
             break;
           }
         }
@@ -118,10 +123,14 @@ public class EventHandler {
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
     }else if (message.startsWith("Bazaar! Bought")){
-      BankCalculator.bazaarProfit -=  Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+      BankCalculator.bazaarProfit -=
+              Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
 
     }else if (message.startsWith("Bazaar! Sold")){
-      BankCalculator.bazaarProfit +=  Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+      BankCalculator.bazaarProfit +=
+              Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+    }else if (message.startsWith("Welcome to Hypixel SkyBlock!")){
+      BankCalculator.getPurse();
     }
   }
 
@@ -140,21 +149,49 @@ public class EventHandler {
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
+        if(!BankCalculator._orderWait) {
+          BankCalculator._purseLast = BankCalculator.getPurse();
+        }
       }
     }
 
     if (e.gui == null && BazaarNotifier.inBazaar) {
       BazaarNotifier.inBazaar = false;
+      Thread t = new Thread(() -> {
+        BankCalculator._orderWait = true;
+        try {
+          Thread.sleep(1000);
+          BankCalculator.get_bazaarProfit();
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
+        }
+        BankCalculator._orderWait = false;
+      });
+      t.start();
     }
 
     if (e.gui == null && BazaarNotifier.inBank) {
       BazaarNotifier.inBank = false;
     }
 
+    if (e.gui == null && BankCalculator.isOnDangerousPage){
+      BankCalculator.isOnDangerousPage = false;
+      Thread t = new Thread(() -> {
+        try {
+          Thread.sleep(1000);
+          BankCalculator.bank += (BankCalculator.purseInBank - BankCalculator.getPurse());
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
+        }
+      });
+      t.start();
+
+    }
+
     if (e.gui instanceof GuiChest && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() &&
         StringUtils.stripControlCodes(
             ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-            .contains("Bank Account"))) &&
+            .contains("Bank"))) &&
         !StringUtils.stripControlCodes(
             ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
             .contains("Bank Account Upgrades")) {
@@ -167,6 +204,7 @@ public class EventHandler {
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
     BazaarNotifier.inBazaar = false;
     BazaarNotifier.inBank = false;
+    BankCalculator.isOnDangerousPage = false;
   }
 
   @SubscribeEvent

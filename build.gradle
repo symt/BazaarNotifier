@@ -32,9 +32,6 @@ minecraft {
     makeObfSourceJar = false
 }
 
-dependencies {
-
-}
 
 jar {
     manifest {

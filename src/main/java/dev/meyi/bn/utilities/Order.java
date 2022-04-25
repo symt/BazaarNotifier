@@ -31,6 +31,4 @@ public class Order {
     public int getAmountRemaining(){
         return  amountRemaining;
     }
-
-
 }

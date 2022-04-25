@@ -259,7 +259,10 @@ public class CraftingCalculator {
 
   public static void getUnlockedRecipes() {
     try {
-      unlockedRecipes = Utils.unlockedRecipes().toString();
+      String s = Utils.unlockedRecipes().toString();
+      if (s != null){
+        unlockedRecipes = s;
+      }
     } catch (IOException ignored) {
     }
   }

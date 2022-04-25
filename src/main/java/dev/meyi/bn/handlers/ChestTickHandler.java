@@ -27,7 +27,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 public class ChestTickHandler {
 
   public static String lastScreenDisplayName = "";
-  private static Date date;
+  private static Date date = new Date();
+
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
 
   public static void updateBazaarOrders(IInventory chest) {
@@ -119,6 +120,9 @@ public class ChestTickHandler {
                 BankCalculator.bazaarProfit -= BazaarNotifier.orders.get(orderInQuestion).orderValue;
               }
               BazaarNotifier.orders.remove(orderInQuestion);
+              verifiedOrders[orderInQuestion] = 1;
+              //Todo
+
             } else if (amountLeft > 0) {
 
               if (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining() > amountLeft) {
@@ -144,6 +148,8 @@ public class ChestTickHandler {
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
         BazaarNotifier.orders.remove(i);
+        //Todo
+
       }
     }
   }
@@ -182,10 +188,17 @@ public class ChestTickHandler {
           .getMinecraft().currentScreen instanceof GuiChest) {
         IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
         String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
-        if (chestName.contains("bank account") && !chestName.contains("upgrade")) {
+        if (chestName.contains("personal bank account") && !chestName.contains("upgrade")) {
           BankCalculator.extractBankFromItemDescription(
-              ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
+              ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory,false);
+        }else if (chestName.contains("co-op bank account")&& !chestName.contains("upgrade")){
+          BankCalculator.extractBankFromItemDescription(
+                  ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory,true);
+        }else if (chestName.equals("bank deposit") ||chestName.equals("bank withdrawal")){
+           BankCalculator.isOnDangerousPage = true;
+           BankCalculator.purseInBank = BankCalculator.getPurse();
         }
+
       } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
         ChestTickHandler.lastScreenDisplayName = "";
       }
