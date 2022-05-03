@@ -250,8 +250,8 @@ public class BazaarNotifierCommand extends CommandBase {
           if (BazaarNotifier.bazaarCache.has(item)) {
             JsonObject data = BazaarNotifier.bazaarCache.getAsJsonObject(item);
 
-            String itemConv = BazaarNotifier.bazaarConversionsReversed
-                .get(WordUtils.capitalize(item.toLowerCase())).getAsString();
+            String itemConv = BazaarNotifier.bazaarConv.inverse()
+                .get(WordUtils.capitalize(item.toLowerCase()));
             if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemConv)
                 || BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemConv)) {
               String[] prices = CraftingCalculator.getEnchantCraft(item);

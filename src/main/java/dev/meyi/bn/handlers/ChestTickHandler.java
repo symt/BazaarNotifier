@@ -59,7 +59,7 @@ public class ChestTickHandler {
         String type = StringUtils.stripControlCodes(
                 item.getDisplayName().split(": ")[0].toLowerCase());
 
-        if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
+        if (BazaarNotifier.bazaarConv.containsValue(displayName)) {
           int amountLeft = -1;
           //double price;
           String priceString;
@@ -121,7 +121,6 @@ public class ChestTickHandler {
               }
               BazaarNotifier.orders.remove(orderInQuestion);
               verifiedOrders[orderInQuestion] = 1;
-              //Todo
 
             } else if (amountLeft > 0) {
 
@@ -148,7 +147,6 @@ public class ChestTickHandler {
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
         BazaarNotifier.orders.remove(i);
-        //Todo
 
       }
     }
@@ -218,8 +216,7 @@ public class ChestTickHandler {
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
               .getTagList("Lore", 8).getStringTagAt(4)).split("x ")[1];
 
-      if (!BazaarNotifier.bazaarConversionsReversed
-          .has(product)) {
+      if (!BazaarNotifier.bazaarConv.containsValue(product)) {
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + EnumChatFormatting.RED
                 + "The bazaar item you just put an order for doesn't exist. Please report this in the discord server"));
@@ -232,10 +229,10 @@ public class ChestTickHandler {
             Utils.updateResources();
           }catch (IOException ignored){}
         }
-
+        date = new Date();
       } else {
-        String productName = BazaarNotifier.bazaarConversionsReversed
-            .get(product).getAsString();
+        String productName = BazaarNotifier.bazaarConv.inverse()
+            .get(product);
         String productWithAmount = StringUtils.stripControlCodes(
             chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
                 .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1];

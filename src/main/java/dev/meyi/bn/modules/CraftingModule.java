@@ -70,7 +70,7 @@ public class CraftingModule extends Module {
             Double pricePerMil = Double.valueOf(list.get(i).get(2));
             String itemName = list.get(i).get(3);
 
-            String itemNameConverted = BazaarNotifier.bazaarConversions.get(itemName).getAsString();
+            String itemNameConverted = BazaarNotifier.bazaarConv.get(itemName);
             message.put(String.valueOf(i + 1), Color.MAGENTA);
             message.put(". ", Color.MAGENTA);
             message.put(itemNameConverted, Color.CYAN);
@@ -187,9 +187,9 @@ public class CraftingModule extends Module {
             .has(list.get(hoveredText).get(3))) {
           try {
             text.put(mouseWheelShift * 160 + "x ", Color.LIGHT_GRAY);
-            text.put(BazaarNotifier.bazaarConversions.get(
+            text.put(BazaarNotifier.bazaarConv.get(
                 BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
-                    .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()).getAsString(),
+                    .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()),
                 Color.LIGHT_GRAY);
           } catch (Exception e) {
             text.put("Error", Color.RED);
@@ -203,19 +203,19 @@ public class CraftingModule extends Module {
             if (b == 0) {
               _material.append((BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
                   .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").get(1).getAsInt()
-                  * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConversions
+                  * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConv
                   .get(BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
                       .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
-                      .get(0).getAsString()).getAsString());
+                      .get(0).getAsString()));
             } else {
               _material.append(" | ").append(
                   BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
                       .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
                       .get(b * 2 + 1).getAsInt() * mouseWheelShift).append("x ").append(
-                  BazaarNotifier.bazaarConversions.get(
+                  BazaarNotifier.bazaarConv.get(
                       BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
                           .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
-                          .get(b * 2).getAsString()).getAsString());
+                          .get(b * 2).getAsString()));
             }
           }
           text.put(_material.toString(), Color.LIGHT_GRAY);

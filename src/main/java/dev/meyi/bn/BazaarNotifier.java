@@ -1,6 +1,8 @@
 package dev.meyi.bn;
 
 import com.google.gson.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.ChestTickHandler;
@@ -15,8 +17,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.util.EnumChatFormatting;
@@ -56,9 +57,9 @@ public class BazaarNotifier {
   public static ModuleList modules;
   public static Configuration config;
 
-  public static JsonObject bazaarConversions;
-  public static JsonObject bazaarConversionsReversed;
+
   public static JsonObject enchantCraftingList;
+  public static BiMap<String, String> bazaarConv = HashBiMap.create();
 
 
   public static File configFile;
@@ -103,12 +104,10 @@ public class BazaarNotifier {
       System.out.println("Error while getting resources from GitHub");
       if(configString != null){
         JsonObject resources = config.resources;
-        bazaarConversions = resources.getAsJsonObject("bazaarConversions");
-        bazaarConversionsReversed = resources.getAsJsonObject("bazaarConversionsReversed");
+        JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
         enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
-      }//else{
-        //Todo Mod is not functional
-      //}
+        bazaarConv = Utils.jsonToBimap(bazaarConversions);
+      }
     }
   }
 

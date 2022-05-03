@@ -180,8 +180,8 @@ public class CraftingCalculator {
   }
 
   public static String[] getEnchantCraft(String itemU) {
-    String itemName = BazaarNotifier.bazaarConversionsReversed
-        .get(WordUtils.capitalize(itemU.toLowerCase())).getAsString();
+    String itemName = BazaarNotifier.bazaarConv.inverse()
+        .get(WordUtils.capitalize(itemU.toLowerCase()));
     String[] values = new String[3];
     if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.entrySet().size() != 0) {
@@ -258,13 +258,11 @@ public class CraftingCalculator {
   }
 
   public static void getUnlockedRecipes() {
-    try {
-      String s = Utils.unlockedRecipes().toString();
-      if (s != null){
-        unlockedRecipes = s;
-      }
-    } catch (IOException ignored) {
-    }
+      try {
+        String s = Utils.unlockedRecipes().toString();
+        if (s != null) {
+          unlockedRecipes = s;
+        }
+      } catch (IOException ignored) {}
   }
-
 }

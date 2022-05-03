@@ -1,13 +1,14 @@
 package dev.meyi.bn.utilities;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 import dev.meyi.bn.BazaarNotifier;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
@@ -23,6 +24,7 @@ public class Utils {
 
 
   private static String playerUUID = "";
+  private static long recipeCooldown = 0;
 
   public static JsonObject getBazaarData() throws IOException {
     HttpClient client = HttpClientBuilder.create().build();
@@ -43,6 +45,11 @@ public class Utils {
 
 
   public static JsonArray unlockedRecipes() throws IOException {
+    if(recipeCooldown + 300000 > System.currentTimeMillis()){
+      return  new JsonArray();
+    }else{
+      recipeCooldown = System.currentTimeMillis();
+    }
     if(!BazaarNotifier.validApiKey){
       BazaarNotifier.validApiKey = validateApiKey();
     }
@@ -167,13 +174,18 @@ public class Utils {
     return true;
   }
 
-  public static boolean validateApiKey() throws IOException {
+  public static boolean validateApiKey(String key) throws IOException {
     return new JsonParser().parse(IOUtils.toString(new BufferedReader
         (new InputStreamReader(
             HttpClientBuilder.create().build().execute(new HttpGet(
-                "https://api.hypixel.net/key?key=" + BazaarNotifier.apiKey)).getEntity()
+                "https://api.hypixel.net/key?key=" + key)).getEntity()
                 .getContent())))).getAsJsonObject().get("success").getAsBoolean();
   }
+
+  public static boolean validateApiKey() throws IOException {
+    return validateApiKey(BazaarNotifier.apiKey);
+  }
+
 
 
   /**
@@ -219,9 +231,19 @@ public class Utils {
     response = client.execute(request);
     result = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
     BazaarNotifier.config.resources =  new JsonParser().parse(result).getAsJsonObject();
-    BazaarNotifier.bazaarConversions = BazaarNotifier.config.resources.getAsJsonObject("bazaarConversions");
-    BazaarNotifier.bazaarConversionsReversed =  BazaarNotifier.config.resources.getAsJsonObject("bazaarConversionsReversed");
+    BazaarNotifier.bazaarConv = jsonToBimap(BazaarNotifier.config.resources.getAsJsonObject("bazaarConversions"));
     BazaarNotifier.enchantCraftingList =  BazaarNotifier.config.resources.getAsJsonObject("enchantCraftingList");
+  }
+  public static BiMap<String, String> jsonToBimap(JsonObject jsonObject){
+    BiMap<String, String> b = HashBiMap.create();
+    Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
+    for (Map.Entry<String, JsonElement> entry: entries) {
+      try {
+        b.forcePut(entry.getKey(), jsonObject.get(entry.getKey()).getAsString());
+      }catch (IllegalArgumentException ignored){}
+    }
+    System.out.println(b);
+    return b;
   }
 
 }

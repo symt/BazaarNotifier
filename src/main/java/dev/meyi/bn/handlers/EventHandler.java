@@ -2,10 +2,17 @@ package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.calc.BankCalculator;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 
+import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Order;
+import dev.meyi.bn.utilities.Utils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -29,8 +36,8 @@ public class EventHandler {
 
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
-          .equals(BazaarNotifier.bazaarConversionsReversed
-              .get(message.split("x ", 2)[1].split(" for ")[0]).getAsString()) && productVerify[1]
+          .equals(BazaarNotifier.bazaarConv.inverse()
+              .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
         BankCalculator.get_bazaarProfit();
@@ -131,6 +138,32 @@ public class EventHandler {
               Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
     }else if (message.startsWith("Welcome to Hypixel SkyBlock!")){
       BankCalculator.getPurse();
+    }else if (message.startsWith("Your new API key is")){
+      String apiKey = message.split("key is ")[1];
+      try {
+        if (Utils.validateApiKey(apiKey)) {
+          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                  BazaarNotifier.prefix + EnumChatFormatting.RED
+                          + "Your api key has been set."));
+          BazaarNotifier.apiKey = apiKey;
+          BazaarNotifier.config.api = apiKey;
+          BazaarNotifier.validApiKey = true;
+          BazaarNotifier.activeBazaar = true;
+          CraftingCalculator.getUnlockedRecipes();
+          BazaarNotifier.config.collectionCheckDisabled = false;
+        } else {
+          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                  BazaarNotifier.prefix + EnumChatFormatting.RED
+                          + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
+          BazaarNotifier.validApiKey = false;
+        }
+      } catch (IOException r) {
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "An error occurred when trying to set your api key. Please re-run the command to try again."));
+        BazaarNotifier.validApiKey = false;
+        r.printStackTrace();
+      }
     }
   }
 
