@@ -13,7 +13,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.text.DecimalFormat;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,9 +38,10 @@ import org.json.JSONTokener;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.4.8";
+  public static final String VERSION = "1.4.9";
   public static final String prefix =
-      EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
+      EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
+          + "] " + EnumChatFormatting.RESET;
   public static String apiKey = "";
 
   public static DecimalFormat df = new DecimalFormat("#,###.0");
@@ -55,6 +66,8 @@ public class BazaarNotifier {
   public static File configFile;
 
   public static ModuleList modules;
+
+  public static SSLSocketFactory sslSocketFactory;
 
   public static void resetMod() {
     modules.resetAll();
@@ -84,6 +97,27 @@ public class BazaarNotifier {
 
   @Mod.EventHandler
   public void init(FMLInitializationEvent event) {
+
+    try {
+      Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(
+          this.getClass().getClassLoader().getResourceAsStream("api-hypixel.crt"));
+      KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+      keyStore.load(null, null);
+      keyStore.setCertificateEntry("api-hypixel-bz", certificate);
+
+      TrustManagerFactory trustManagerFactory = TrustManagerFactory
+          .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+      trustManagerFactory.init(keyStore);
+
+      SSLContext sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+
+      BazaarNotifier.sslSocketFactory = sslContext.getSocketFactory();
+
+    } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException | KeyManagementException e) {
+      e.printStackTrace();
+    }
+
     MinecraftForge.EVENT_BUS.register(new EventHandler());
     MinecraftForge.EVENT_BUS.register(new ChestTickHandler());
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
