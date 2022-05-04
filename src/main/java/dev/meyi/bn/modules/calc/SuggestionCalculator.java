@@ -28,7 +28,6 @@ public class SuggestionCalculator {
 
           if (!BazaarNotifier.bazaarConv.containsKey(key)) {
             BazaarNotifier.bazaarConv.put(key, key);
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("ADDED ITEMS"));
           }
           JsonObject currentProduct = new JsonObject();
           currentProduct.addProperty("productId", BazaarNotifier.bazaarConv.get(key));

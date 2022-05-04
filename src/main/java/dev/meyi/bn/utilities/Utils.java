@@ -4,12 +4,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 import dev.meyi.bn.BazaarNotifier;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -20,6 +14,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.lwjgl.opengl.GL11;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 public class Utils {
 
 
@@ -27,6 +29,7 @@ public class Utils {
   private static long recipeCooldown = 0;
 
   public static JsonObject getBazaarData() throws IOException {
+    Gson gson = new Gson();
     HttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
     if (!BazaarNotifier.apiKeyDisabled) {
@@ -40,11 +43,12 @@ public class Utils {
         (new InputStreamReader(
             response.getEntity().getContent())));
 
-    return new JsonParser().parse(result).getAsJsonObject().get("products").getAsJsonObject();
+    return gson.fromJson(result, JsonObject.class).getAsJsonObject().get("products").getAsJsonObject();
   }
 
 
   public static JsonArray unlockedRecipes() throws IOException {
+    Gson gson = new Gson();
     if(recipeCooldown + 300000 > System.currentTimeMillis()){
       return  new JsonArray();
     }else{
@@ -66,7 +70,7 @@ public class Utils {
             .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
 
         try {
-          playerUUID = new JsonParser().parse(uuidResponse).getAsJsonObject().get("id").getAsString();
+          playerUUID = gson.fromJson(uuidResponse, JsonObject.class).getAsJsonObject().get("id").getAsString();
         }catch (Exception e){
           return new JsonArray();
         }
@@ -79,7 +83,7 @@ public class Utils {
 
       String _results = IOUtils
           .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-      JsonObject results = new JsonParser().parse(_results).getAsJsonObject();
+      JsonObject results = gson.fromJson(_results, JsonObject.class);
       long lastSaved = 0;
       int profileIndex = 0;
       if(!results.get("success").getAsBoolean() || !results.has("profiles")){

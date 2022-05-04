@@ -2,6 +2,7 @@ package dev.meyi.bn.utilities;
 
 import java.util.Comparator;
 
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 
 public class JSONComparator implements Comparator<JsonObject> {
@@ -20,8 +21,9 @@ public class JSONComparator implements Comparator<JsonObject> {
     try {
       valA = a.get(key).getAsDouble();
       valB = b.get(key).getAsDouble();
-    } catch (Exception e) {
+    } catch (JsonIOException e) {
       System.err.println("The provided value in " + key + " is not a double.");
+      e.printStackTrace();
     }
 
     return -valA.compareTo(valB);

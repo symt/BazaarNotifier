@@ -1,13 +1,21 @@
 package dev.meyi.bn.modules.calc;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
-import java.util.*;
 
+
+import net.minecraft.client.util.JsonException;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.text.WordUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Collections;
+import java.util.Arrays;
 
 
 public class CraftingCalculator {
@@ -111,7 +119,8 @@ public class CraftingCalculator {
             list.add(new ArrayList<>(Arrays
                 .asList(String.valueOf(profitInstaSell), Double.toString(profitSellOffer),
                     Double.toString(pricePerMil), itemName)));
-          } catch (Exception ignored) {
+          } catch (JsonIOException e) {
+            e.printStackTrace();
           }
         } else {
           list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
@@ -263,6 +272,8 @@ public class CraftingCalculator {
         if (s != null) {
           unlockedRecipes = s;
         }
-      } catch (IOException ignored) {}
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
   }
 }

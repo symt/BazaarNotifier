@@ -51,7 +51,7 @@ public class BankCalculator {
 
 
   public static double moneyStoredInSellOffers() {
-    if (BazaarNotifier.orders.size() != 0) {
+    if (!BazaarNotifier.orders.isEmpty()) {
       double orderWorth = 0;
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
         if (BazaarNotifier.orders.get(i).type.equals("sell")) {

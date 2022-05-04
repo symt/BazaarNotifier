@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import netscape.javascript.JSException;
 
 public class CraftingModule extends Module {
   public static final ModuleName type = ModuleName.CRAFTING;
@@ -191,7 +192,7 @@ public class CraftingModule extends Module {
                 BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
                     .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()),
                 Color.LIGHT_GRAY);
-          } catch (Exception e) {
+          } catch (JSException e) {
             text.put("Error", Color.RED);
           }
         } else {
