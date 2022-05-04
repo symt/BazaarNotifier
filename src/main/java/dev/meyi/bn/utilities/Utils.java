@@ -81,10 +81,13 @@ public class Utils {
 
       for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
         if (results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
-            .get(playerUUID).getAsJsonObject().get("last_save").getAsLong() > lastSaved) {
-          lastSaved = results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
-              .get(playerUUID).getAsJsonObject().get("last_save").getAsLong();
-          profileIndex = i;
+                .get(playerUUID).getAsJsonObject().has("last_save")) {
+          if (results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
+                  .get(playerUUID).getAsJsonObject().get("last_save").getAsLong() > lastSaved) {
+            lastSaved = results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members").getAsJsonObject()
+                    .get(playerUUID).getAsJsonObject().get("last_save").getAsLong();
+            profileIndex = i;
+          }
         }
       }
       BazaarNotifier.playerDataFromAPI = results.get("profiles").getAsJsonArray()
