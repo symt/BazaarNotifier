@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.net.ssl.HttpsURLConnection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -23,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,18 +34,19 @@ import org.json.JSONObject;
 public class Utils {
 
   public static JSONObject getBazaarData() throws IOException {
-    HttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
     if (!BazaarNotifier.apiKeyDisabled) {
       apiBit = "?key=" + BazaarNotifier.apiKey;
     }
-    HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar" + apiBit);
-    HttpResponse response = client.execute(request);
+
+    HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.hypixel.net/skyblock/bazaar" + apiBit).openConnection();
+    connection.setSSLSocketFactory(BazaarNotifier.sslSocketFactory);
+    connection.connect();
 
     String result = IOUtils.toString(new BufferedReader
         (new InputStreamReader(
-            response.getEntity().getContent())));
+            connection.getInputStream())));
+
 
     return new JSONObject(result).getJSONObject("products");
   }
