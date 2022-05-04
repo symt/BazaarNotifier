@@ -1,6 +1,5 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
@@ -38,7 +37,7 @@ public class BankModule extends Module {
     items.add(message2);
     LinkedHashMap<String, Color> message3 = new LinkedHashMap<>();
     message3.put("Bazaar profit2: ", Color.CYAN);
-    message3.put(BazaarNotifier.df.format(BankCalculator.get_bazaarProfit()) , Color.MAGENTA);
+    message3.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()) , Color.MAGENTA);
     items.add(message3);
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);

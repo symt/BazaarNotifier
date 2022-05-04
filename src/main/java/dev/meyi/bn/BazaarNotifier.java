@@ -1,8 +1,10 @@
 package dev.meyi.bn;
 
-import com.google.gson.*;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.ChestTickHandler;
@@ -13,11 +15,13 @@ import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.ScheduledEvents;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+
 
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.util.EnumChatFormatting;
@@ -36,7 +40,6 @@ public class BazaarNotifier {
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
-  public static String apiKey = "";
 
   public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
@@ -49,7 +52,7 @@ public class BazaarNotifier {
   public static boolean apiKeyDisabled = true;// Change this if an api key is ever required to access the bazaar again.
 
 
-  public static List<Order> orders = new LinkedList<>();
+  public static ArrayList<Order> orders = new ArrayList<>();
   public static JsonObject bazaarDataRaw = new JsonObject();
   public static JsonObject bazaarCache = new JsonObject();
   public static JsonArray bazaarDataFormatted = new JsonArray();
@@ -67,7 +70,7 @@ public class BazaarNotifier {
 
   public static void resetMod() {
     modules.resetAll();
-    orders = new LinkedList<>();
+    orders = new ArrayList<>();
     config = Configuration.createDefaultConfig();
   }
 
@@ -95,7 +98,6 @@ public class BazaarNotifier {
       modules.resetAll();
     }else {
       modules = new ModuleList(config);
-      BazaarNotifier.apiKey = config.api;
     }
 
     try{

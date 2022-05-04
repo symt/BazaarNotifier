@@ -24,7 +24,7 @@ public class BankCalculator {
 
 
 
-  public static double get_bazaarProfit() {
+  public static double getBazaarProfit() {
       _bazaarProfit += getPurse() - _purseLast;
       _purseLast = getPurse();
     return _bazaarProfit;

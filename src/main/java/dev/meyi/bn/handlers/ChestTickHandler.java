@@ -5,7 +5,6 @@ import dev.meyi.bn.modules.calc.BankCalculator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import dev.meyi.bn.utilities.Order;
@@ -27,7 +26,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 public class ChestTickHandler {
 
   public static String lastScreenDisplayName = "";
-  private static Date date = new Date();
+  private static long date = System.currentTimeMillis();
 
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
 
@@ -61,21 +60,18 @@ public class ChestTickHandler {
 
         if (BazaarNotifier.bazaarConv.containsValue(displayName)) {
           int amountLeft = -1;
-          //double price;
+
           String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "")
                     .split(" ")[3];
-            //price = Double.parseDouble(priceString);
           } else if (lore.get(5).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "")
                     .split(" ")[3];
-            //price = Double.parseDouble(priceString);
           } else {
             priceString = StringUtils.stripControlCodes(
                     lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
                             .split(" ")[3]);
-            //price = Double.parseDouble(priceString);
           }
           int orderInQuestion = -1;
           for (int j = 0; j < BazaarNotifier.orders.size(); j++) {
@@ -220,16 +216,12 @@ public class ChestTickHandler {
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + EnumChatFormatting.RED
                 + "The bazaar item you just put an order for doesn't exist. Please report this in the discord server"));
-        if(date == null){
-          try {
-            Utils.updateResources();
-          }catch (IOException ignored){}
-        }else if (new Date().getTime() > date.getTime() + (60 * 60 * 1000)){
+        if (System.currentTimeMillis() > date + (60 * 60 * 1000)){
           try {
             Utils.updateResources();
           }catch (IOException ignored){}
         }
-        date = new Date();
+        date = System.currentTimeMillis();
       } else {
         String productName = BazaarNotifier.bazaarConv.inverse()
             .get(product);

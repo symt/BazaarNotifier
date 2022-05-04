@@ -30,7 +30,7 @@ public class Utils {
     HttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
     if (!BazaarNotifier.apiKeyDisabled) {
-      apiBit = "?key=" + BazaarNotifier.apiKey;
+      apiBit = "?key=" + BazaarNotifier.config.api;
     }
     HttpGet request = new HttpGet(
         "https://api.hypixel.net/skyblock/bazaar" + apiBit);
@@ -53,7 +53,7 @@ public class Utils {
     if(!BazaarNotifier.validApiKey){
       BazaarNotifier.validApiKey = validateApiKey();
     }
-    if (!BazaarNotifier.apiKey.equals("") && BazaarNotifier.validApiKey) {
+    if (!BazaarNotifier.config.api.equals("") && BazaarNotifier.validApiKey) {
 
       HttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
@@ -73,7 +73,7 @@ public class Utils {
       }
 
       HttpGet request = new HttpGet(
-          "https://api.hypixel.net/skyblock/profiles?key=" + BazaarNotifier.apiKey + "&uuid="
+          "https://api.hypixel.net/skyblock/profiles?key=" + BazaarNotifier.config.api + "&uuid="
               + playerUUID);
       HttpResponse response = client.execute(request);
 
@@ -165,25 +165,27 @@ public class Utils {
     return sortedJsonArray;
   }
 
-  public static boolean isValidJSONObject(String json) {
+  public static boolean isJSONValid(String jsonInString) {
+    Gson gson = new Gson();
     try {
-      new JsonParser().parse(json);
-    } catch (JsonParseException e) {
+      gson.fromJson(jsonInString, Object.class);
+      return true;
+    } catch(com.google.gson.JsonSyntaxException ex) {
       return false;
     }
-    return true;
   }
 
   public static boolean validateApiKey(String key) throws IOException {
-    return new JsonParser().parse(IOUtils.toString(new BufferedReader
+    Gson gson = new Gson();
+    return gson.fromJson(IOUtils.toString(new BufferedReader
         (new InputStreamReader(
             HttpClientBuilder.create().build().execute(new HttpGet(
                 "https://api.hypixel.net/key?key=" + key)).getEntity()
-                .getContent())))).getAsJsonObject().get("success").getAsBoolean();
+                .getContent()))), JsonObject.class).getAsJsonObject().get("success").getAsBoolean();
   }
 
   public static boolean validateApiKey() throws IOException {
-    return validateApiKey(BazaarNotifier.apiKey);
+    return validateApiKey(BazaarNotifier.config.api);
   }
 
 
@@ -227,7 +229,7 @@ public class Utils {
     HttpResponse response;
     HttpClient client = HttpClientBuilder.create().build();
     request = new HttpGet(
-            "https://raw.githubusercontent.com/Detlev1/BazaarNotifier/master/src/main/resources/resources.json");
+            "https://raw.githubusercontent.com/symth/BazaarNotifier/1.5.0/src/main/resources/resources.json");
     response = client.execute(request);
     result = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
     BazaarNotifier.config.resources =  new JsonParser().parse(result).getAsJsonObject();
@@ -239,7 +241,7 @@ public class Utils {
     Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
     for (Map.Entry<String, JsonElement> entry: entries) {
       try {
-        b.forcePut(entry.getKey(), jsonObject.get(entry.getKey()).getAsString());
+        b.put(entry.getKey(), jsonObject.get(entry.getKey()).getAsString());
       }catch (IllegalArgumentException ignored){}
     }
     System.out.println(b);

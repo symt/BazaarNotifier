@@ -40,7 +40,7 @@ public class EventHandler {
               .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
-        BankCalculator.get_bazaarProfit();
+        BankCalculator.getBazaarProfit();
         verify = null;
         productVerify = new String[2];
       }
@@ -145,7 +145,6 @@ public class EventHandler {
           Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                           + "Your api key has been set."));
-          BazaarNotifier.apiKey = apiKey;
           BazaarNotifier.config.api = apiKey;
           BazaarNotifier.validApiKey = true;
           BazaarNotifier.activeBazaar = true;
@@ -194,7 +193,7 @@ public class EventHandler {
         BankCalculator._orderWait = true;
         try {
           Thread.sleep(1000);
-          BankCalculator.get_bazaarProfit();
+          BankCalculator.getBazaarProfit();
         } catch (InterruptedException ex) {
           ex.printStackTrace();
         }
