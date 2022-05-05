@@ -4,18 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
-
-
-import net.minecraft.client.util.JsonException;
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Collections;
-import java.util.Arrays;
+import java.util.*;
 
 
 public class CraftingCalculator {
@@ -25,7 +18,6 @@ public class CraftingCalculator {
 
   public static ArrayList<ArrayList<String>> getBestEnchantRecipes() {
     ArrayList<ArrayList<String>> list = new ArrayList<>();
-
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").entrySet()) {
       String itemName = keys.getKey();
       if (unlockedRecipes.contains(

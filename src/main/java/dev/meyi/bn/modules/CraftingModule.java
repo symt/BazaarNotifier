@@ -1,17 +1,20 @@
 package dev.meyi.bn.modules;
 
+import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
+import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.modules.calc.CraftingCalculator;
-import java.awt.Color;
+import dev.meyi.bn.utilities.Utils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import netscape.javascript.JSException;
+
 
 public class CraftingModule extends Module {
   public static final ModuleName type = ModuleName.CRAFTING;
@@ -56,8 +59,8 @@ public class CraftingModule extends Module {
 
   @Override
   protected void draw() {
-    list = CraftingCalculator.getBestEnchantRecipes();
     if (BazaarNotifier.bazaarDataRaw != null) {
+      list = CraftingCalculator.getBestEnchantRecipes();
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
       generateHelperLine();
       items.add(helperLine);
@@ -108,6 +111,10 @@ public class CraftingModule extends Module {
       this.longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + this.longestXString;
       renderMaterials(checkHoveredText(), list);
+    }else{
+      Utils.drawCenteredString("Waiting for bazaar data", x + 100,
+              y + (int) ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * 5 * scale),
+              0xAAAAAA, scale);
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
         * (BazaarNotifier.config.craftingListLength + 1)
@@ -192,7 +199,7 @@ public class CraftingModule extends Module {
                 BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
                     .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()),
                 Color.LIGHT_GRAY);
-          } catch (JSException e) {
+          } catch (JsonIOException e) {
             text.put("Error", Color.RED);
           }
         } else {

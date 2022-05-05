@@ -14,15 +14,6 @@ import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.ScheduledEvents;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-
-
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -30,6 +21,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 
 @Mod(modid = BazaarNotifier.MODID, version = BazaarNotifier.VERSION)
@@ -40,7 +38,7 @@ public class BazaarNotifier {
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
-
+  public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/Detlev1/BazaarNotifier/master/src/main/resources/resources.json";
   public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
 

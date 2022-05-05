@@ -228,15 +228,15 @@ public class Utils {
     GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
   }
   public static void updateResources() throws IOException{
+    Gson gson = new Gson();
     String result;
     HttpGet request;
     HttpResponse response;
     HttpClient client = HttpClientBuilder.create().build();
-    request = new HttpGet(
-            "https://raw.githubusercontent.com/symth/BazaarNotifier/1.5.0/src/main/resources/resources.json");
+    request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
     result = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-    BazaarNotifier.config.resources =  new JsonParser().parse(result).getAsJsonObject();
+    BazaarNotifier.config.resources =  gson.fromJson(result, JsonObject.class).getAsJsonObject();
     BazaarNotifier.bazaarConv = jsonToBimap(BazaarNotifier.config.resources.getAsJsonObject("bazaarConversions"));
     BazaarNotifier.enchantCraftingList =  BazaarNotifier.config.resources.getAsJsonObject("enchantCraftingList");
   }
