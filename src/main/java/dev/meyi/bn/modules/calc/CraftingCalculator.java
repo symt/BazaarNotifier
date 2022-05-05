@@ -18,6 +18,9 @@ public class CraftingCalculator {
 
   public static ArrayList<ArrayList<String>> getBestEnchantRecipes() {
     ArrayList<ArrayList<String>> list = new ArrayList<>();
+    if(BazaarNotifier.enchantCraftingList == null || BazaarNotifier.bazaarDataRaw == null){
+      return list;
+    }
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").entrySet()) {
       String itemName = keys.getKey();
       if (unlockedRecipes.contains(
