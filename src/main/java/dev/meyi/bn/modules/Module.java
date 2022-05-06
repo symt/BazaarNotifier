@@ -23,16 +23,16 @@ public abstract class Module {
   boolean needsToMove = false;
 
   public Module() {
-    x = 0;
-    y = 0;
-    scale = 1;
+    this.x = 0;
+    this.y = 0;
+    this.scale = 1;
   }
 
   public Module(ModuleConfig module) {
-    x = module.x;
-    y = module.y;
-    scale = module.scale;
-    active = module.active;
+    this.x = module.x;
+    this.y = module.y;
+    this.scale = module.scale;
+    this.active = module.active;
   }
 
   protected abstract void draw();
@@ -70,6 +70,9 @@ public abstract class Module {
 
   public ModuleConfig generateModuleConfig() {
     return new ModuleConfig(name(),x,y,scale,active);
+  }
+  public ModuleConfig generateDefaultConfig(){
+    return new ModuleConfig(name(), 10,10,1,true);
   }
 
   protected int getMouseCoordinateX() {

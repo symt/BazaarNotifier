@@ -47,8 +47,8 @@ public class ScheduledEvents {
             if (BazaarNotifier.orders.size() > 0) {
               for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
                 Order currentOrder = BazaarNotifier.orders.get(i);
-                String key = BazaarNotifier.bazaarConversionsReversed
-                    .get(currentOrder.product).getAsString();
+                String key = BazaarNotifier.bazaarConv.inverse()
+                    .get(currentOrder.product);
                 double price = currentOrder.pricePerUnit;
                 if (currentOrder.type.equals("buy")) {
                   double diff =

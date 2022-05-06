@@ -18,9 +18,30 @@ import net.minecraft.util.StringUtils;
 
 public class BankCalculator {
 
+  public static double purseLast = 0;
+  private static double bazaarProfit2 = 0;
+  public static boolean orderWait = false;
+
+
+
+  public static double getBazaarProfit() {
+      bazaarProfit2 += getPurse() - purseLast;
+      purseLast = getPurse();
+    return bazaarProfit2;
+  }
+
+
+  public static double purseInBank = 0; //fix for personal bank
+  public static boolean isOnDangerousPage = false; //a page that can instantly close the bank gui without opening it again
+
+  private static boolean personalBankInitialised = false;
+  private static boolean coopBankInitialised = false;
+  private static  boolean purseInitialised = false;
+
+
+
   public static double bank = 0;
-  private static double moneyOnStartup =
-          moneyStoredInSellOffers() + moneyStoredInBuyOrders() + getPurse();
+  private static double moneyOnStartup = 0;
   public static double bazaarProfit = 0;
 
   public static double calculateProfit() {
@@ -56,10 +77,20 @@ public class BankCalculator {
   }
 
   public static double getPurse() {
-    if (getPurseFromSidebar() == -1) {
-      return getPurseFromAPI();
+    double ps = getPurseFromSidebar();
+    if (ps == -1) {
+      double pa = getPurseFromAPI();
+      if(pa != -1 && !purseInitialised){
+        moneyOnStartup += pa;
+        purseInitialised = true;
+      }
+      return  pa;
     } else {
-      return getPurseFromSidebar();
+      if(!purseInitialised) {
+        moneyOnStartup += ps;
+        purseInitialised = true;
+      }
+      return ps;
     }
   }
 
@@ -71,6 +102,7 @@ public class BankCalculator {
   }
 
   private static double getPurseFromSidebar() {
+    //Todo Powder can cause errors
     Scoreboard scoreboard = Minecraft.getMinecraft().theWorld.getScoreboard();
     if (scoreboard == null) {
       return -1;
@@ -116,21 +148,32 @@ public class BankCalculator {
     return -1;
   }
 
-  public static void extractBankFromItemDescription(IInventory chest) {
+  public static void extractBankFromItemDescription(IInventory chest, boolean isCoop) {
+    //Todo Test Check Coop
     if (chest != null) {
       if (chest.getStackInSlot(11) != null) {
         if (chest.getStackInSlot(11).getDisplayName().toLowerCase().contains("deposit coins")) {
-          if (bank == 0) {
-            bank = Double.parseDouble(StringUtils.stripControlCodes(
-                    chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                            .getTagList("Lore", 8)
-                            .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
-            moneyOnStartup += bank;
+          if(!isCoop) {
+            if (!personalBankInitialised) {
+              double p = Double.parseDouble(StringUtils.stripControlCodes(
+                      chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
+                              .getTagList("Lore", 8)
+                              .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
+              bank += p;
+              moneyOnStartup += p;
+              personalBankInitialised = true;
+            }
+          }else{
+            if (!coopBankInitialised) {
+              double p = Double.parseDouble(StringUtils.stripControlCodes(
+                      chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
+                              .getTagList("Lore", 8)
+                              .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
+              bank += p;
+              moneyOnStartup += p;
+              coopBankInitialised = true;
+            }
           }
-          bank = Double.parseDouble(StringUtils.stripControlCodes(
-                  chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                          .getTagList("Lore", 8)
-                          .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
         }
       }
     }
@@ -139,5 +182,8 @@ public class BankCalculator {
   public static void reset() {
     moneyOnStartup = getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank;
     bazaarProfit = 0;
+    bazaarProfit2 = 0;
   }
+
+
 }

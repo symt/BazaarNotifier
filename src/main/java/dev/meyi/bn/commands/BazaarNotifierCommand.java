@@ -24,7 +24,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 
 public class BazaarNotifierCommand extends CommandBase {
-
+  private static long date = System.currentTimeMillis();;
 
   @Override
   public List<String> getCommandAliases() {
@@ -52,8 +52,8 @@ public class BazaarNotifierCommand extends CommandBase {
       EntityPlayer player = (EntityPlayer) ics;
       if (args.length >= 1 && args[0].equalsIgnoreCase("toggle")) {
         if (args.length == 1 || args[1].equalsIgnoreCase("all")) {
-          if (!BazaarNotifier.apiKey.equals("") || BazaarNotifier.apiKeyDisabled) {
-            BazaarNotifier.orders = new LinkedList<>();
+          if (!BazaarNotifier.config.api.equals("") || BazaarNotifier.apiKeyDisabled) {
+            BazaarNotifier.orders.clear();
             BazaarNotifier.activeBazaar ^= true;
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + (BazaarNotifier.activeBazaar ? EnumChatFormatting.GREEN
@@ -89,13 +89,12 @@ public class BazaarNotifierCommand extends CommandBase {
         }
       } else if (args.length >= 1 && args[0].equalsIgnoreCase("api")) {
         if (args.length == 2) {
-          BazaarNotifier.apiKey = args[1];
+          BazaarNotifier.config.api = args[1];
           try {
             if (Utils.validateApiKey()) {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
-              BazaarNotifier.apiKey = args[1];
               BazaarNotifier.config.api = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
@@ -135,7 +134,7 @@ public class BazaarNotifierCommand extends CommandBase {
         } else {
           switch (args[1].toLowerCase()) {
             case "collection":
-              if (BazaarNotifier.config.collectionCheckDisabled && !BazaarNotifier.apiKey.equals("")) {
+              if (BazaarNotifier.config.collectionCheckDisabled && !BazaarNotifier.config.api.equals("")) {
                 player.addChatMessage(
                     new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                         + "Only showing unlocked recipes"));
@@ -205,7 +204,7 @@ public class BazaarNotifierCommand extends CommandBase {
               }
               break;
             case ("show_chat_messages"):
-              BazaarNotifier.config.showChatMessages = !BazaarNotifier.config.showChatMessages;
+              BazaarNotifier.config.showChatMessages ^= true;
               if(BazaarNotifier.config.showChatMessages){
                 player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN + "Chat messages are now enabled "));
               }else{
@@ -225,7 +224,7 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "All module locations have been reset and the order list has been emptied."));
         } else if (args[1].equalsIgnoreCase("orders") && args.length == 2) {
-          BazaarNotifier.orders = new LinkedList<>();
+          BazaarNotifier.orders.clear();
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Your orders have been cleared."));
         } else if (args[1].equalsIgnoreCase("scale") && args.length == 2) {
@@ -249,8 +248,8 @@ public class BazaarNotifierCommand extends CommandBase {
           if (BazaarNotifier.bazaarCache.has(item)) {
             JsonObject data = BazaarNotifier.bazaarCache.getAsJsonObject(item);
 
-            String itemConv = BazaarNotifier.bazaarConversionsReversed
-                .get(WordUtils.capitalize(item.toLowerCase())).getAsString();
+            String itemConv = BazaarNotifier.bazaarConv.inverse()
+                .get(WordUtils.capitalize(item.toLowerCase()));
             if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemConv)
                 || BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemConv)) {
               String[] prices = CraftingCalculator.getEnchantCraft(item);
@@ -331,6 +330,22 @@ public class BazaarNotifierCommand extends CommandBase {
                     .appendSibling(supportLink))
             .appendSibling(new ChatComponentText("\n" + BazaarNotifier.prefix)));
 
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("update")){
+        if(date < System.currentTimeMillis() - (10*60*1000)) {
+          try {
+            Utils.updateResources();
+            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                    + "Successfully updated required resources from GitHub"));
+            date = System.currentTimeMillis();
+          }catch (IOException ignored) {
+            player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                    + "There was an error when updating your resources. Try again later"));
+            date = System.currentTimeMillis();
+          }
+        } else{
+          player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Please wait 10 minutes before running that command again"));
+        }
       } else if (args.length > 0) {
         player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
             + "The command you just tried to do doesn't exist. Do /bn"));
@@ -394,6 +409,7 @@ public class BazaarNotifierCommand extends CommandBase {
           add("reset");
           add("settings");
           add("toggle");
+          add("update");
         }
       }.forEach(cmd -> {
         if (args[0].trim().length() == 0 || cmd.startsWith(args[0].toLowerCase())) {
