@@ -100,7 +100,7 @@ public class BazaarNotifier {
       if (resourcesFile.isFile()) {
         resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
         resources = gson.fromJson(resourcesString, JsonObject.class);
-      }else {
+      } else {
         Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), "UTF-8");
         resources = gson.fromJson(reader, JsonObject.class);
       }
@@ -119,7 +119,8 @@ public class BazaarNotifier {
     try{
       Utils.updateResources();
     }catch (IOException e){
-      System.out.println("Error while getting resources from GitHub");
+      System.err.println("Error while getting resources from GitHub");
+      e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
       enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
       bazaarConv = Utils.jsonToBimap(bazaarConversions);
@@ -139,11 +140,10 @@ public class BazaarNotifier {
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                    () -> config.saveConfig(configFile , config)));
-    Runtime.getRuntime()
-        .addShutdownHook(
-             new Thread(
-                    () -> Utils.saveResources(resourcesFile , resources)));
+                    () -> {
+                      Configuration.saveConfig(configFile, config);
+                      Utils.saveResources(resourcesFile, resources);
+                    }));
 
   }
 }
