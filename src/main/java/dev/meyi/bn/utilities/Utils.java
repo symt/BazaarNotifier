@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static dev.meyi.bn.BazaarNotifier.resources;
-
 public class Utils {
 
 
@@ -245,9 +243,9 @@ public class Utils {
     request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
     result = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-    resources =  gson.fromJson(result, JsonObject.class).getAsJsonObject();
-    BazaarNotifier.bazaarConv = jsonToBimap(resources.getAsJsonObject("bazaarConversions"));
-    BazaarNotifier.enchantCraftingList =  resources.getAsJsonObject("enchantCraftingList");
+    BazaarNotifier.resources =  gson.fromJson(result, JsonObject.class).getAsJsonObject();
+    BazaarNotifier.bazaarConv = jsonToBimap(BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
+    BazaarNotifier.enchantCraftingList =  BazaarNotifier.resources.getAsJsonObject("enchantCraftingList");
   }
   public static BiMap<String, String> jsonToBimap(JsonObject jsonObject){
     BiMap<String, String> b = HashBiMap.create();
