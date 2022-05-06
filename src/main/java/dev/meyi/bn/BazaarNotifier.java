@@ -34,7 +34,11 @@ import java.util.ArrayList;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
+<<<<<<< HEAD
   public static final String VERSION = "1.5.0";
+=======
+  public static final String VERSION = "1.4.10";
+>>>>>>> master
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
