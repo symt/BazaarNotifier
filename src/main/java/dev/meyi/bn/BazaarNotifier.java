@@ -62,17 +62,6 @@ public class BazaarNotifier {
   public static JsonObject enchantCraftingList;
   public static BiMap<String, String> bazaarConv = HashBiMap.create();
 
-  public static JsonObject bazaarConversions = new JsonParser().parse(
-          new InputStreamReader(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream
-                  ("/bazaarConversions.json")), StandardCharsets.UTF_8)).getAsJsonObject();
-  public static JsonObject bazaarConversionsReversed = new JsonParser().parse(
-          new InputStreamReader(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream
-                  ("/bazaarConversionsReversed.json")), StandardCharsets.UTF_8)).getAsJsonObject();
-  public static JsonObject enchantCraftingList = new JsonParser().parse(
-          new InputStreamReader(Objects.requireNonNull(BazaarNotifier.class.getResourceAsStream
-                  ("/enchantCraftingList.json")), StandardCharsets.UTF_8)).getAsJsonObject();
-
-
   public static File configFile;
 
 
