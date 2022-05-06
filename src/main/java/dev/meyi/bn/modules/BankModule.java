@@ -1,6 +1,5 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;

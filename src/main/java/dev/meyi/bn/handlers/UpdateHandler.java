@@ -1,5 +1,6 @@
 package dev.meyi.bn.handlers;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.meyi.bn.BazaarNotifier;
@@ -29,12 +30,13 @@ public class UpdateHandler {
     if (firstJoin) {
       firstJoin = false;
       new ScheduledThreadPoolExecutor(1).schedule(() -> {
+        Gson gson = new Gson();
         try {
-          JsonObject json = new JsonParser().parse(IOUtils.toString(new BufferedReader
+          JsonObject json = gson.fromJson(IOUtils.toString(new BufferedReader
                   (new InputStreamReader(
                           HttpClientBuilder.create().build().execute(new HttpGet(
                                           "https://api.github.com/repos/symt/BazaarNotifier/releases/latest"))
-                                  .getEntity().getContent())))).getAsJsonObject();
+                                  .getEntity().getContent()))),JsonObject.class).getAsJsonObject();
           String[] latestTag = json.get("tag_name").getAsString().split("\\.");
           String[] currentTag = BazaarNotifier.VERSION.split("\\.");
 

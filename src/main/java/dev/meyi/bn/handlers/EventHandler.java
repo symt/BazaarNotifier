@@ -2,10 +2,17 @@ package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.calc.BankCalculator;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 
+import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Order;
+import dev.meyi.bn.utilities.Utils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -29,10 +36,11 @@ public class EventHandler {
 
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
-          .equals(BazaarNotifier.bazaarConversionsReversed
-              .get(message.split("x ", 2)[1].split(" for ")[0]).getAsString()) && productVerify[1]
+          .equals(BazaarNotifier.bazaarConv.inverse()
+              .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
           .equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
+        BankCalculator.getBazaarProfit();
         verify = null;
         productVerify = new String[2];
       }
@@ -75,6 +83,8 @@ public class EventHandler {
       if (found) {
 
         BazaarNotifier.orders.remove(orderToRemove);
+
+
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
@@ -102,13 +112,16 @@ public class EventHandler {
               .compareTo(BigDecimal.valueOf(refund)) == 0) {
             //BankCalculator.bazaarProfit -= (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
             BazaarNotifier.orders.remove(i);
+
+
             break;
           }
         } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
           if (order.product.equalsIgnoreCase(itemRefunded)
               && order.getAmountRemaining() == refundAmount) {
-            //BankCalculator.bazaarProfit += (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
             BazaarNotifier.orders.remove(i);
+
+
             break;
           }
         }
@@ -118,10 +131,39 @@ public class EventHandler {
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
     }else if (message.startsWith("Bazaar! Bought")){
-      BankCalculator.bazaarProfit -=  Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+      BankCalculator.bazaarProfit -=
+              Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
 
     }else if (message.startsWith("Bazaar! Sold")){
-      BankCalculator.bazaarProfit +=  Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+      BankCalculator.bazaarProfit +=
+              Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+    }else if (message.startsWith("Welcome to Hypixel SkyBlock!")){
+      BankCalculator.getPurse();
+    }else if (message.startsWith("Your new API key is")){
+      String apiKey = message.split("key is ")[1];
+      try {
+        if (Utils.validateApiKey(apiKey)) {
+          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                  BazaarNotifier.prefix + EnumChatFormatting.RED
+                          + "Your api key has been set."));
+          BazaarNotifier.config.api = apiKey;
+          BazaarNotifier.validApiKey = true;
+          BazaarNotifier.activeBazaar = true;
+          CraftingCalculator.getUnlockedRecipes();
+          BazaarNotifier.config.collectionCheckDisabled = false;
+        } else {
+          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                  BazaarNotifier.prefix + EnumChatFormatting.RED
+                          + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
+          BazaarNotifier.validApiKey = false;
+        }
+      } catch (IOException r) {
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "An error occurred when trying to set your api key. Please re-run the command to try again."));
+        BazaarNotifier.validApiKey = false;
+        r.printStackTrace();
+      }
     }
   }
 
@@ -140,21 +182,49 @@ public class EventHandler {
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
+        if(!BankCalculator.orderWait) {
+          BankCalculator.purseLast = BankCalculator.getPurse();
+        }
       }
     }
 
     if (e.gui == null && BazaarNotifier.inBazaar) {
       BazaarNotifier.inBazaar = false;
+      Thread t = new Thread(() -> {
+        BankCalculator.orderWait = true;
+        try {
+          Thread.sleep(1000);
+          BankCalculator.getBazaarProfit();
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
+        }
+        BankCalculator.orderWait = false;
+      });
+      t.start();
     }
 
     if (e.gui == null && BazaarNotifier.inBank) {
       BazaarNotifier.inBank = false;
     }
 
+    if (e.gui == null && BankCalculator.isOnDangerousPage){
+      BankCalculator.isOnDangerousPage = false;
+      Thread t = new Thread(() -> {
+        try {
+          Thread.sleep(1000);
+          BankCalculator.bank += (BankCalculator.purseInBank - BankCalculator.getPurse());
+        } catch (InterruptedException ex) {
+          ex.printStackTrace();
+        }
+      });
+      t.start();
+
+    }
+
     if (e.gui instanceof GuiChest && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() &&
         StringUtils.stripControlCodes(
             ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-            .contains("Bank Account"))) &&
+            .contains("Bank"))) &&
         !StringUtils.stripControlCodes(
             ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
             .contains("Bank Account Upgrades")) {
@@ -167,6 +237,7 @@ public class EventHandler {
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
     BazaarNotifier.inBazaar = false;
     BazaarNotifier.inBank = false;
+    BankCalculator.isOnDangerousPage = false;
   }
 
   @SubscribeEvent

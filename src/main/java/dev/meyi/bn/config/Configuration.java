@@ -1,17 +1,20 @@
 package dev.meyi.bn.config;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.Defaults;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Configuration {
+  private static final int MODULE_LENGTH = 4;
 
   public boolean collectionCheckDisabled;
   public int craftingSortingOption;
@@ -24,12 +27,13 @@ public class Configuration {
   public String api;
   public String version;
   public ModuleConfig[] modules;
+  public JsonObject resources;
 
 
 
   public Configuration(boolean collectionCheckDisabled, int craftingSortingOption, int craftingListLength,
                        boolean showInstantSellProfit,boolean showSellOfferProfit, boolean showProfitPerMil,
-                       int suggestionListLength,boolean showChatMessages, ModuleConfig[] modules){
+                       int suggestionListLength,boolean showChatMessages,String APIKey, ModuleConfig[] modules){
     this.collectionCheckDisabled = collectionCheckDisabled;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
@@ -37,7 +41,7 @@ public class Configuration {
     this.showSellOfferProfit = showSellOfferProfit;
     this.showProfitPerMil = showProfitPerMil;
     this.suggestionListLength = suggestionListLength;
-    this.api = BazaarNotifier.apiKey;
+    this.api = APIKey;
     this.version = BazaarNotifier.VERSION;
     this.modules = modules;
     this.showChatMessages = showChatMessages;
@@ -55,22 +59,20 @@ public class Configuration {
     }
       Files.write(Paths.get(file.getAbsolutePath()),
               gson.toJson(config).getBytes(StandardCharsets.UTF_8));
-    }catch (Exception ignored){
-      System.out.println("Error while saving config file");
+    }catch (IOException e){
+      e.printStackTrace();
     }
   }
 
   public static Configuration createDefaultConfig() {
-    ModuleConfig[] c = new ModuleConfig[4];
+    ModuleConfig[] c = new ModuleConfig[MODULE_LENGTH];
     for (int i = 0; i < ModuleName.values().length; i++) {
       Module m = ModuleName.values()[i].returnDefaultModule();
-      if (m != null) {
-        c[i] = (m.generateModuleConfig());
-      }
+      c[i] = m.generateDefaultConfig();
     }
     return new Configuration(Defaults.COLLECTION_CHECKING,
             Defaults.CRAFTING_SORTING_OPTION ,Defaults.CRAFTING_LIST_LENGTH,Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
-            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,Defaults.SEND_CHAT_MESSAGES,c);
+            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,Defaults.SEND_CHAT_MESSAGES,"",c);
   }
 
 }

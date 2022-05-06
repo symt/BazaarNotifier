@@ -5,6 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,12 +26,11 @@ public class SuggestionCalculator {
           String key = keys.getKey();
           JsonObject product = bazaarData.getAsJsonObject(key);
 
-          if (!BazaarNotifier.bazaarConversions.has(key)) {
-            BazaarNotifier.bazaarConversions.addProperty(key, key);
-            BazaarNotifier.bazaarConversionsReversed.addProperty(key, key);
+          if (!BazaarNotifier.bazaarConv.containsKey(key)) {
+            BazaarNotifier.bazaarConv.put(key, key);
           }
           JsonObject currentProduct = new JsonObject();
-          currentProduct.addProperty("productId", BazaarNotifier.bazaarConversions.get(key).getAsString());
+          currentProduct.addProperty("productId", BazaarNotifier.bazaarConv.get(key));
           currentProduct.addProperty("sellOfferPrice",
                   (product.getAsJsonArray("buy_summary").size() > 0
                       && product.getAsJsonArray("sell_summary").size() > 0) ?
