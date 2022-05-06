@@ -1,13 +1,14 @@
 package dev.meyi.bn.modules.calc;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
-import java.util.*;
-
 import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.text.WordUtils;
+
+import java.io.IOException;
+import java.util.*;
 
 
 public class CraftingCalculator {
@@ -17,7 +18,9 @@ public class CraftingCalculator {
 
   public static ArrayList<ArrayList<String>> getBestEnchantRecipes() {
     ArrayList<ArrayList<String>> list = new ArrayList<>();
-
+    if(BazaarNotifier.enchantCraftingList == null || BazaarNotifier.bazaarDataRaw == null){
+      return list;
+    }
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").entrySet()) {
       String itemName = keys.getKey();
       if (unlockedRecipes.contains(
@@ -111,7 +114,8 @@ public class CraftingCalculator {
             list.add(new ArrayList<>(Arrays
                 .asList(String.valueOf(profitInstaSell), Double.toString(profitSellOffer),
                     Double.toString(pricePerMil), itemName)));
-          } catch (Exception ignored) {
+          } catch (JsonIOException e) {
+            e.printStackTrace();
           }
         } else {
           list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
@@ -180,8 +184,8 @@ public class CraftingCalculator {
   }
 
   public static String[] getEnchantCraft(String itemU) {
-    String itemName = BazaarNotifier.bazaarConversionsReversed
-        .get(WordUtils.capitalize(itemU.toLowerCase())).getAsString();
+    String itemName = BazaarNotifier.bazaarConv.inverse()
+        .get(WordUtils.capitalize(itemU.toLowerCase()));
     String[] values = new String[3];
     if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.entrySet().size() != 0) {
@@ -258,10 +262,13 @@ public class CraftingCalculator {
   }
 
   public static void getUnlockedRecipes() {
-    try {
-      unlockedRecipes = Utils.unlockedRecipes().toString();
-    } catch (IOException ignored) {
-    }
+      try {
+        String s = Utils.unlockedRecipes().toString();
+        if (s != null) {
+          unlockedRecipes = s;
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
   }
-
 }
