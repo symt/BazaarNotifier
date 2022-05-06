@@ -1,7 +1,6 @@
 package dev.meyi.bn.config;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
@@ -27,9 +26,6 @@ public class Configuration {
   public String api;
   public String version;
   public ModuleConfig[] modules;
-  public JsonObject resources;
-
-
 
   public Configuration(boolean collectionCheckDisabled, int craftingSortingOption, int craftingListLength,
                        boolean showInstantSellProfit,boolean showSellOfferProfit, boolean showProfitPerMil,

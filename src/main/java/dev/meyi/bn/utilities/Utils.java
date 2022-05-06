@@ -15,12 +15,18 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.lwjgl.opengl.GL11;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static dev.meyi.bn.BazaarNotifier.resources;
 
 public class Utils {
 
@@ -239,9 +245,9 @@ public class Utils {
     request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
     result = IOUtils.toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-    BazaarNotifier.config.resources =  gson.fromJson(result, JsonObject.class).getAsJsonObject();
-    BazaarNotifier.bazaarConv = jsonToBimap(BazaarNotifier.config.resources.getAsJsonObject("bazaarConversions"));
-    BazaarNotifier.enchantCraftingList =  BazaarNotifier.config.resources.getAsJsonObject("enchantCraftingList");
+    resources =  gson.fromJson(result, JsonObject.class).getAsJsonObject();
+    BazaarNotifier.bazaarConv = jsonToBimap(resources.getAsJsonObject("bazaarConversions"));
+    BazaarNotifier.enchantCraftingList =  resources.getAsJsonObject("enchantCraftingList");
   }
   public static BiMap<String, String> jsonToBimap(JsonObject jsonObject){
     BiMap<String, String> b = HashBiMap.create();
@@ -253,6 +259,18 @@ public class Utils {
     }
     System.out.println(b);
     return b;
+  }
+  public static void saveResources(File file, JsonObject resources) {
+    Gson gson = new Gson();
+    try {
+      if (!file.isFile()) {
+        file.createNewFile();
+      }
+      Files.write(Paths.get(file.getAbsolutePath()),
+              gson.toJson(resources).getBytes(StandardCharsets.UTF_8));
+    }catch (IOException e){
+      e.printStackTrace();
+    }
   }
 
 }
