@@ -1,6 +1,5 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
@@ -36,14 +35,10 @@ public class BankModule extends Module {
     message2.put("Bazaar profit: ", Color.CYAN);
     message2.put(BazaarNotifier.df.format(BankCalculator.bazaarProfit) , Color.MAGENTA);
     items.add(message2);
-    LinkedHashMap<String, Color> message3 = new LinkedHashMap<>();
-    message3.put("Bazaar profit2: ", Color.CYAN);
-    message3.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()) , Color.MAGENTA);
-    items.add(message3);
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;
-    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 3) * scale);
+    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 2) * scale);
   }
 
   @Override
