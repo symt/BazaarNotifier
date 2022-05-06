@@ -24,6 +24,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -38,7 +40,7 @@ public class BazaarNotifier {
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
-  public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/symt/BazaarNotifier/1.5.0/src/main/resources/resources.json";
+  public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json";
   public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
 
@@ -98,6 +100,9 @@ public class BazaarNotifier {
       if (resourcesFile.isFile()) {
         resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
         resources = gson.fromJson(resourcesString, JsonObject.class);
+      }else {
+        Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), "UTF-8");
+        resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -115,11 +120,9 @@ public class BazaarNotifier {
       Utils.updateResources();
     }catch (IOException e){
       System.out.println("Error while getting resources from GitHub");
-      if(configString != null){
-        JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
-        enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
-        bazaarConv = Utils.jsonToBimap(bazaarConversions);
-      }
+      JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
+      enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
+      bazaarConv = Utils.jsonToBimap(bazaarConversions);
     }
   }
 
