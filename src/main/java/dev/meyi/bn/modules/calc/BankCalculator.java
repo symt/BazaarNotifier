@@ -18,16 +18,16 @@ import net.minecraft.util.StringUtils;
 
 public class BankCalculator {
 
-  public static double _purseLast = 0;
-  private static double _bazaarProfit = 0;
-  public static boolean _orderWait = false;
+  public static double purseLast = 0;
+  private static double bazaarProfit2 = 0;
+  public static boolean orderWait = false;
 
 
 
   public static double getBazaarProfit() {
-      _bazaarProfit += getPurse() - _purseLast;
-      _purseLast = getPurse();
-    return _bazaarProfit;
+      bazaarProfit2 += getPurse() - purseLast;
+      purseLast = getPurse();
+    return bazaarProfit2;
   }
 
 
@@ -51,7 +51,7 @@ public class BankCalculator {
 
 
   public static double moneyStoredInSellOffers() {
-    if (!BazaarNotifier.orders.isEmpty()) {
+    if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
         if (BazaarNotifier.orders.get(i).type.equals("sell")) {
@@ -182,7 +182,7 @@ public class BankCalculator {
   public static void reset() {
     moneyOnStartup = getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank;
     bazaarProfit = 0;
-    _bazaarProfit = 0;
+    bazaarProfit2 = 0;
   }
 
 

@@ -110,6 +110,7 @@ public class EventHandler {
           if (BigDecimal.valueOf(refund >= 10000 ? Math.round(order.orderValue)
               : order.orderValue)
               .compareTo(BigDecimal.valueOf(refund)) == 0) {
+            //BankCalculator.bazaarProfit -= (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
             BazaarNotifier.orders.remove(i);
 
 
@@ -181,8 +182,8 @@ public class EventHandler {
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
-        if(!BankCalculator._orderWait) {
-          BankCalculator._purseLast = BankCalculator.getPurse();
+        if(!BankCalculator.orderWait) {
+          BankCalculator.purseLast = BankCalculator.getPurse();
         }
       }
     }
@@ -190,14 +191,14 @@ public class EventHandler {
     if (e.gui == null && BazaarNotifier.inBazaar) {
       BazaarNotifier.inBazaar = false;
       Thread t = new Thread(() -> {
-        BankCalculator._orderWait = true;
+        BankCalculator.orderWait = true;
         try {
           Thread.sleep(1000);
           BankCalculator.getBazaarProfit();
         } catch (InterruptedException ex) {
           ex.printStackTrace();
         }
-        BankCalculator._orderWait = false;
+        BankCalculator.orderWait = false;
       });
       t.start();
     }

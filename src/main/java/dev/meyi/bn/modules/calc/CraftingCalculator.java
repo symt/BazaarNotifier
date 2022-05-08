@@ -8,7 +8,11 @@ import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Collections;
 
 
 public class CraftingCalculator {

@@ -24,6 +24,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -38,7 +40,7 @@ public class BazaarNotifier {
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
-  public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/Detlev1/BazaarNotifier/master/src/main/resources/resources.json";
+  public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json";
   public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
 
@@ -57,14 +59,15 @@ public class BazaarNotifier {
   public static JsonObject playerDataFromAPI = new JsonObject();
   public static ModuleList modules;
   public static Configuration config;
+  public static JsonObject resources;
 
 
   public static JsonObject enchantCraftingList;
   public static BiMap<String, String> bazaarConv = HashBiMap.create();
 
-
   public static File configFile;
-
+  public static File resourcesFile;
+  private File bnDir;
 
   public static void resetMod() {
     modules.resetAll();
@@ -78,13 +81,28 @@ public class BazaarNotifier {
 
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
-    configFile = event.getSuggestedConfigurationFile();
+    bnDir = new File(event.getModConfigurationDirectory(), "BazaarNotifier");
+    bnDir.mkdirs();
+    configFile = new File(bnDir, "config.json");
+    resourcesFile = new File(bnDir, "resources.json");
     String configString = null;
+    String resourcesString = null;
     Gson gson = new Gson();
     try {
       if (configFile.isFile()) {
         configString = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
         config = gson.fromJson(configString, Configuration.class);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    try {
+      if (resourcesFile.isFile()) {
+        resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
+        resources = gson.fromJson(resourcesString, JsonObject.class);
+      } else {
+        Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), "UTF-8");
+        resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -101,13 +119,11 @@ public class BazaarNotifier {
     try{
       Utils.updateResources();
     }catch (IOException e){
-      System.out.println("Error while getting resources from GitHub");
-      if(configString != null){
-        JsonObject resources = config.resources;
-        JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
-        enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
-        bazaarConv = Utils.jsonToBimap(bazaarConversions);
-      }
+      System.err.println("Error while getting resources from GitHub");
+      e.printStackTrace();
+      JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
+      enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
+      bazaarConv = Utils.jsonToBimap(bazaarConversions);
     }
   }
 
@@ -124,7 +140,10 @@ public class BazaarNotifier {
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                    () -> config.saveConfig(configFile , config)));
+                    () -> {
+                      Configuration.saveConfig(configFile, config);
+                      Utils.saveResources(resourcesFile, resources);
+                    }));
 
   }
 }
