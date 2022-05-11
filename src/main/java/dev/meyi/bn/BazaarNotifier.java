@@ -3,7 +3,6 @@ package dev.meyi.bn;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.config.Configuration;
@@ -11,8 +10,9 @@ import dev.meyi.bn.handlers.ChestTickHandler;
 import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
+import dev.meyi.bn.json.resp.BazaarResponse;
+import dev.meyi.bn.json.resp.Order;
 import dev.meyi.bn.modules.ModuleList;
-import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.util.EnumChatFormatting;
@@ -53,9 +53,7 @@ public class BazaarNotifier {
 
 
   public static ArrayList<Order> orders = new ArrayList<>();
-  public static JsonObject bazaarDataRaw = new JsonObject();
-  public static JsonObject bazaarCache = new JsonObject();
-  public static JsonArray bazaarDataFormatted = new JsonArray();
+  public static BazaarResponse bazaarDataRaw;
   public static JsonObject playerDataFromAPI = new JsonObject();
   public static ModuleList modules;
   public static Configuration config;

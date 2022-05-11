@@ -2,16 +2,17 @@ package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
+import dev.meyi.bn.json.resp.Order;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.Utils;
-import java.awt.Color;
+import net.minecraft.client.Minecraft;
+import org.apache.commons.lang3.text.WordUtils;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import net.minecraft.client.Minecraft;
-import org.apache.commons.lang3.text.WordUtils;
 
 public class NotificationModule extends Module {
   public static final ModuleName type = ModuleName.NOTIFICATION;
@@ -38,12 +39,12 @@ public class NotificationModule extends Module {
         Order currentOrder = BazaarNotifier.orders.get(i);
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
 
-        Color typeSpecificColor = currentOrder.goodOrder ? new Color(0x55FF55)
+        Color typeSpecificColor = currentOrder.orderStatus == Order.OrderType.BEST ? new Color(0x55FF55)
             : currentOrder.type.equals("buy") ? new Color(0xFF55FF)
                 : new Color(0x55FFFF);
 
-        String notification = currentOrder.goodOrder ? "BEST" :
-            currentOrder.matchedOrder ? "MATCHED" : "OUTDATED";
+        String notification = currentOrder.orderStatus == Order.OrderType.BEST ? "BEST" :
+            currentOrder.orderStatus == Order.OrderType.MATCHED ? "MATCHED" : "OUTDATED";
         message.put(WordUtils.capitalizeFully(currentOrder.type), typeSpecificColor);
         message.put(" - ", new Color(0xAAAAAA));
         message.put(notification + " ", new Color(0xFFFF55));
@@ -62,9 +63,7 @@ public class NotificationModule extends Module {
       int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + longestXString;
     } else {
-      Utils.drawCenteredString("No orders found", (int) ((x / scale) + 200 * scale / scale / 4),
-          (int) (y / scale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6)), 0xAAAAAA,
-          scale);
+      Utils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
       float X = x + 200 * scale;
       boundsX = (int) X;
     }

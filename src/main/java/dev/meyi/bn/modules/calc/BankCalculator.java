@@ -4,9 +4,6 @@ package dev.meyi.bn.modules.calc;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.meyi.bn.BazaarNotifier;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.scoreboard.Score;
@@ -14,6 +11,10 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class BankCalculator {

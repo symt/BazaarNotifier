@@ -4,6 +4,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.resp.BazaarItem;
+import dev.meyi.bn.json.resp.BazaarResponse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -21,10 +23,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Utils {
 
@@ -32,7 +31,7 @@ public class Utils {
   private static String playerUUID = "";
   private static long recipeCooldown = 0;
 
-  public static JsonObject getBazaarData() throws IOException {
+  public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
     HttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
@@ -47,14 +46,16 @@ public class Utils {
         (new InputStreamReader(
             response.getEntity().getContent())));
 
-    return gson.fromJson(result, JsonObject.class).getAsJsonObject().get("products").getAsJsonObject();
+    JsonObject j = gson.fromJson(result, JsonObject.class).getAsJsonObject();
+     return new BazaarResponse(j.get("success").getAsBoolean(), j.get("lastUpdated").getAsLong(),
+             jsonToMap(j.getAsJsonObject("products")));
   }
 
 
-  public static JsonArray unlockedRecipes() throws IOException {
+  public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
     if(recipeCooldown + 300000 > System.currentTimeMillis()){
-      return  new JsonArray();
+      return null;
     }else{
       recipeCooldown = System.currentTimeMillis();
     }
@@ -76,7 +77,7 @@ public class Utils {
         try {
           playerUUID = gson.fromJson(uuidResponse, JsonObject.class).getAsJsonObject().get("id").getAsString();
         }catch (Exception e){
-          return new JsonArray();
+          return null;
         }
       }
 
@@ -91,7 +92,7 @@ public class Utils {
       long lastSaved = 0;
       int profileIndex = 0;
       if(!results.get("success").getAsBoolean() || !results.has("profiles")){
-        return new JsonArray();
+        return null;
       }
 
       for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
@@ -112,29 +113,30 @@ public class Utils {
               || !results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
               .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().has("slayer_bosses")){
         System.out.println("could not load unlocked collection tiers from API");
-        return new JsonArray();
+        return null;
       }
+      List<String> unlockedCollections = new ArrayList<>();
 
-      JsonArray unlockedCollections = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
-          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("unlocked_coll_tiers").getAsJsonArray();
+
+      results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
+              .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("unlocked_coll_tiers")
+              .getAsJsonArray().forEach(cmd -> {unlockedCollections.add(cmd.getAsString());});
+
+
       JsonObject slayer = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
           .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("slayer_bosses").getAsJsonObject();
-      if (slayer.getAsJsonObject("zombie").getAsJsonObject("claimed_levels").has("level_4")) {
-        unlockedCollections.add(new JsonPrimitive("zombie_4"));
-      }
-      if (slayer.getAsJsonObject("spider").getAsJsonObject("claimed_levels").has("level_4")) {
-        unlockedCollections.add(new JsonPrimitive("spider_4"));
-      }
-      if (slayer.getAsJsonObject("wolf").getAsJsonObject("claimed_levels").has("level_4")) {
-        unlockedCollections.add(new JsonPrimitive("wolf_4"));
-      }
-      if (slayer.getAsJsonObject("enderman").getAsJsonObject("claimed_levels").has("level_2")) {
-        unlockedCollections.add(new JsonPrimitive("enderman_2"));
+      Set<Map.Entry<String, JsonElement>> set = slayer.entrySet();
+      for(Map.Entry<String,JsonElement> entry : set){
+        Set<Map.Entry<String, JsonElement>> set2 = slayer.getAsJsonObject(entry.getKey()).getAsJsonObject("claimed_levels").entrySet();
+        for(Map.Entry<String,JsonElement> entry2 : set2){
+          unlockedCollections.add( entry.getKey() + entry2.getKey().replace("level", ""));
+        }
       }
       return unlockedCollections;
     } else {
       BazaarNotifier.config.collectionCheckDisabled = true;
-      return new JsonArray();
+
+      return null;
     }
   }
 
@@ -230,6 +232,8 @@ public class Utils {
 
 
   public static void drawCenteredString(String text, int x, int y, int color, float moduleScale) {
+    x = (int) (x / moduleScale + 200 / 4);
+    y = (int) (y / moduleScale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6));
     GL11.glScalef(moduleScale, moduleScale, 1);
     Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
     GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
@@ -255,9 +259,37 @@ public class Utils {
         b.put(entry.getKey(), jsonObject.get(entry.getKey()).getAsString());
       }catch (IllegalArgumentException ignored){}
     }
-    System.out.println(b);
     return b;
   }
+  public static Map<String, BazaarItem> jsonToMap(JsonObject bazaarProducts){
+    Map<String, BazaarItem> products = new HashMap<>();
+    for (Map.Entry<String, JsonElement> keys : bazaarProducts.entrySet()) {
+      String itemName = keys.getKey();
+
+      List<BazaarItem.BazaarSubItem> sellSummary = new ArrayList<>();
+      for(int i = 0; i < bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("sell_summary").size(); i++){
+        JsonObject j =  bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("sell_summary").get(i).getAsJsonObject();
+        sellSummary.add(new BazaarItem.BazaarSubItem(j.get("amount").getAsInt(), j.get("pricePerUnit").getAsDouble(), j.get("orders").getAsInt()));
+      }
+      List<BazaarItem.BazaarSubItem> buySummary = new ArrayList<>();
+      for(int i = 0; i < bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("buy_summary").size(); i++){
+        JsonObject j =  bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("buy_summary").get(i).getAsJsonObject();
+        buySummary.add(new BazaarItem.BazaarSubItem(j.get("amount").getAsInt(), j.get("pricePerUnit").getAsDouble(), j.get("orders").getAsInt()));
+      }
+
+      JsonObject JsonQuickStatus = bazaarProducts.getAsJsonObject(itemName).getAsJsonObject("quick_status");
+      BazaarItem.BazaarItemSummary quickStatus = new BazaarItem.BazaarItemSummary(itemName,
+              JsonQuickStatus.get("sellPrice").getAsDouble(), JsonQuickStatus.get("sellVolume").getAsLong(),
+              JsonQuickStatus.get("sellMovingWeek").getAsLong(), JsonQuickStatus.get("sellOrders").getAsLong(),
+              JsonQuickStatus.get("buyPrice").getAsDouble(), JsonQuickStatus.get("buyVolume").getAsLong(),
+              JsonQuickStatus.get("buyMovingWeek").getAsLong(),JsonQuickStatus.get("buyOrders").getAsLong());
+
+      products.put(itemName, new BazaarItem(itemName, sellSummary,buySummary, quickStatus));
+    }
+    return products;
+  }
+
+
   public static void saveResources(File file, JsonObject resources) {
     Gson gson = new Gson();
     try {

@@ -48,7 +48,7 @@ public class Configuration {
 
   public static void saveConfig(File file, Configuration config) {
     Gson gson = new Gson();
-    modules = BazaarNotifier.modules.generateConfig();
+    BazaarNotifier.config.modules = BazaarNotifier.modules.generateConfig();
     try {
       if (!file.isFile()) {
         file.createNewFile();

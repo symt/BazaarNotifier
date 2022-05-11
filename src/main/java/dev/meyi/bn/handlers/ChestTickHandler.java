@@ -1,13 +1,8 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.resp.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import dev.meyi.bn.utilities.Order;
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -21,6 +16,10 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ChestTickHandler {
