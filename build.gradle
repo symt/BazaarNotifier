@@ -25,7 +25,7 @@ compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 }
-version = "1.4.10"
+version = "1.4.11"
 group = "dev.meyi.bn"
 archivesBaseName = "BazaarNotifier"
 
