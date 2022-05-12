@@ -17,7 +17,8 @@ public class SuggestionCalculator {
   public static void basic() {
     try {
       if (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled) {
-        JsonObject bazaarData = BazaarNotifier.bazaarDataRaw;
+	BazaarNotifier.bazaarDataRaw.remove("AMALGAMATED_CRIMSONITE");
+	JsonObject bazaarData = BazaarNotifier.bazaarDataRaw;
         Iterator<Map.Entry<String, JsonElement>> bazaarKeys = bazaarData.entrySet().iterator();
         JsonArray bazaarDataFormatted = new JsonArray();
 
