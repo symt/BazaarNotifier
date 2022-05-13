@@ -7,8 +7,6 @@ import dev.meyi.bn.modules.SuggestionModule;
 
 import java.util.*;
 
-//Todo Replace JSON
-
 
 public class SuggestionCalculator {
 
@@ -16,7 +14,6 @@ public class SuggestionCalculator {
     try {
       if (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled) {
         List<String[]> list = new LinkedList<>();
-
         for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products.entrySet()) {
             String key = entry.getKey();
             BazaarItem product = BazaarNotifier.bazaarDataRaw.products.get(key);
