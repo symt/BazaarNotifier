@@ -24,6 +24,9 @@ public class CraftingCalculator {
     }
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").entrySet()) {
       String itemName = keys.getKey();
+      if(!BazaarNotifier.bazaarDataRaw.products.containsKey(itemName)){
+        continue;
+      }
       if (unlockedRecipes.contains(
               BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").getAsJsonObject(itemName)
                       .get("collection").getAsString()) || Objects.equals(
@@ -31,10 +34,8 @@ public class CraftingCalculator {
                       .get("collection").getAsString(), "NONE") || BazaarNotifier.config.collectionCheckDisabled) {
         if (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() > 0 &&
                 BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() > 0) {
-          if (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() != 0) {// I don´t know why, but it sometimes crashes with org.json.JSONException: JSONArray[0] not found.
             String material = BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
                     .getAsJsonObject(itemName).get("material").getAsString();
-            try {
               double price1 =
                       (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).pricePerUnit) -
                               (BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(0).pricePerUnit
@@ -53,9 +54,6 @@ public class CraftingCalculator {
               list.add(new ArrayList<>(Arrays
                       .asList(Double.toString(price1), Double.toString(price2),
                               Double.toString(profitPerMil), itemName)));
-            } catch (Exception ignored) {
-            }
-          }
         } else {
           list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
         }
