@@ -3,11 +3,13 @@ package dev.meyi.bn.modules;
 import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
+import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -32,6 +34,24 @@ public class CraftingModule extends Module {
   }
 
   private void generateHelperLine() {
+    if(Mouse.isButtonDown(1)) {
+      int width1 = Minecraft.getMinecraft().fontRendererObj.getStringWidth("   Profits (Buy Orders) -")+ x;
+      int width2 = Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") + width1;
+      int width3 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(" / Sell Offer") + width2;
+      int width4 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(" / 1m Instant")+ width3;
+      if (getMouseCoordinateY() > y-2 && getMouseCoordinateY() < y + 10) {
+        if (getMouseCoordinateX() > width1 && getMouseCoordinateX() < width2){
+          BazaarNotifier.config.craftingSortingOption = 0;
+          CraftingCalculator.getBestEnchantRecipes();
+        }else if (getMouseCoordinateX() > width2 && getMouseCoordinateX() < width3 ){
+          BazaarNotifier.config.craftingSortingOption = 1;
+          CraftingCalculator.getBestEnchantRecipes();
+        }else if (getMouseCoordinateX() > width3 && getMouseCoordinateX() < width4){
+          BazaarNotifier.config.craftingSortingOption = 2;
+          CraftingCalculator.getBestEnchantRecipes();
+        }
+      }
+    }
     helperLine.clear();
     helperLine.put("   ", Color.MAGENTA);
     helperLine.put("Profits (Buy Orders)", Color.LIGHT_GRAY);

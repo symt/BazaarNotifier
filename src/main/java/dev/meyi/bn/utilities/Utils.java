@@ -120,7 +120,7 @@ public class Utils {
 
       results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
               .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("unlocked_coll_tiers")
-              .getAsJsonArray().forEach(cmd -> {unlockedCollections.add(cmd.getAsString());});
+              .getAsJsonArray().forEach(cmd -> unlockedCollections.add(cmd.getAsString()));
 
 
       JsonObject slayer = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()

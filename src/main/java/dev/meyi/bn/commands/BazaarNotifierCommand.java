@@ -7,7 +7,6 @@ import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -247,7 +246,6 @@ public class BazaarNotifierCommand extends CommandBase {
         } else {
           String itemName = String.join(" ", args).substring(5).toLowerCase().replace( '-', ' ');
           itemName = WordUtils.capitalize(itemName);
-          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(itemName));
           if (BazaarNotifier.bazaarConv.containsValue(itemName)
                   && BazaarNotifier.bazaarDataRaw != null) {
 

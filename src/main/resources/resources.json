@@ -768,6 +768,30 @@
 			"ENCHANTED_NETHER_STALK": {
 				"material": "NETHER_STALK",
 				"collection": "NETHER_STALK_4"
+			},
+			"ENCHANTED_RED_SAND": {
+				"material": "SAND:1",
+				"collection": "SAND:1_2"
+			},
+			"ENCHANTED_RED_SAND_CUBE": {
+				"material": "ENCHANTED_RED_SAND",
+				"collection": "SAND:1_4"
+			},
+			"ENCHANTED_SULPHUR": {
+				"material": "SULPHUR",
+				"collection": "SULPHUR_2"
+			},
+			"ENCHANTED_SULPHUR_CUBE": {
+				"material": "ENCHANTED_SULPHUR",
+				"collection": "SULPHUR_6"
+			},
+			"ENCHANTED_MYCELIUM": {
+				"material": "MYCEL",
+				"collection": "MYCEL_3"
+			},
+			"ENCHANTED_MYCELIUM_CUBE": {
+				"material": "ENCHANTED_MYCELIUM",
+				"collection": "MYCEL_7"
 			}
 		},
 		"other": {
@@ -1296,6 +1320,27 @@
 					2
 				],
 				"collection": "NONE"
+			},
+			"MAGMA_FISH_SILVER": {
+				"material" : [
+					"MAGMA_FISH",
+					80
+				],
+				"collection" : "MAGMA_FISH_3"
+			},
+			"MAGMA_FISH_GOLD": {
+				"material" : [
+					"MAGMA_FISH_SILVER",
+					80
+				],
+				"collection" : "MAGMA_FISH_7"
+			},
+			"MAGMA_FISH_DIAMOND": {
+				"material" : [
+					"MAGMA_FISH_GOLD",
+					80
+				],
+				"collection" : "MAGMA_FISH_10"
 			}
 		}
 	}
