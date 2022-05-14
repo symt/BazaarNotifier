@@ -2,6 +2,7 @@ package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.Order;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import net.minecraft.client.Minecraft;
@@ -20,6 +21,7 @@ public class ScheduledEvents {
     craftingLoop();
     suggestionLoop();
     collectionLoop();
+    purseLoop();
   }
 
   public static void create() {
@@ -41,6 +43,11 @@ public class ScheduledEvents {
   public void collectionLoop() {
     Executors.newScheduledThreadPool(1)
         .scheduleAtFixedRate(CraftingCalculator::getUnlockedRecipes, 5, 5, TimeUnit.MINUTES);
+  }
+
+  public void purseLoop() {
+    Executors.newScheduledThreadPool(1)
+            .scheduleAtFixedRate(BankCalculator::getPurse, 5, 5, TimeUnit.SECONDS);
   }
 
   public void outdatedNotification() {
