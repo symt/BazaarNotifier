@@ -1,10 +1,15 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
+const { Client } = require("discord.js");
+const client = new Client({intents: 32767});
 require('dotenv').config()
 
+const prefix = "~";
+const channel = process.env.channel;
 client.on("ready", () => {
-    require("./bazaar/bazaar.js")(client, "732332400440508496");
+    const { cacheUpdate } = require("./bazaar/bazaar.js");
+    cacheUpdate();
     console.log("Login successful!")
 });
 
 client.login(process.env.BOT);
+
+module.exports = { client, prefix, channel };
