@@ -7,4 +7,10 @@ public class BazaarResponse {
   public long lastUpdated;
 
   public Map<String, BazaarItem> products;
+
+  public BazaarResponse(boolean success,long lastUpdated, Map<String, BazaarItem> products){
+    this.success = success;
+    this.lastUpdated = lastUpdated;
+    this.products = products;
+  }
 }

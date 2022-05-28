@@ -1,15 +1,11 @@
 package dev.meyi.bn.modules.calc;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.Utils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 
-import java.util.Iterator;
-import java.util.Map;
+import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.resp.BazaarItem;
+import dev.meyi.bn.modules.SuggestionModule;
+
+import java.util.*;
 
 
 public class SuggestionCalculator {
@@ -17,69 +13,49 @@ public class SuggestionCalculator {
   public static void basic() {
     try {
       if (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled) {
-	BazaarNotifier.bazaarDataRaw.remove("AMALGAMATED_CRIMSONITE");
-	JsonObject bazaarData = BazaarNotifier.bazaarDataRaw;
-        Iterator<Map.Entry<String, JsonElement>> bazaarKeys = bazaarData.entrySet().iterator();
-        JsonArray bazaarDataFormatted = new JsonArray();
+        List<String[]> list = new LinkedList<>();
+        for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products.entrySet()) {
+            String key = entry.getKey();
+            BazaarItem product = BazaarNotifier.bazaarDataRaw.products.get(key);
 
-        while (bazaarKeys.hasNext()) {
-          Map.Entry<String, JsonElement> keys = bazaarKeys.next();
-          String key = keys.getKey();
-          JsonObject product = bazaarData.getAsJsonObject(key);
+            if (!BazaarNotifier.bazaarConv.containsKey(key)) {
+              BazaarNotifier.bazaarConv.put(key, key);
+            }
+            String productId = BazaarNotifier.bazaarConv.get(key);
+            double sellPrice = (product.buy_summary.size() > 0 && product.sell_summary.size() > 0) ?
+                    product.buy_summary.get(0).pricePerUnit : 0;
+            double buyPrice = (product.sell_summary.size() > 0 && product.buy_summary.size() > 0) ?
+                    product.sell_summary.get(0).pricePerUnit : 0;
+            long sellMovingWeek =  product.quick_status.buyMovingWeek;
+            long buyMovingWeek = product.quick_status.sellMovingWeek;
 
-          if (!BazaarNotifier.bazaarConv.containsKey(key)) {
-            BazaarNotifier.bazaarConv.put(key, key);
-          }
-          JsonObject currentProduct = new JsonObject();
-          currentProduct.addProperty("productId", BazaarNotifier.bazaarConv.get(key));
-          currentProduct.addProperty("sellOfferPrice",
-                  (product.getAsJsonArray("buy_summary").size() > 0
-                      && product.getAsJsonArray("sell_summary").size() > 0) ?
-                      product.getAsJsonArray("buy_summary").get(0).getAsJsonObject()
-                          .get("pricePerUnit").getAsDouble() : 0);
-          currentProduct.addProperty("buyOrderPrice",
-                  (product.getAsJsonArray("sell_summary").size() > 0
-                      && product.getAsJsonArray("buy_summary").size() > 0) ?
-                      product.getAsJsonArray("sell_summary").get(0).getAsJsonObject()
-                          .get("pricePerUnit").getAsDouble() : 0);
-          currentProduct.addProperty("sellCount",
-                  product.getAsJsonObject("quick_status")
-                      .get("buyMovingWeek").getAsLong());
-          currentProduct.addProperty("buyCount",
-                  product.getAsJsonObject("quick_status")
-                      .get("sellMovingWeek").getAsLong());
-
-          double diff = currentProduct.get("sellOfferPrice").getAsDouble() * .99d - currentProduct
-              .get("buyOrderPrice").getAsDouble();
-          double profitFlowPerMinute =
-              (currentProduct.get("sellCount").getAsLong() + currentProduct.get("buyCount").getAsLong() == 0) ? 0 :
-                  ((currentProduct.get("sellCount").getAsLong() * currentProduct.get("buyCount").getAsLong()) / (
-                      10080d
-                          * (currentProduct.get("sellCount").getAsLong() + currentProduct
-                          .get("buyCount").getAsLong())))
-                      * diff;
-          currentProduct.addProperty("profitFlowPerMinute", profitFlowPerMinute);
-          bazaarDataFormatted.add(currentProduct);
+            double diff = sellPrice * .99d - buyPrice;
+            double profitFlowPerMinute =
+                    (sellMovingWeek + buyMovingWeek == 0) ? 0 :
+                            ((sellMovingWeek * buyMovingWeek) / (  10080d * (sellMovingWeek + buyMovingWeek)))* diff;
+            list.add(new String[]{productId, Double.toString(profitFlowPerMinute)});
         }
-
-        bazaarDataFormatted = Utils.sortJSONArray(bazaarDataFormatted, "profitFlowPerMinute");
-
-        JsonObject bazaarCache = new JsonObject();
-        bazaarDataFormatted.forEach((data) -> {
-          JsonObject jsonData = (JsonObject) data;
-          bazaarCache.add(jsonData.get("productId").getAsString().toLowerCase(), data);
-        });
-
-        BazaarNotifier.bazaarCache = bazaarCache;
-        BazaarNotifier.bazaarDataFormatted = bazaarDataFormatted;
+        list.sort(Comparator.comparingDouble(o -> Double.parseDouble(o[1])));
+        Collections.reverse(list);
+        SuggestionModule.list = list;
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
+  public static double calculateEP(BazaarItem item){
+      double sellPrice = (item.buy_summary.size() > 0 && item.sell_summary.size() > 0) ?
+              item.buy_summary.get(0).pricePerUnit : 0;
+      double buyPrice = (item.sell_summary.size() > 0 && item.buy_summary.size() > 0) ?
+              item.sell_summary.get(0).pricePerUnit : 0;
+      long sellMovingWeek =  item.quick_status.sellMovingWeek;
+      long buyMovingWeek = item.quick_status.buyMovingWeek;
+      return (buyMovingWeek + sellMovingWeek == 0) ? 0 : ((buyMovingWeek * sellMovingWeek) /
+                      (  10080d * (buyMovingWeek + sellMovingWeek)))* (sellPrice * .99d - buyPrice);
+  }
 
   public static String setSuggestionLength(int length) {
-    if (length > BazaarNotifier.bazaarDataRaw.entrySet().size()) {
+    if (length > BazaarNotifier.bazaarDataRaw.products.size()) {
       return length + " is too long";
     } else {
       BazaarNotifier.config.suggestionListLength = length;

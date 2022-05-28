@@ -1,4 +1,4 @@
-package dev.meyi.bn.utilities;
+package dev.meyi.bn.json.resp;
 
 
 public class Order {
@@ -7,9 +7,7 @@ public class Order {
     private int amountRemaining;
     public double pricePerUnit;
     public String priceString;
-    public boolean outdatedOrder = false;
-    public boolean matchedOrder = false;
-    public boolean goodOrder = true;
+    public OrderType orderStatus = OrderType.BEST;
     public double orderValue;
     public String type;
     public String currentNotification;
@@ -31,4 +29,6 @@ public class Order {
     public int getAmountRemaining(){
         return  amountRemaining;
     }
+
+    public enum OrderType {BEST , MATCHED, OUTDATED}
 }

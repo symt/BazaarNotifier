@@ -1,16 +1,12 @@
 package dev.meyi.bn.commands;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,9 +18,13 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.text.WordUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class BazaarNotifierCommand extends CommandBase {
-  private static long date = System.currentTimeMillis();;
+  private static long date = System.currentTimeMillis();
 
   @Override
   public List<String> getCommandAliases() {
@@ -244,28 +244,31 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Use the following format: /bn find (item)"));
         } else {
-          String item = String.join(" ", args).substring(5).toLowerCase();
-          if (BazaarNotifier.bazaarCache.has(item)) {
-            JsonObject data = BazaarNotifier.bazaarCache.getAsJsonObject(item);
+          String itemName = String.join(" ", args).substring(5).toLowerCase().replace( '-', ' ');
+          itemName = WordUtils.capitalize(itemName);
+          if (BazaarNotifier.bazaarConv.containsValue(itemName)
+                  && BazaarNotifier.bazaarDataRaw != null) {
 
             String itemConv = BazaarNotifier.bazaarConv.inverse()
-                .get(WordUtils.capitalize(item.toLowerCase()));
+                    .get(WordUtils.capitalize(itemName.toLowerCase()));
+            BazaarItem item = BazaarNotifier.bazaarDataRaw.products.get(itemConv);
+
+
             if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemConv)
                 || BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemConv)) {
-              String[] prices = CraftingCalculator.getEnchantCraft(item);
+              String[] prices = CraftingCalculator.getEnchantCraft(itemName);
 
               player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
-                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
-                  + "\n" +
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(itemName) + "\n" +
                   EnumChatFormatting.DARK_RED + "Buy Order: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(data.get("buyOrderPrice").getAsDouble())
-                  + "\n" +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(item.sell_summary.size() == 0 ?
+                    0 : item.sell_summary.get(0).pricePerUnit) + "\n" +
                   EnumChatFormatting.DARK_RED + "Sell Offer: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df
-                  .format(data.get("sellOfferPrice").getAsDouble()) + "\n" +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(item.buy_summary.size() == 0 ?
+                    0 : item.buy_summary.get(0).pricePerUnit) + "\n" +
                   EnumChatFormatting.DARK_RED + "Estimated Profit: " +
                   EnumChatFormatting.RED + BazaarNotifier.df
-                  .format(data.get("profitFlowPerMinute").getAsDouble()) + "\n" +
+                    .format(SuggestionCalculator.calculateEP(item)) + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
                   EnumChatFormatting.RED + prices[0] + "\n" +
@@ -277,21 +280,22 @@ public class BazaarNotifierCommand extends CommandBase {
               ));
             } else {
               player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + "\n" +
-                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(item)
-                  + "\n"
-                  + EnumChatFormatting.DARK_RED + "Buy Order: " + EnumChatFormatting.RED +
-                  BazaarNotifier.df.format(data.get("buyOrderPrice").getAsDouble()) + "\n"
-                  + EnumChatFormatting.DARK_RED + "Sell Offer: "
-                  + EnumChatFormatting.RED +
-                  BazaarNotifier.df.format(data.get("sellOfferPrice").getAsDouble()) + "\n"
-                  + EnumChatFormatting.DARK_RED
-                  + "Estimated Profit: " + EnumChatFormatting.RED +
-                  BazaarNotifier.df.format(data.get("profitFlowPerMinute").getAsDouble()) + "\n" +
-                  BazaarNotifier.prefix));
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils.capitalize(itemName) + "\n" +
+                  EnumChatFormatting.DARK_RED + "Buy Order: " +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(item.sell_summary.size() == 0 ?
+                    0 : item.sell_summary.get(0).pricePerUnit) + "\n" +
+                  EnumChatFormatting.DARK_RED + "Sell Offer: " +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(item.buy_summary.size() == 0 ?
+                    0 : item.buy_summary.get(0).pricePerUnit) + "\n" +
+                  EnumChatFormatting.DARK_RED + "Estimated Profit: " +
+                  EnumChatFormatting.RED + BazaarNotifier.df
+                    .format(SuggestionCalculator.calculateEP(item)) + "\n" +
+                  BazaarNotifier.prefix
+              ));
             }
 
 
-          } else if (BazaarNotifier.bazaarCache.entrySet().size() == 0) {
+          } else if (BazaarNotifier.bazaarDataRaw == null) {
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.RED
                     + "Please wait a moment for the mod to get bazaar information"));
@@ -427,6 +431,20 @@ public class BazaarNotifierCommand extends CommandBase {
           }
         }.forEach(cmd -> {
           if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {
+            arguments.add(cmd);
+          }
+        });
+      } else if (args.length <= 2 && args[0].equalsIgnoreCase("find")) {
+        ArrayList<String> a = new ArrayList<>();
+        for (String s: BazaarNotifier.bazaarConv.values()) {
+          s = s.replace(' ', '-');
+          a.add(s.toLowerCase());
+        }
+        a.forEach(cmd -> {
+          if (args[1].trim().length() == 0 || cmd.startsWith(args[1].toLowerCase())) {
+            arguments.add(cmd);
+          }
+          if (!arguments.contains(cmd) &&(cmd.contains(args[1].toLowerCase()))){
             arguments.add(cmd);
           }
         });

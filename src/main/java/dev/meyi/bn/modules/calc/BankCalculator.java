@@ -4,9 +4,6 @@ package dev.meyi.bn.modules.calc;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.meyi.bn.BazaarNotifier;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.scoreboard.Score;
@@ -15,12 +12,17 @@ import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class BankCalculator {
 
   public static double purseLast = 0;
   private static double bazaarProfit2 = 0;
   public static boolean orderWait = false;
+  private static double purseBackup = 0;
 
 
 
@@ -79,13 +81,8 @@ public class BankCalculator {
   public static double getPurse() {
     double ps = getPurseFromSidebar();
     if (ps == -1) {
-      double pa = getPurseFromAPI();
-      if(pa != -1 && !purseInitialised){
-        moneyOnStartup += pa;
-        purseInitialised = true;
-      }
-      return  pa;
-    } else {
+      return  purseBackup;
+    }else {
       if(!purseInitialised) {
         moneyOnStartup += ps;
         purseInitialised = true;
@@ -94,15 +91,7 @@ public class BankCalculator {
     }
   }
 
-  public static double getPurseFromAPI() {
-    if (BazaarNotifier.playerDataFromAPI.entrySet().size() != 0) {
-      return BazaarNotifier.playerDataFromAPI.get("coin_purse").getAsDouble();
-    }
-    return -1;
-  }
-
   private static double getPurseFromSidebar() {
-    //Todo Powder can cause errors
     Scoreboard scoreboard = Minecraft.getMinecraft().theWorld.getScoreboard();
     if (scoreboard == null) {
       return -1;
@@ -135,12 +124,14 @@ public class BankCalculator {
           int i = purse.indexOf("(");
           String s = purse.substring(i + 1, purse.length() - 1);
           purse = purse.replace(s, "").replaceAll("[^0-9 .]", "");
-          return Float.parseFloat(purse);
+          purseBackup = Float.parseFloat(purse);
+          return purseBackup;
         } else {
           String purse = StringUtils
                   .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()))
                   .replaceAll("[^0-9 +.]", "");
-          return Float.parseFloat(purse);
+          purseBackup = Float.parseFloat(purse);
+          return purseBackup;
         }
       }
     }

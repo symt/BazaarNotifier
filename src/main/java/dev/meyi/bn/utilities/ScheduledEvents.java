@@ -1,11 +1,14 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.resp.Order;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
+import net.minecraft.client.Minecraft;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import net.minecraft.client.Minecraft;
 
 public class ScheduledEvents {
 
@@ -15,8 +18,10 @@ public class ScheduledEvents {
 
   private ScheduledEvents() {
     outdatedNotification();
+    craftingLoop();
     suggestionLoop();
     collectionLoop();
+    purseLoop();
   }
 
   public static void create() {
@@ -24,6 +29,10 @@ public class ScheduledEvents {
     if (instance == null) {
       new ScheduledEvents();
     }
+  }
+  public void craftingLoop(){
+    Executors.newScheduledThreadPool(1)
+        .scheduleAtFixedRate(CraftingCalculator::getBestEnchantRecipes, 5,5,TimeUnit.SECONDS);
   }
 
   public void suggestionLoop() {
@@ -34,6 +43,11 @@ public class ScheduledEvents {
   public void collectionLoop() {
     Executors.newScheduledThreadPool(1)
         .scheduleAtFixedRate(CraftingCalculator::getUnlockedRecipes, 5, 5, TimeUnit.MINUTES);
+  }
+
+  public void purseLoop() {
+    Executors.newScheduledThreadPool(1)
+            .scheduleAtFixedRate(BankCalculator::getPurse, 5, 5, TimeUnit.SECONDS);
   }
 
   public void outdatedNotification() {
@@ -52,65 +66,48 @@ public class ScheduledEvents {
                 double price = currentOrder.pricePerUnit;
                 if (currentOrder.type.equals("buy")) {
                   double diff =
-                      BazaarNotifier.bazaarDataRaw.getAsJsonObject(key).getAsJsonArray("sell_summary")
-                          .get(0).getAsJsonObject()
-                          .get("pricePerUnit").getAsDouble() - price;
-                  if (BazaarNotifier.bazaarDataRaw.getAsJsonObject(key).getAsJsonArray("sell_summary")
-                      .get(0).getAsJsonObject().get("orders").getAsInt() != 1 && diff == 0
-                      && !currentOrder.matchedOrder) {
-                    currentOrder.matchedOrder = true;
-                    currentOrder.outdatedOrder = false;
-                    currentOrder.goodOrder = false;
+                      BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).pricePerUnit - price;
+                  if (BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders != 1 && diff == 0
+                      && currentOrder.orderStatus != Order.OrderType.MATCHED) {
+                    currentOrder.orderStatus = Order.OrderType.MATCHED;
                     currentOrder.currentNotification = "MATCHED";
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(
                               Utils.chatNotification(price, i, "Buy Order", "MATCHED"));
                     }
-                  } else if (diff > 0 && !currentOrder.outdatedOrder) {
+                  } else if (diff > 0 && currentOrder.orderStatus != Order.OrderType.OUTDATED) {
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(
                               Utils.chatNotification(price, i, "Buy Order", "OUTDATED"));
                     }
-                    currentOrder.outdatedOrder = true;
-                    currentOrder.matchedOrder = false;
-                    currentOrder.goodOrder = false;
+                    currentOrder.orderStatus = Order.OrderType.OUTDATED;
                     currentOrder.currentNotification = "OUTDATED";
                   } else if (diff == 0 &&
-                      BazaarNotifier.bazaarDataRaw.getAsJsonObject(key).getAsJsonArray("sell_summary")
-                          .get(0).getAsJsonObject().get("orders").getAsInt() == 1) {
-                    if (currentOrder.outdatedOrder || currentOrder
-                        .matchedOrder) {
+                      BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders == 1) {
+                    if (currentOrder.orderStatus == Order.OrderType.OUTDATED ||
+                            currentOrder.orderStatus == Order.OrderType.MATCHED) {
                       if (BazaarNotifier.config.showChatMessages) {
                         Minecraft.getMinecraft().thePlayer.addChatMessage(
                             Utils.chatNotification(price, i, "Buy Order", "REVIVED"));
                       }
                     }
-                    currentOrder.outdatedOrder = false;
-                    currentOrder.matchedOrder = false;
-                    currentOrder.goodOrder = true;
+                    currentOrder.orderStatus = Order.OrderType.BEST;
                   }
                 } else {
-                  double diff = price - BazaarNotifier.bazaarDataRaw.getAsJsonObject(key)
-                      .getAsJsonArray("buy_summary")
-                      .get(0).getAsJsonObject()
-                      .get("pricePerUnit").getAsDouble();
-                  if (BazaarNotifier.bazaarDataRaw.get(key).getAsJsonObject().get("buy_summary").getAsJsonArray()
-                      .get(0).getAsJsonObject().get("orders").getAsInt() != 1 && diff == 0 && !currentOrder.matchedOrder) {
-                    currentOrder.matchedOrder = true;
-                    currentOrder.outdatedOrder = false;
-                    currentOrder.goodOrder = false;
+                  double diff = price - BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).pricePerUnit;
+                  if (BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).orders != 1 &&
+                          diff == 0 && currentOrder.orderStatus != Order.OrderType.MATCHED) {
+                    currentOrder.orderStatus = Order.OrderType.MATCHED;
                     currentOrder.currentNotification = "MATCHED";
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(
                               Utils.chatNotification(price, i, "Sell Offer", "MATCHED"));
                     }
-                  } else if (diff > 0 && !currentOrder.outdatedOrder) {
-                    currentOrder.outdatedOrder = true;
-                    currentOrder.matchedOrder = false;
-                    currentOrder.goodOrder = false;
+                  } else if (diff > 0 && currentOrder.orderStatus != Order.OrderType.OUTDATED) {
+                    currentOrder.orderStatus = Order.OrderType.OUTDATED;
                     currentOrder.currentNotification = "OUTDATED";
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
@@ -118,18 +115,15 @@ public class ScheduledEvents {
                               Utils.chatNotification(price, i, "Sell Offer", "OUTDATED"));
                     }
                   } else if (diff == 0
-                      && BazaarNotifier.bazaarDataRaw.getAsJsonObject(key).getAsJsonArray("buy_summary")
-                      .get(0).getAsJsonObject().get("orders").getAsInt() == 1) {
-                    if (currentOrder.outdatedOrder || currentOrder
-                        .matchedOrder) {
+                      && BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).orders == 1) {
+                    if (currentOrder.orderStatus == Order.OrderType.OUTDATED ||
+                            currentOrder.orderStatus == Order.OrderType.MATCHED) {
                       if (BazaarNotifier.config.showChatMessages) {
                         Minecraft.getMinecraft().thePlayer.addChatMessage(
                             Utils.chatNotification(price, i, "Sell Offer", "REVIVED"));
                       }
                     }
-                    currentOrder.outdatedOrder = false;
-                    currentOrder.matchedOrder = false;
-                    currentOrder.goodOrder = true;
+                    currentOrder.orderStatus = Order.OrderType.BEST;
                   }
                 }
               }

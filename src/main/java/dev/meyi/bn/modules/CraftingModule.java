@@ -9,8 +9,9 @@ import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Mouse;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ public class CraftingModule extends Module {
   public static final ModuleName type = ModuleName.CRAFTING;
   private final LinkedHashMap<String, Color> helperLine = new LinkedHashMap<>();
   int longestXString;
-  ArrayList<ArrayList<String>> list;
+  public static ArrayList<ArrayList<String>> list = new ArrayList<>();
   int lastHovered = 0;
 
 
@@ -33,6 +34,24 @@ public class CraftingModule extends Module {
   }
 
   private void generateHelperLine() {
+    if(Mouse.isButtonDown(1)) {
+      int width1 = Minecraft.getMinecraft().fontRendererObj.getStringWidth("   Profits (Buy Orders) -")+ x;
+      int width2 = Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") + width1;
+      int width3 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(" / Sell Offer") + width2;
+      int width4 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(" / 1m Instant")+ width3;
+      if (getMouseCoordinateY() > y-2 && getMouseCoordinateY() < y + 10) {
+        if (getMouseCoordinateX() > width1 && getMouseCoordinateX() < width2){
+          BazaarNotifier.config.craftingSortingOption = 0;
+          CraftingCalculator.getBestEnchantRecipes();
+        }else if (getMouseCoordinateX() > width2 && getMouseCoordinateX() < width3 ){
+          BazaarNotifier.config.craftingSortingOption = 1;
+          CraftingCalculator.getBestEnchantRecipes();
+        }else if (getMouseCoordinateX() > width3 && getMouseCoordinateX() < width4){
+          BazaarNotifier.config.craftingSortingOption = 2;
+          CraftingCalculator.getBestEnchantRecipes();
+        }
+      }
+    }
     helperLine.clear();
     helperLine.put("   ", Color.MAGENTA);
     helperLine.put("Profits (Buy Orders)", Color.LIGHT_GRAY);
@@ -60,7 +79,6 @@ public class CraftingModule extends Module {
   @Override
   protected void draw() {
     if (BazaarNotifier.bazaarDataRaw != null) {
-      list = CraftingCalculator.getBestEnchantRecipes();
       List<LinkedHashMap<String, Color>> items = new ArrayList<>();
       generateHelperLine();
       items.add(helperLine);
@@ -112,9 +130,9 @@ public class CraftingModule extends Module {
       boundsX = x + this.longestXString;
       renderMaterials(checkHoveredText(), list);
     }else{
-      Utils.drawCenteredString("Waiting for bazaar data", x + 100,
-              y + (int) ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * 5 * scale),
-              0xAAAAAA, scale);
+      Utils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA,scale);
+      float X = x + 200 * scale;
+      boundsX = (int) X;
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
         * (BazaarNotifier.config.craftingListLength + 1)
