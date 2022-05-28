@@ -1,9 +1,12 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.resp.Order;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
@@ -17,10 +20,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class ChestTickHandler {
 
@@ -31,20 +30,20 @@ public class ChestTickHandler {
 
   public static void updateBazaarOrders(IInventory chest) {
     int[] verifiedOrders = new int[BazaarNotifier.orders.size()];
-    ItemStack[] items = new ItemStack[chest.getSizeInventory() +1];
-    for(int i = 0; i < chest.getSizeInventory(); i++){
+    ItemStack[] items = new ItemStack[chest.getSizeInventory() + 1];
+    for (int i = 0; i < chest.getSizeInventory(); i++) {
       items[i] = chest.getStackInSlot(i);
     }
-    items[items.length-1] = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+    items[items.length - 1] = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
 
     for (ItemStack item : items) {
       if (item != null
-              && Item.itemRegistry.getIDForObject(item.getItem()) != 160    // Glass
-              && Item.itemRegistry.getIDForObject(item.getItem()) != 102    // Glass
-              && Item.itemRegistry.getIDForObject(item.getItem()) != 262) { // Arrow
+          && Item.itemRegistry.getIDForObject(item.getItem()) != 160    // Glass
+          && Item.itemRegistry.getIDForObject(item.getItem()) != 102    // Glass
+          && Item.itemRegistry.getIDForObject(item.getItem()) != 262) { // Arrow
         NBTTagList lorePreFilter = item.getTagCompound()
-                .getCompoundTag("display")
-                .getTagList("Lore", 8);
+            .getCompoundTag("display")
+            .getTagList("Lore", 8);
 
         List<String> lore = new ArrayList<>();
 
@@ -53,9 +52,9 @@ public class ChestTickHandler {
         }
 
         String displayName = StringUtils
-                .stripControlCodes(item.getDisplayName().split(": ")[1]);
+            .stripControlCodes(item.getDisplayName().split(": ")[1]);
         String type = StringUtils.stripControlCodes(
-                item.getDisplayName().split(": ")[0].toLowerCase());
+            item.getDisplayName().split(": ")[0].toLowerCase());
 
         if (BazaarNotifier.bazaarConv.containsValue(displayName)) {
           int amountLeft = -1;
@@ -63,20 +62,20 @@ public class ChestTickHandler {
           String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "")
-                    .split(" ")[3];
+                .split(" ")[3];
           } else if (lore.get(5).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(7)).replaceAll(",", "")
-                    .split(" ")[3];
+                .split(" ")[3];
           } else {
             priceString = StringUtils.stripControlCodes(
-                    lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
-                            .split(" ")[3]);
+                lore.get((lore.get(3).startsWith("Filled:")) ? 5 : 4).replaceAll(",", "")
+                    .split(" ")[3]);
           }
           int orderInQuestion = -1;
           for (int j = 0; j < BazaarNotifier.orders.size(); j++) {
             Order order = BazaarNotifier.orders.get(j);
             if (priceString.equalsIgnoreCase(order.priceString) && type
-                    .equals(order.type)) {
+                .equals(order.type)) {
               orderInQuestion = j;
               break;
             }
@@ -98,7 +97,7 @@ public class ChestTickHandler {
                     break;
                   }
                   amountFulfilled += Integer.parseInt(
-                          lore.get(j).replaceAll(",", "").split("x ")[0].substring(2));
+                      lore.get(j).replaceAll(",", "").split("x ")[0].substring(2));
                 }
                 amountLeft = totalAmount - amountFulfilled;
               }
@@ -106,13 +105,15 @@ public class ChestTickHandler {
             if (forceRemove) {
               if (BazaarNotifier.config.showChatMessages) {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                        BazaarNotifier.prefix + EnumChatFormatting.RED
-                                + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
+                    BazaarNotifier.prefix + EnumChatFormatting.RED
+                        + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
               }
               if (BazaarNotifier.orders.get(orderInQuestion).type.equals("sell")) {
-                BankCalculator.bazaarProfit += BazaarNotifier.orders.get(orderInQuestion).orderValue;
+                BankCalculator.bazaarProfit += BazaarNotifier.orders
+                    .get(orderInQuestion).orderValue;
               } else if (BazaarNotifier.orders.get(orderInQuestion).type.equals("buy")) {
-                BankCalculator.bazaarProfit -= BazaarNotifier.orders.get(orderInQuestion).orderValue;
+                BankCalculator.bazaarProfit -= BazaarNotifier.orders
+                    .get(orderInQuestion).orderValue;
               }
               BazaarNotifier.orders.remove(orderInQuestion);
               verifiedOrders[orderInQuestion] = 1;
@@ -121,10 +122,12 @@ public class ChestTickHandler {
 
               if (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining() > amountLeft) {
                 if (BazaarNotifier.orders.get(orderInQuestion).type.equals("sell")) {
-                  BankCalculator.bazaarProfit += (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining()
+                  BankCalculator.bazaarProfit +=
+                      (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining()
                           - amountLeft) * BazaarNotifier.orders.get(orderInQuestion).pricePerUnit;
                 } else if (BazaarNotifier.orders.get(orderInQuestion).type.equals("buy")) {
-                  BankCalculator.bazaarProfit -= (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining()
+                  BankCalculator.bazaarProfit -=
+                      (BazaarNotifier.orders.get(orderInQuestion).getAmountRemaining()
                           - amountLeft) * BazaarNotifier.orders.get(orderInQuestion).pricePerUnit;
                 }
               }
@@ -183,13 +186,13 @@ public class ChestTickHandler {
         String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
         if (chestName.contains("personal bank account") && !chestName.contains("upgrade")) {
           BankCalculator.extractBankFromItemDescription(
-              ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory,false);
-        }else if (chestName.contains("co-op bank account")&& !chestName.contains("upgrade")){
+              ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory, false);
+        } else if (chestName.contains("co-op bank account") && !chestName.contains("upgrade")) {
           BankCalculator.extractBankFromItemDescription(
-                  ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory,true);
-        }else if (chestName.equals("bank deposit") ||chestName.equals("bank withdrawal")){
-           BankCalculator.isOnDangerousPage = true;
-           BankCalculator.purseInBank = BankCalculator.getPurse();
+              ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory, true);
+        } else if (chestName.equals("bank deposit") || chestName.equals("bank withdrawal")) {
+          BankCalculator.isOnDangerousPage = true;
+          BankCalculator.purseInBank = BankCalculator.getPurse();
         }
 
       } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
@@ -215,10 +218,11 @@ public class ChestTickHandler {
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
             BazaarNotifier.prefix + EnumChatFormatting.RED
                 + "The bazaar item you just put an order for doesn't exist. Please report this in the discord server"));
-        if (System.currentTimeMillis() > date + (60 * 60 * 1000)){
+        if (System.currentTimeMillis() > date + (60 * 60 * 1000)) {
           try {
             Utils.updateResources();
-          }catch (IOException ignored){}
+          } catch (IOException ignored) {
+          }
         }
         date = System.currentTimeMillis();
       } else {
@@ -236,8 +240,8 @@ public class ChestTickHandler {
         EventHandler.productVerify[0] = productName;
         EventHandler.productVerify[1] = productWithAmount;
         String type = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
-                .equalsIgnoreCase("Confirm Sell Offer") ? "sell" : "buy";
-        EventHandler.verify = new Order(product,amount,price,priceString,type);
+            .equalsIgnoreCase("Confirm Sell Offer") ? "sell" : "buy";
+        EventHandler.verify = new Order(product, amount, price, priceString, type);
       }
     }
   }

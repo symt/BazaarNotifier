@@ -5,7 +5,6 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.Defaults;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Configuration {
+
   private static final int MODULE_LENGTH = 4;
 
   public boolean collectionCheckDisabled;
@@ -27,9 +27,10 @@ public class Configuration {
   public String version;
   public ModuleConfig[] modules;
 
-  public Configuration(boolean collectionCheckDisabled, int craftingSortingOption, int craftingListLength,
-                       boolean showInstantSellProfit,boolean showSellOfferProfit, boolean showProfitPerMil,
-                       int suggestionListLength,boolean showChatMessages, String apiKey, ModuleConfig[] modules){
+  public Configuration(boolean collectionCheckDisabled, int craftingSortingOption,
+      int craftingListLength,
+      boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
+      int suggestionListLength, boolean showChatMessages, String apiKey, ModuleConfig[] modules) {
     this.collectionCheckDisabled = collectionCheckDisabled;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
@@ -44,8 +45,6 @@ public class Configuration {
   }
 
 
-
-
   public static void saveConfig(File file, Configuration config) {
     Gson gson = new Gson();
     BazaarNotifier.config.modules = BazaarNotifier.modules.generateConfig();
@@ -54,8 +53,8 @@ public class Configuration {
         file.createNewFile();
       }
       Files.write(Paths.get(file.getAbsolutePath()),
-              gson.toJson(config).getBytes(StandardCharsets.UTF_8));
-    }catch (IOException e){
+          gson.toJson(config).getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -69,8 +68,10 @@ public class Configuration {
       c[i] = m.generateDefaultConfig();
     }
     return new Configuration(Defaults.COLLECTION_CHECKING,
-            Defaults.CRAFTING_SORTING_OPTION ,Defaults.CRAFTING_LIST_LENGTH,Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
-            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,Defaults.SEND_CHAT_MESSAGES,null,c);
+        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
+        Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
+        Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, null,
+        c);
   }
 
 }

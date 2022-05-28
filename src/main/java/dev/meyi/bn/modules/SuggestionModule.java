@@ -5,15 +5,15 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
-import net.minecraft.client.Minecraft;
-
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 public class SuggestionModule extends Module {
+
   public static final ModuleName type = ModuleName.SUGGESTION;
   public static List<String[]> list = new LinkedList<>();
 
@@ -33,7 +33,7 @@ public class SuggestionModule extends Module {
       for (int i = shift; i < BazaarNotifier.config.suggestionListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         message.put((i + 1) + ". ", Color.MAGENTA);
-        message.put(list.get(i)[0],Color.CYAN);
+        message.put(list.get(i)[0], Color.CYAN);
         message.put(" - ", Color.GRAY);
         message.put("EP: ", Color.RED);
         message.put("" + BazaarNotifier.df.format(Double.valueOf(list.get(i)[1])), Color.ORANGE);
@@ -45,11 +45,12 @@ public class SuggestionModule extends Module {
       boundsX = x + longestXString;
 
     } else {
-      Utils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA,scale);
+      Utils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA, scale);
       boundsX = x + 200;
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * BazaarNotifier.config.suggestionListLength + BazaarNotifier.config.suggestionListLength * 2 * scale - 2;
+        * BazaarNotifier.config.suggestionListLength
+        + BazaarNotifier.config.suggestionListLength * 2 * scale - 2;
     boundsY = (int) Y;
   }
 

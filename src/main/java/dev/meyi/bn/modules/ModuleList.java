@@ -6,13 +6,13 @@ import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.handlers.MouseHandler;
 import java.util.ArrayList;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 public class ModuleList extends ArrayList<Module> {
+
   public ModuleList() {
-   this(BazaarNotifier.config);
+    this(BazaarNotifier.config);
   }
 
   Module movingModule = null;
@@ -87,9 +87,10 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
 
-  public void shiftSettingCheck(){
-    for (Module m: this) {
-      if (MouseHandler.mouseWheelMovement != 0 && Keyboard.isKeyDown(42) && !Keyboard.isKeyDown(29)) {
+  public void shiftSettingCheck() {
+    for (Module m : this) {
+      if (MouseHandler.mouseWheelMovement != 0 && Keyboard.isKeyDown(42) && !Keyboard
+          .isKeyDown(29)) {
         m.mouseWheelShift -= MouseHandler.mouseWheelMovement;
         if (m.mouseWheelShift < 1) {
           m.mouseWheelShift = 1;
@@ -157,9 +158,10 @@ public class ModuleList extends ArrayList<Module> {
       m.scale = 1;
     }
   }
-  public ModuleConfig[] generateConfig(){
+
+  public ModuleConfig[] generateConfig() {
     ModuleConfig[] config = new ModuleConfig[BazaarNotifier.modules.size()];
-    for(int i = 0; i < BazaarNotifier.modules.size(); i++) {
+    for (int i = 0; i < BazaarNotifier.modules.size(); i++) {
       config[i] = this.get(i).generateModuleConfig();
     }
     return config;

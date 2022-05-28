@@ -10,26 +10,26 @@ import dev.meyi.bn.handlers.ChestTickHandler;
 import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
-import dev.meyi.bn.json.resp.Order;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 
 @Mod(modid = BazaarNotifier.MODID, version = BazaarNotifier.VERSION)
@@ -99,7 +99,8 @@ public class BazaarNotifier {
         resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
         resources = gson.fromJson(resourcesString, JsonObject.class);
       } else {
-        Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), "UTF-8");
+        Reader reader = new InputStreamReader(
+            BazaarNotifier.class.getResourceAsStream("/resources.json"), StandardCharsets.UTF_8);
         resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {
@@ -110,13 +111,13 @@ public class BazaarNotifier {
       config = Configuration.createDefaultConfig();
       modules = new ModuleList();
       modules.resetAll();
-    }else {
+    } else {
       modules = new ModuleList(config);
     }
 
-    try{
+    try {
       Utils.updateResources();
-    }catch (IOException e){
+    } catch (IOException e) {
       System.err.println("Error while getting resources from GitHub");
       e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
@@ -138,10 +139,10 @@ public class BazaarNotifier {
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                    () -> {
-                      Configuration.saveConfig(configFile, config);
-                      Utils.saveResources(resourcesFile, resources);
-                    }));
+                () -> {
+                  Configuration.saveConfig(configFile, config);
+                  Utils.saveResources(resourcesFile, resources);
+                }));
 
   }
 }

@@ -69,10 +69,11 @@ public abstract class Module {
   }
 
   public ModuleConfig generateModuleConfig() {
-    return new ModuleConfig(name(),x,y,scale,active);
+    return new ModuleConfig(name(), x, y, scale, active);
   }
-  public ModuleConfig generateDefaultConfig(){
-    return new ModuleConfig(name(), 10,10,1,true);
+
+  public ModuleConfig generateDefaultConfig() {
+    return new ModuleConfig(name(), 10, 10, 1, true);
   }
 
   protected int getMouseCoordinateX() {

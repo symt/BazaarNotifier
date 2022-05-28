@@ -1,10 +1,12 @@
 package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.resp.Order;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
+import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.ChatComponentText;
@@ -17,14 +19,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-
 public class EventHandler {
 
   static Order verify = null;
   static String[] productVerify = new String[2];
-  
+
   @SubscribeEvent
   public void bazaarChatHandler(ClientChatReceivedEvent e) {
 
@@ -71,7 +70,6 @@ public class EventHandler {
               && order.startAmount == amount && order.type.equals("sell")
               && order.pricePerUnit < edgePrice) {
 
-
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
@@ -112,14 +110,12 @@ public class EventHandler {
             //BankCalculator.bazaarProfit -= (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
             BazaarNotifier.orders.remove(i);
 
-
             break;
           }
         } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
           if (order.product.equalsIgnoreCase(itemRefunded)
               && order.getAmountRemaining() == refundAmount) {
             BazaarNotifier.orders.remove(i);
-
 
             break;
           }
@@ -129,22 +125,22 @@ public class EventHandler {
       ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
-    }else if (message.startsWith("Bazaar! Bought")){
+    } else if (message.startsWith("Bazaar! Bought")) {
       BankCalculator.bazaarProfit -=
-              Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
+          Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",", ""));
 
-    }else if (message.startsWith("Bazaar! Sold")){
+    } else if (message.startsWith("Bazaar! Sold")) {
       BankCalculator.bazaarProfit +=
-              Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",",""));
-    }else if (message.startsWith("Welcome to Hypixel SkyBlock!")){
+          Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",", ""));
+    } else if (message.startsWith("Welcome to Hypixel SkyBlock!")) {
       BankCalculator.getPurse();
-    }else if (message.startsWith("Your new API key is")){
+    } else if (message.startsWith("Your new API key is")) {
       String apiKey = message.split("key is ")[1];
       try {
         if (Utils.validateApiKey(apiKey)) {
           Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                  BazaarNotifier.prefix + EnumChatFormatting.RED
-                          + "Your api key has been set."));
+              BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Your api key has been set."));
           BazaarNotifier.config.api = apiKey;
           BazaarNotifier.validApiKey = true;
           BazaarNotifier.activeBazaar = true;
@@ -152,14 +148,14 @@ public class EventHandler {
           BazaarNotifier.config.collectionCheckDisabled = false;
         } else {
           Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                  BazaarNotifier.prefix + EnumChatFormatting.RED
-                          + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
+              BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
           BazaarNotifier.validApiKey = false;
         }
       } catch (IOException r) {
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                BazaarNotifier.prefix + EnumChatFormatting.RED
-                        + "An error occurred when trying to set your api key. Please re-run the command to try again."));
+            BazaarNotifier.prefix + EnumChatFormatting.RED
+                + "An error occurred when trying to set your api key. Please re-run the command to try again."));
         BazaarNotifier.validApiKey = false;
         r.printStackTrace();
       }
@@ -181,7 +177,7 @@ public class EventHandler {
         .contains("Bazaar")) || BazaarNotifier.forceRender)) {
       if (!BazaarNotifier.inBazaar) {
         BazaarNotifier.inBazaar = true;
-        if(!BankCalculator.orderWait) {
+        if (!BankCalculator.orderWait) {
           BankCalculator.purseLast = BankCalculator.getPurse();
         }
       }
@@ -206,7 +202,7 @@ public class EventHandler {
       BazaarNotifier.inBank = false;
     }
 
-    if (e.gui == null && BankCalculator.isOnDangerousPage){
+    if (e.gui == null && BankCalculator.isOnDangerousPage) {
       BankCalculator.isOnDangerousPage = false;
       Thread t = new Thread(() -> {
         try {
