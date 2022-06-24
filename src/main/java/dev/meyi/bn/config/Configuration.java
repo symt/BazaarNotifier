@@ -68,9 +68,9 @@ public class Configuration {
       Module m = ModuleName.values()[i].returnDefaultModule();
       c[i] = m.generateDefaultConfig();
     }
-    return new Configuration(Defaults.COLLECTION_CHECKING,
+    return new Configuration(Defaults.COLLECTION_CHECKING_DISABLED,
             Defaults.CRAFTING_SORTING_OPTION ,Defaults.CRAFTING_LIST_LENGTH,Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
-            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,Defaults.SEND_CHAT_MESSAGES,null,c);
+            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,Defaults.SEND_CHAT_MESSAGES,"",c);
   }
 
 }

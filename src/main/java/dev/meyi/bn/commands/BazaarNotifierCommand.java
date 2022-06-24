@@ -105,6 +105,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
               BazaarNotifier.validApiKey = false;
+              BazaarNotifier.config.collectionCheckDisabled = true;
             }
           } catch (IOException e) {
             player.addChatMessage(new ChatComponentText(

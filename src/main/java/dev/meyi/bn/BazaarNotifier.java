@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -99,7 +100,7 @@ public class BazaarNotifier {
         resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
         resources = gson.fromJson(resourcesString, JsonObject.class);
       } else {
-        Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), "UTF-8");
+        Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), StandardCharsets.UTF_8);
         resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {

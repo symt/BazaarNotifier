@@ -53,6 +53,12 @@ public class Utils {
 
 
   public static List<String> unlockedRecipes() throws IOException {
+    if(BazaarNotifier.config.api == null){ //Todo Remove this before release
+      BazaarNotifier.config.api = "";
+    }
+    if(BazaarNotifier.config.collectionCheckDisabled || BazaarNotifier.config.api.equals("")) {
+      return null;
+    }
     Gson gson = new Gson();
     if(recipeCooldown + 300000 > System.currentTimeMillis()){
       return null;
@@ -62,7 +68,10 @@ public class Utils {
     if(!BazaarNotifier.validApiKey){
       BazaarNotifier.validApiKey = validateApiKey();
     }
-    if (!BazaarNotifier.config.api.equals("") && BazaarNotifier.validApiKey) {
+    if (!BazaarNotifier.validApiKey) {
+        BazaarNotifier.config.collectionCheckDisabled ^= true;
+        return null;
+    }
 
       HttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
@@ -133,12 +142,11 @@ public class Utils {
         }
       }
       return unlockedCollections;
-    } else {
-      BazaarNotifier.config.collectionCheckDisabled = true;
 
-      return null;
-    }
+
+
   }
+
 
 
   public static boolean isInteger(String s) {
