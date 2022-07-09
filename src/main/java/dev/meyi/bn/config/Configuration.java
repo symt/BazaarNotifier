@@ -38,7 +38,7 @@ public class Configuration {
     this.showSellOfferProfit = showSellOfferProfit;
     this.showProfitPerMil = showProfitPerMil;
     this.suggestionListLength = suggestionListLength;
-    this.api = apiKey;
+    this.api = apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
     this.version = BazaarNotifier.VERSION;
     this.modules = modules;
     this.showChatMessages = showChatMessages;
@@ -70,7 +70,7 @@ public class Configuration {
     return new Configuration(Defaults.COLLECTION_CHECKING,
         Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
         Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
-        Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, null,
+        Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
         c);
   }
 
