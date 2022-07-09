@@ -123,6 +123,10 @@ public class UpdateHandler {
               Minecraft.getMinecraft().thePlayer.addChatMessage(
                   new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "You are on an outdated beta version. Please update via the discord server. Run /bn discord for the link"));
+            } else {
+              Minecraft.getMinecraft().thePlayer.addChatMessage(
+                  new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
+                      + "You are on a beta version. Please report any bugs you come across in the discord server."));
             }
           }
 
