@@ -23,7 +23,7 @@ public class Configuration {
   public boolean showProfitPerMil;
   public int suggestionListLength;
   public boolean showChatMessages;
-  public String api;
+  public String api = "";
   public String version;
   public ModuleConfig[] modules;
 
@@ -38,7 +38,8 @@ public class Configuration {
     this.showSellOfferProfit = showSellOfferProfit;
     this.showProfitPerMil = showProfitPerMil;
     this.suggestionListLength = suggestionListLength;
-    this.api = apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
+    this.api =
+        apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
     this.version = BazaarNotifier.VERSION;
     this.modules = modules;
     this.showChatMessages = showChatMessages;
