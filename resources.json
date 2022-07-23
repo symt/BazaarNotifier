@@ -1296,6 +1296,39 @@
 					2
 				],
 				"collection": "NONE"
+			},
+			"FUEL_GABAGOOL": {
+				"material": [
+					"CRUDE_GABAGOOL",
+					32,
+					"ENCHANTED_COAL",
+					16,
+					"ENCHANTED_SULPHUR",
+					1
+				],
+				"collection": "NONE"
+			},
+			"HEAVY_GABAGOOL": {
+				"material": [
+					"FUEL_GABAGOOL",
+					32,
+					"ENCHANTED_COAL",
+					16,
+					"ENCHANTED_SULPHUR",
+					1
+				],
+				"collection": "NONE"
+			},
+			"HYPERGOLIC_GABAGOOL": {
+				"material": [
+					"HEAVY_GABAGOOL",
+					32,
+					"ENCHANTED_COAL",
+					16,
+					"ENCHANTED_SULPHUR",
+					1
+				],
+				"collection": "NONE"
 			}
 		}
 	}
