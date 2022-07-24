@@ -93,7 +93,7 @@
 		"COAL": "Coal",
 		"ENCHANTED_QUARTZ": "Enchanted Quartz",
 		"ENDER_PEARL": "Ender Pearl",
-		"ENCHANTED_COAL_BLOCK": "Enchanted Coal Block",
+		"ENCHANTED_COAL_BLOCK": "Enchanted Block of Coal",
 		"ENCHANTED_CACTUS_GREEN": "Enchanted Cactus Green",
 		"ENCHANTED_PRISMARINE_CRYSTALS": "Enchanted Prismarine Crystals",
 		"ENCHANTED_CARROT_STICK": "Enchanted Carrot On A Stick",
@@ -128,7 +128,7 @@
 		"ENCHANTED_OAK_LOG": "Enchanted Oak Log",
 		"RABBIT_HIDE": "Rabbit Hide",
 		"WHITE_GIFT": "White Gift",
-		"INK_SACK": "Ink Sac",
+		"INK_SACK": "Ink Sack",
 		"FLINT": "Flint",
 		"ENCHANTED_SPRUCE_LOG": "Enchanted Spruce Log",
 		"WOLF_TOOTH": "Wolf Tooth",
@@ -328,7 +328,7 @@
 		"ENCHANTED_RED_SAND": "Enchanted Red Sand",
 		"ENCHANTED_RED_SAND_CUBE": "Enchanted Red Sand Cube",
 		"CORRUPTED_BAIT": "Corrupted Bait",
-		"HORNS_OF_TORMENT": "Horns Of Torment",
+		"HORNS_OF_TORMENT": "Horns of Torment",
 		"DARK_ORB": "Dark Orb",
 		"ROCK_GEMSTONE": "Rock Gemstone",
 		"END_STONE_SHULKER": "End Stone Shulker",
@@ -347,7 +347,7 @@
 		"METEOR_SHARD": "Meteor Shard",
 		"DIAMOND_ATOM": "Diamond Atom",
 		"PRECURSOR_GEAR": "Precursor Gear",
-		"NECROMANCER_BROOCH": "Necromancer Brooch",
+		"NECROMANCER_BROOCH": "Necromancer's Brooch",
 		"DEEP_SEA_ORB": "Deep Sea Orb",
 		"PETRIFIED_STARFALL": "Petrified Starfall",
 		"RED_SCARF": "Red Scarf",
@@ -361,7 +361,7 @@
 		"OPTICAL_LENS": "Optical Lens",
 		"HOT_BAIT": "Hot Bait",
 		"BEATING_HEART": "Beating Heart",
-		"AMALGAMATED_CRIMSONITE_NEW": "Amalgamated Crimsonite",
+		"AMALGAMATED_CRIMSONITE": "Amalgamated Crimsonite",
 		"TOIL_LOG": "Toil Log",
 		"SALMON_OPAL": "Salmon Opal",
 		"AOTE_STONE": "Warped Stone",
@@ -768,30 +768,6 @@
 			"ENCHANTED_NETHER_STALK": {
 				"material": "NETHER_STALK",
 				"collection": "NETHER_STALK_4"
-			},
-			"ENCHANTED_RED_SAND": {
-				"material": "SAND:1",
-				"collection": "SAND:1_2"
-			},
-			"ENCHANTED_RED_SAND_CUBE": {
-				"material": "ENCHANTED_RED_SAND",
-				"collection": "SAND:1_4"
-			},
-			"ENCHANTED_SULPHUR": {
-				"material": "SULPHUR",
-				"collection": "SULPHUR_2"
-			},
-			"ENCHANTED_SULPHUR_CUBE": {
-				"material": "ENCHANTED_SULPHUR",
-				"collection": "SULPHUR_6"
-			},
-			"ENCHANTED_MYCELIUM": {
-				"material": "MYCEL",
-				"collection": "MYCEL_3"
-			},
-			"ENCHANTED_MYCELIUM_CUBE": {
-				"material": "ENCHANTED_MYCELIUM",
-				"collection": "MYCEL_7"
 			}
 		},
 		"other": {
@@ -1321,26 +1297,38 @@
 				],
 				"collection": "NONE"
 			},
-			"MAGMA_FISH_SILVER": {
-				"material" : [
-					"MAGMA_FISH",
-					80
+			"FUEL_GABAGOOL": {
+				"material": [
+					"CRUDE_GABAGOOL",
+					32,
+					"ENCHANTED_COAL",
+					16,
+					"ENCHANTED_SULPHUR",
+					1
 				],
-				"collection" : "MAGMA_FISH_3"
+				"collection": "NONE"
 			},
-			"MAGMA_FISH_GOLD": {
-				"material" : [
-					"MAGMA_FISH_SILVER",
-					80
+			"HEAVY_GABAGOOL": {
+				"material": [
+					"FUEL_GABAGOOL",
+					32,
+					"ENCHANTED_COAL",
+					16,
+					"ENCHANTED_SULPHUR",
+					1
 				],
-				"collection" : "MAGMA_FISH_7"
+				"collection": "NONE"
 			},
-			"MAGMA_FISH_DIAMOND": {
-				"material" : [
-					"MAGMA_FISH_GOLD",
-					80
+			"HYPERGOLIC_GABAGOOL": {
+				"material": [
+					"HEAVY_GABAGOOL",
+					32,
+					"ENCHANTED_COAL",
+					16,
+					"ENCHANTED_SULPHUR",
+					1
 				],
-				"collection" : "MAGMA_FISH_10"
+				"collection": "NONE"
 			}
 		}
 	}

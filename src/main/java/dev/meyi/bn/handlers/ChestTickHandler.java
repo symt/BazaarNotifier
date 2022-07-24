@@ -115,8 +115,7 @@ public class ChestTickHandler {
                 BankCalculator.bazaarProfit -= BazaarNotifier.orders
                     .get(orderInQuestion).orderValue;
               }
-              BazaarNotifier.orders.remove(orderInQuestion);
-              verifiedOrders[orderInQuestion] = 1;
+              verifiedOrders[orderInQuestion] = 0;
 
             } else if (amountLeft > 0) {
 
@@ -145,7 +144,6 @@ public class ChestTickHandler {
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
         BazaarNotifier.orders.remove(i);
-
       }
     }
   }

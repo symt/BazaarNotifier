@@ -78,10 +78,7 @@ public class EventHandler {
         }
       }
       if (found) {
-
         BazaarNotifier.orders.remove(orderToRemove);
-
-
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
