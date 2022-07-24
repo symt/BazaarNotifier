@@ -2,19 +2,19 @@ package dev.meyi.bn.modules;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
-import dev.meyi.bn.json.resp.Order;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
-import net.minecraft.client.Minecraft;
-import org.apache.commons.lang3.text.WordUtils;
-
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import org.apache.commons.lang3.text.WordUtils;
 
 public class NotificationModule extends Module {
+
   public static final ModuleName type = ModuleName.NOTIFICATION;
 
   public NotificationModule() {
@@ -39,9 +39,10 @@ public class NotificationModule extends Module {
         Order currentOrder = BazaarNotifier.orders.get(i);
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
 
-        Color typeSpecificColor = currentOrder.orderStatus == Order.OrderType.BEST ? new Color(0x55FF55)
-            : currentOrder.type.equals("buy") ? new Color(0xFF55FF)
-                : new Color(0x55FFFF);
+        Color typeSpecificColor =
+            currentOrder.orderStatus == Order.OrderType.BEST ? new Color(0x55FF55)
+                : currentOrder.type.equals("buy") ? new Color(0xFF55FF)
+                    : new Color(0x55FFFF);
 
         String notification = currentOrder.orderStatus == Order.OrderType.BEST ? "BEST" :
             currentOrder.orderStatus == Order.OrderType.MATCHED ? "MATCHED" : "OUTDATED";

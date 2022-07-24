@@ -5,7 +5,6 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.Defaults;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Configuration {
+
   private static final int MODULE_LENGTH = 4;
 
   public boolean collectionCheckDisabled;
@@ -23,13 +23,16 @@ public class Configuration {
   public boolean showProfitPerMil;
   public int suggestionListLength;
   public boolean showChatMessages;
-  public String api;
+
+  public boolean useBuyOrders;
+  public String api = "";
   public String version;
   public ModuleConfig[] modules;
 
-  public Configuration(boolean collectionCheckDisabled, int craftingSortingOption, int craftingListLength,
-                       boolean showInstantSellProfit,boolean showSellOfferProfit, boolean showProfitPerMil,
-                       int suggestionListLength,boolean showChatMessages, String apiKey, ModuleConfig[] modules){
+  public Configuration(boolean collectionCheckDisabled, int craftingSortingOption,
+      int craftingListLength,
+      boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
+      int suggestionListLength, boolean showChatMessages, String apiKey,boolean useBuyOrders, ModuleConfig[] modules) {
     this.collectionCheckDisabled = collectionCheckDisabled;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
@@ -37,13 +40,12 @@ public class Configuration {
     this.showSellOfferProfit = showSellOfferProfit;
     this.showProfitPerMil = showProfitPerMil;
     this.suggestionListLength = suggestionListLength;
-    this.api = apiKey;
+    this.api =
+        apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
     this.version = BazaarNotifier.VERSION;
     this.modules = modules;
     this.showChatMessages = showChatMessages;
   }
-
-
 
 
   public static void saveConfig(File file, Configuration config) {
@@ -54,8 +56,8 @@ public class Configuration {
         file.createNewFile();
       }
       Files.write(Paths.get(file.getAbsolutePath()),
-              gson.toJson(config).getBytes(StandardCharsets.UTF_8));
-    }catch (IOException e){
+          gson.toJson(config).getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -68,9 +70,11 @@ public class Configuration {
       Module m = ModuleName.values()[i].returnDefaultModule();
       c[i] = m.generateDefaultConfig();
     }
-    return new Configuration(Defaults.COLLECTION_CHECKING_DISABLED,
-            Defaults.CRAFTING_SORTING_OPTION ,Defaults.CRAFTING_LIST_LENGTH,Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
-            Defaults.PROFIT_PER_MIL,Defaults.SUGGESTION_LIST_LENGTH,Defaults.SEND_CHAT_MESSAGES,"",c);
+    return new Configuration(Defaults.COLLECTION_CHECKING,
+        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
+        Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
+        Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
+        Defaults.USE_BUY_ORDERS, c);
   }
 
 }

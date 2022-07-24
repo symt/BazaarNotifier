@@ -4,6 +4,7 @@ import dev.meyi.bn.config.ModuleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
@@ -12,14 +13,14 @@ public abstract class Module {
 
   protected int x;
   protected int y;
-  protected float scale;
+  public float scale;
   int lastMouseX, lastMouseY;
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
   int mouseWheelShift = 0;
   boolean moving = false;
-  boolean active = true;
+  public boolean active = true;
   boolean needsToMove = false;
 
   public Module() {
@@ -69,10 +70,11 @@ public abstract class Module {
   }
 
   public ModuleConfig generateModuleConfig() {
-    return new ModuleConfig(name(),x,y,scale,active);
+    return new ModuleConfig(name(), x, y, scale, active);
   }
-  public ModuleConfig generateDefaultConfig(){
-    return new ModuleConfig(name(), 10,10,1,true);
+
+  public ModuleConfig generateDefaultConfig() {
+    return new ModuleConfig(name(), 10, 10, 1, true);
   }
 
   protected int getMouseCoordinateX() {
@@ -82,6 +84,14 @@ public abstract class Module {
   protected int getMouseCoordinateY() {
     return (Display.getHeight() - Mouse.getY()) / new ScaledResolution(Minecraft.getMinecraft())
         .getScaleFactor();
+  }
+  public String getReadableName(){
+    String name = StringUtils.lowerCase(name());
+    return StringUtils.capitalize(name) + " Module";
+  }
+
+  public String getName(){
+    return  name();
   }
 
 }

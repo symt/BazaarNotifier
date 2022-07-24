@@ -1,14 +1,13 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.resp.Order;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
-import net.minecraft.client.Minecraft;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import net.minecraft.client.Minecraft;
 
 public class ScheduledEvents {
 
@@ -30,9 +29,10 @@ public class ScheduledEvents {
       new ScheduledEvents();
     }
   }
-  public void craftingLoop(){
+
+  public void craftingLoop() {
     Executors.newScheduledThreadPool(1)
-        .scheduleAtFixedRate(CraftingCalculator::getBestEnchantRecipes, 5,5,TimeUnit.SECONDS);
+        .scheduleAtFixedRate(CraftingCalculator::getBestEnchantRecipes, 5, 5, TimeUnit.SECONDS);
   }
 
   public void suggestionLoop() {
@@ -47,7 +47,7 @@ public class ScheduledEvents {
 
   public void purseLoop() {
     Executors.newScheduledThreadPool(1)
-            .scheduleAtFixedRate(BankCalculator::getPurse, 5, 5, TimeUnit.SECONDS);
+        .scheduleAtFixedRate(BankCalculator::getPurse, 5, 5, TimeUnit.SECONDS);
   }
 
   public void outdatedNotification() {
@@ -66,8 +66,10 @@ public class ScheduledEvents {
                 double price = currentOrder.pricePerUnit;
                 if (currentOrder.type.equals("buy")) {
                   double diff =
-                      BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).pricePerUnit - price;
-                  if (BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders != 1 && diff == 0
+                      BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary
+                          .get(0).pricePerUnit - price;
+                  if (BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders != 1
+                      && diff == 0
                       && currentOrder.orderStatus != Order.OrderType.MATCHED) {
                     currentOrder.orderStatus = Order.OrderType.MATCHED;
                     currentOrder.currentNotification = "MATCHED";
@@ -85,9 +87,10 @@ public class ScheduledEvents {
                     currentOrder.orderStatus = Order.OrderType.OUTDATED;
                     currentOrder.currentNotification = "OUTDATED";
                   } else if (diff == 0 &&
-                      BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders == 1) {
+                      BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders
+                          == 1) {
                     if (currentOrder.orderStatus == Order.OrderType.OUTDATED ||
-                            currentOrder.orderStatus == Order.OrderType.MATCHED) {
+                        currentOrder.orderStatus == Order.OrderType.MATCHED) {
                       if (BazaarNotifier.config.showChatMessages) {
                         Minecraft.getMinecraft().thePlayer.addChatMessage(
                             Utils.chatNotification(price, i, "Buy Order", "REVIVED"));
@@ -96,9 +99,11 @@ public class ScheduledEvents {
                     currentOrder.orderStatus = Order.OrderType.BEST;
                   }
                 } else {
-                  double diff = price - BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).pricePerUnit;
-                  if (BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).orders != 1 &&
-                          diff == 0 && currentOrder.orderStatus != Order.OrderType.MATCHED) {
+                  double diff = price - BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary
+                      .get(0).pricePerUnit;
+                  if (BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).orders != 1
+                      &&
+                      diff == 0 && currentOrder.orderStatus != Order.OrderType.MATCHED) {
                     currentOrder.orderStatus = Order.OrderType.MATCHED;
                     currentOrder.currentNotification = "MATCHED";
                     if (BazaarNotifier.config.showChatMessages) {
@@ -115,9 +120,10 @@ public class ScheduledEvents {
                               Utils.chatNotification(price, i, "Sell Offer", "OUTDATED"));
                     }
                   } else if (diff == 0
-                      && BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).orders == 1) {
+                      && BazaarNotifier.bazaarDataRaw.products.get(key).buy_summary.get(0).orders
+                      == 1) {
                     if (currentOrder.orderStatus == Order.OrderType.OUTDATED ||
-                            currentOrder.orderStatus == Order.OrderType.MATCHED) {
+                        currentOrder.orderStatus == Order.OrderType.MATCHED) {
                       if (BazaarNotifier.config.showChatMessages) {
                         Minecraft.getMinecraft().thePlayer.addChatMessage(
                             Utils.chatNotification(price, i, "Sell Offer", "REVIVED"));

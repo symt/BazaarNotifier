@@ -10,8 +10,8 @@ import dev.meyi.bn.handlers.ChestTickHandler;
 import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
-import dev.meyi.bn.json.resp.Order;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.5.0";
+  public static final String VERSION = "1.5.0-beta6";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -60,13 +60,13 @@ public class BazaarNotifier {
   public static Configuration config;
   public static JsonObject resources;
 
+  public static String guiToOpen = "";
 
   public static JsonObject enchantCraftingList;
   public static BiMap<String, String> bazaarConv = HashBiMap.create();
 
   public static File configFile;
   public static File resourcesFile;
-  private File bnDir;
 
   public static void resetMod() {
     modules.resetAll();
@@ -80,7 +80,7 @@ public class BazaarNotifier {
 
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
-    bnDir = new File(event.getModConfigurationDirectory(), "BazaarNotifier");
+    File bnDir = new File(event.getModConfigurationDirectory(), "BazaarNotifier");
     bnDir.mkdirs();
     configFile = new File(bnDir, "config.json");
     resourcesFile = new File(bnDir, "resources.json");
@@ -100,7 +100,8 @@ public class BazaarNotifier {
         resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
         resources = gson.fromJson(resourcesString, JsonObject.class);
       } else {
-        Reader reader = new InputStreamReader(BazaarNotifier.class.getResourceAsStream("/resources.json"), StandardCharsets.UTF_8);
+        Reader reader = new InputStreamReader(
+            BazaarNotifier.class.getResourceAsStream("/resources.json"), StandardCharsets.UTF_8);
         resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {
@@ -111,13 +112,13 @@ public class BazaarNotifier {
       config = Configuration.createDefaultConfig();
       modules = new ModuleList();
       modules.resetAll();
-    }else {
+    } else {
       modules = new ModuleList(config);
     }
 
-    try{
+    try {
       Utils.updateResources();
-    }catch (IOException e){
+    } catch (IOException e) {
       System.err.println("Error while getting resources from GitHub");
       e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
@@ -133,16 +134,17 @@ public class BazaarNotifier {
     MinecraftForge.EVENT_BUS.register(new ChestTickHandler());
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
+
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
     ScheduledEvents.create();
 
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                    () -> {
-                      Configuration.saveConfig(configFile, config);
-                      Utils.saveResources(resourcesFile, resources);
-                    }));
+                () -> {
+                  Configuration.saveConfig(configFile, config);
+                  Utils.saveResources(resourcesFile, resources);
+                }));
 
   }
 }

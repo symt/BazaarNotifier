@@ -1,9 +1,8 @@
 package dev.meyi.bn.utilities;
 
-import java.util.Comparator;
-
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
+import java.util.Comparator;
 
 public class JSONComparator implements Comparator<JsonObject> {
 
