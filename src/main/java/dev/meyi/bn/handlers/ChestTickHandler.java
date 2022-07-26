@@ -4,9 +4,6 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
@@ -19,6 +16,10 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ChestTickHandler {
@@ -115,8 +116,7 @@ public class ChestTickHandler {
                 BankCalculator.bazaarProfit -= BazaarNotifier.orders
                     .get(orderInQuestion).orderValue;
               }
-              BazaarNotifier.orders.remove(orderInQuestion);
-              verifiedOrders[orderInQuestion] = 1;
+              verifiedOrders[orderInQuestion] = 0;
 
             } else if (amountLeft > 0) {
 
@@ -145,7 +145,6 @@ public class ChestTickHandler {
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
         BazaarNotifier.orders.remove(i);
-
       }
     }
   }

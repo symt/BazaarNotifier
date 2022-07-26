@@ -7,8 +7,6 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
-import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.ChatComponentText;
@@ -21,6 +19,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
+import java.math.BigDecimal;
 
 public class EventHandler {
 
@@ -81,10 +82,7 @@ public class EventHandler {
         }
       }
       if (found) {
-
         BazaarNotifier.orders.remove(orderToRemove);
-
-
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
