@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
@@ -32,7 +33,7 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
-    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
+    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith("[Bazaar] Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConv.inverse()
               .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
@@ -82,7 +83,7 @@ public class EventHandler {
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
-    } else if (message.startsWith("Cancelled!")) {
+    } else if (message.startsWith("Cancelled!") || message.startsWith("[Bazaar] Cancelled!")) {
       double refund = 0;
       int refundAmount = 0;
       String itemRefunded = "";
@@ -118,15 +119,14 @@ public class EventHandler {
           }
         }
       }
-    } else if (message.startsWith("Bazaar! Claimed ")) {
+    } else if (message.startsWith("Bazaar! Claimed ") || message.startsWith("[Bazaar] Claimed")) {
       ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
-    } else if (message.startsWith("Bazaar! Bought")) {
+    } else if (message.startsWith("Bazaar! Bought") || message.startsWith("[Bazaar] Bought")) {
       BankCalculator.bazaarProfit -=
           Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",", ""));
-
-    } else if (message.startsWith("Bazaar! Sold")) {
+    } else if (message.startsWith("Bazaar! Sold") || message.startsWith("[Bazaar] Sold")) {
       BankCalculator.bazaarProfit +=
           Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",", ""));
     } else if (message.startsWith("Welcome to Hypixel SkyBlock!")) {
@@ -178,6 +178,8 @@ public class EventHandler {
           BankCalculator.purseLast = BankCalculator.getPurse();
         }
       }
+    } else if (e.gui instanceof GuiEditSign) {
+      BazaarNotifier.inBazaar = false;
     }
 
     if (e.gui == null && BazaarNotifier.inBazaar) {
