@@ -23,7 +23,6 @@ public class Configuration {
   public boolean showProfitPerMil;
   public int suggestionListLength;
   public boolean showChatMessages;
-
   public boolean useBuyOrders;
   public String api = "";
   public String version;
@@ -45,6 +44,7 @@ public class Configuration {
     this.version = BazaarNotifier.VERSION;
     this.modules = modules;
     this.showChatMessages = showChatMessages;
+    this.useBuyOrders = useBuyOrders;
   }
 
 

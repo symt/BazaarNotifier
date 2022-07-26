@@ -1,12 +1,16 @@
 package dev.meyi.bn.commands;
 
+import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -88,7 +92,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   toggle ? EnumChatFormatting.DARK_GREEN + "on"
                       : EnumChatFormatting.DARK_RED + "off")));
         }
-      }else if (args.length >= 1 && args[0].equalsIgnoreCase("api")) {
+      } else if (args.length >= 1 && args[0].equalsIgnoreCase("api")) {
         if (args.length == 2) {
           BazaarNotifier.config.api = args[1];
           try {
@@ -120,7 +124,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   + "Run /bn api (key) to set your api key. Do /api if you need to get your api key."));
           BazaarNotifier.validApiKey = false;
         }
-      }else if (args.length >= 1 && args[0].equalsIgnoreCase("settings")) {
+      } else if (args.length >= 1 && args[0].equalsIgnoreCase("settings")) {
         ChatComponentText wikiLink = new ChatComponentText(EnumChatFormatting.RED
             + "" + EnumChatFormatting.BOLD
             + "Go to the wiki ");
@@ -388,9 +392,6 @@ public class BazaarNotifierCommand extends CommandBase {
       }
     }
   }
-
-
-
 
   public boolean canCommandSenderUseCommand(final ICommandSender sender) {
     return true;

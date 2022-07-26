@@ -37,7 +37,7 @@ import java.util.ArrayList;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.5.0-beta6";
+  public static final String VERSION = "1.5.0-beta7";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -134,7 +134,6 @@ public class BazaarNotifier {
     MinecraftForge.EVENT_BUS.register(new ChestTickHandler());
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
-
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
     ScheduledEvents.create();
 
