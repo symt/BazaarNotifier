@@ -24,7 +24,7 @@ public class EventHandler {
       return;
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
-    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")) {
+    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith("[Bazaar] Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConversionsReversed
               .getString(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
@@ -70,7 +70,7 @@ public class EventHandler {
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
-    } else if (message.startsWith("Cancelled!")) {
+    } else if (message.startsWith("Cancelled!") || message.startsWith("[Bazaar] Cancelled!")) {
       double refund = 0;
       int refundAmount = 0;
       String itemRefunded = "";
@@ -102,7 +102,7 @@ public class EventHandler {
           }
         }
       }
-    } else if (message.startsWith("Bazaar! Claimed ")) {
+    } else if (message.startsWith("Bazaar! Claimed ") || message.startsWith("[Bazaar] Claimed ")) {
       ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
