@@ -1,16 +1,12 @@
 package dev.meyi.bn.commands;
 
-import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
