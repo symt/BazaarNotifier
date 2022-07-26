@@ -4,6 +4,8 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
@@ -39,10 +41,18 @@ public class ChestTickHandler {
           lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(j)));
         }
 
-        String displayName = StringUtils
-            .stripControlCodes(chest.getStackInSlot(i).getDisplayName().split(": ")[1]);
-        String type = StringUtils.stripControlCodes(
-            chest.getStackInSlot(i).getDisplayName().split(": ")[0].toLowerCase());
+        Pattern p = Pattern
+            .compile("(BUY|SELL):? (.*)");
+        Matcher m = p.matcher(StringUtils.stripControlCodes(chest.getStackInSlot(i).getDisplayName()));
+        String displayName = "";
+        String type = "";
+        if (m.find()) {
+          displayName = m.group(2);
+          type = m.group(1).toLowerCase();
+        } else {
+          System.out.println("Bazaar item header incorrect. Aborting!");
+          return;
+        }
 
         if (BazaarNotifier.bazaarConversionsReversed.has(displayName)) {
           int amountLeft = -1;
