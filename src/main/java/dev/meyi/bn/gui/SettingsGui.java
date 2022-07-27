@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class SettingsGui extends GuiScreen {
     GuiTextField apiKey;
+    String previousApiKey;
 
 
     @Override
@@ -30,9 +31,11 @@ public class SettingsGui extends GuiScreen {
                 BazaarNotifier.config.showChatMessages? "Chat messages enabled" : "Chat messages disabled"));
         buttonId++;
         apiKey = new GuiTextField(buttonId, fontRendererObj, getButtonX(buttonId), getButtonY(buttonId), 200, 20);
+        apiKey.setMaxStringLength(40);
         apiKey.setFocused(true);
         apiKey.setCanLoseFocus(false);
         apiKey.setText(BazaarNotifier.config.api);
+        previousApiKey = BazaarNotifier.config.api;
     }
 
     @Override
@@ -71,14 +74,16 @@ public class SettingsGui extends GuiScreen {
         super.onGuiClosed();
         try {
             String key = apiKey.getText();
-            if(key.equals("")){
+            if(key.equals("") || key.equals(previousApiKey)){
                 return;
             }
             if(Utils.validateApiKey(key)){
                 BazaarNotifier.config.api = key;
-            }else{
                 Minecraft.getMinecraft().thePlayer.addChatMessage(
-                        new ChatComponentText("Your API-Key was not saved because it was invalid"));
+                        new ChatComponentText(BazaarNotifier.prefix + "A new Api-Key has been set"));
+            }else{
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                        BazaarNotifier.prefix + "Your API-Key was not saved because it was invalid"));
             }
 
         } catch (IOException e) {

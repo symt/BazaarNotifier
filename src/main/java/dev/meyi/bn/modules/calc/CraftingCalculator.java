@@ -39,12 +39,12 @@ public class CraftingCalculator {
           String material = BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
               .getAsJsonObject(itemName).get("material").getAsString();
           double price1 =
-              (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).pricePerUnit) -
+              (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).getPriceWithTax()) -
                   (BazaarNotifier.config.useBuyOrders?
                           (BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(0).pricePerUnit * 160):
                           (BazaarNotifier.bazaarDataRaw.products.get(material).buy_summary.get(0).pricePerUnit * 160));
           double price2 =
-              BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).pricePerUnit -
+              BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).getPriceWithTax() -
                   (BazaarNotifier.config.useBuyOrders?
                       (BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(0).pricePerUnit * 160):
                       (BazaarNotifier.bazaarDataRaw.products.get(material).buy_summary.get(0).pricePerUnit * 160));
@@ -76,9 +76,9 @@ public class CraftingCalculator {
             BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() > 0) {
           try {
             double itemSellPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
-                    .get(0).pricePerUnit;
+                    .get(0).getPriceWithTax();
             double itemBuyPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary
-                    .get(0).pricePerUnit;
+                    .get(0).getPriceWithTax();
             double ingredientPrice = 0d;
             int ingredientCount;
             double materialCost = 0d;
@@ -199,11 +199,11 @@ public class CraftingCalculator {
         String material = BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
             .getAsJsonObject(itemName).get("material").getAsString();
         double price1 =
-            BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).pricePerUnit -
+            BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).getPriceWithTax() -
                 BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(1).pricePerUnit
                     * 160;
         double price2 =
-            BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).pricePerUnit -
+            BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).getPriceWithTax() -
                 BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(1).pricePerUnit
                     * 160;
         double profitPerMilCount = 1000000 / (
@@ -211,11 +211,11 @@ public class CraftingCalculator {
                 * 160);
         double profitPerMil = profitPerMilCount * price1;
         double price12 =
-                BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).pricePerUnit -
+                BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).getPriceWithTax() -
                         BazaarNotifier.bazaarDataRaw.products.get(material).buy_summary.get(1).pricePerUnit
                                 * 160;
         double price22 =
-                BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).pricePerUnit -
+                BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).getPriceWithTax() -
                         BazaarNotifier.bazaarDataRaw.products.get(material).buy_summary.get(1).pricePerUnit
                                 * 160;
         double profitPerMilCount2 = 1000000 / (
@@ -240,9 +240,9 @@ public class CraftingCalculator {
     } else if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.products.size() != 0) {
         double itemSellPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
-            .get(0).pricePerUnit;
+            .get(0).getPriceWithTax();
         double itemBuyPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary
-            .get(0).pricePerUnit;
+            .get(0).getPriceWithTax();
         double ingredientPrice = 0d;
         int ingredientCount;
         double materialCost = 0d;
