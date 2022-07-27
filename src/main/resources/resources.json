@@ -607,7 +607,7 @@
 			},
 			"ENCHANTED_IRON_BLOCK": {
 				"material": "ENCHANTED_IRON",
-				"collection": "IRON_7"
+				"collection": "IRON_INGOT_7"
 			},
 			"ENCHANTED_PORK": {
 				"material": "PORK",
@@ -699,7 +699,7 @@
 			},
 			"ENCHANTED_IRON": {
 				"material": "IRON_INGOT",
-				"collection": "IRON_4"
+				"collection": "IRON_INGOT_4"
 			},
 			"ENCHANTED_HAY_BLOCK": {
 				"material": "HAY_BLOCK",
@@ -951,9 +951,7 @@
 				"material": [
 					"ENCHANTED_MITHRIL",
 					56,
-					"ENCHANTED_COBBLESTONE",
-					448,
-					"ENCHANTED_REDSTONE_BLOCK",
+					"RECOMBOBULATOR_3000",
 					1,
 					"COBBLESTONE",
 					64,
