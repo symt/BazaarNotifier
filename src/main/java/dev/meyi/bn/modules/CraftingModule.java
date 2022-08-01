@@ -56,7 +56,7 @@ public class CraftingModule extends Module {
 
       for (int i = 3; i>= 0; i--) {
         totalWidth -= width[i];
-        if(totalWidth < relativeX){
+        if(totalWidth < relativeX && inMovementBox()){
           switch (i){
             case 0: if(mouseButtonDown){
                         BazaarNotifier.config.useBuyOrders ^= true;
