@@ -13,14 +13,14 @@ public abstract class Module {
 
   protected int x;
   protected int y;
-  public float scale;
+  protected float scale;
   int lastMouseX, lastMouseY;
   int boundsX, boundsY;
   int padding = 3;
   int shift = 0;
   int mouseWheelShift = 0;
   boolean moving = false;
-  public boolean active = true;
+  boolean active = true;
   boolean needsToMove = false;
 
   public Module() {
@@ -94,4 +94,19 @@ public abstract class Module {
     return  name();
   }
 
+  public float getScale() {
+    return scale;
+  }
+
+  public void setScale(float scale) {
+    this.scale = scale;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
 }

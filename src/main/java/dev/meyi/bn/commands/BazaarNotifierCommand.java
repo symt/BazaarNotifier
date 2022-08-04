@@ -278,20 +278,13 @@ public class BazaarNotifierCommand extends CommandBase {
                   EnumChatFormatting.RED + BazaarNotifier.df
                   .format(SuggestionCalculator.calculateEP(item)) + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
-                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Buy order materials:" + "\n" +
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Buy order materials / Instant buy materials" + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
-                  EnumChatFormatting.RED + prices[0] + "\n" +
+                  EnumChatFormatting.RED + prices[0] + " / " + prices[3] + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
-                  EnumChatFormatting.RED + prices[1] + "\n" +
+                  EnumChatFormatting.RED + prices[1] + " / " + prices[4] + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit per 1M: " +
-                  EnumChatFormatting.RED + prices[2] + "\n" +
-                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Instant buy materials:" + "\n" +
-                  EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
-                  EnumChatFormatting.RED + prices[3] + "\n" +
-                  EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
-                  EnumChatFormatting.RED + prices[4] + "\n" +
-                  EnumChatFormatting.DARK_RED + "Profit per 1M: " +
-                  EnumChatFormatting.RED + prices[5] + "\n" +
+                  EnumChatFormatting.RED + prices[2] + " / " + prices[5] + "\n" +
                   BazaarNotifier.prefix
               ));
             } else {

@@ -7,9 +7,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.config.GuiSlider;
 
-
-import java.io.IOException;
-
 public class ModuleSettingsGui extends GuiScreen {
     Module module;
     GuiSlider scaleSlider;
@@ -22,8 +19,8 @@ public class ModuleSettingsGui extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        buttonList.add(new GuiButton(0, getButtonX(0), getButtonY(0), module.active? "Module active" : "Module disabled"));
-        buttonList.add(scaleSlider = new GuiSlider(1, getButtonX(1), getButtonY(1), 200, 20, "Scale: ", "", 1, 30, module.scale*10, false,true));
+        buttonList.add(new GuiButton(0, getButtonX(0), getButtonY(0), module.isActive()? "Module active" : "Module disabled"));
+        buttonList.add(scaleSlider = new GuiSlider(1, getButtonX(1), getButtonY(1), 200, 20, "Scale: ", "", 1, 30, module.getScale()*10, false,true));
         if(module.getName().equals("SUGGESTION")) {
             buttonList.add(lengthSlider = new GuiSlider(2, getButtonX(2), getButtonY(2), 200, 20, "Entries: ", "", 1, 100, BazaarNotifier.config.suggestionListLength, false, true));
         }else if ( module.getName().equals("CRAFTING")){
@@ -49,12 +46,12 @@ public class ModuleSettingsGui extends GuiScreen {
     }
 
     @Override
-    protected void actionPerformed(GuiButton Button) throws IOException {
+    protected void actionPerformed(GuiButton Button){
         switch (Button.id){
-            case 0: module.active ^= true;
-                Button.displayString = module.active? "Module active" : "Module disabled";
+            case 0: module.setActive(!module.isActive());
+                Button.displayString = module.isActive()? "Module active" : "Module disabled";
                 break;
-            case 1: module.scale = (float) scaleSlider.getValue()/10;
+            case 1: module.setScale((float) scaleSlider.getValue()/10);
                 break;
             case 2: if(module.getName().equals("SUGGESTION")) {
                         BazaarNotifier.config.suggestionListLength = (int) Math.round(lengthSlider.getValue());
@@ -102,8 +99,8 @@ public class ModuleSettingsGui extends GuiScreen {
             BazaarNotifier.config.craftingListLength = (int) lengthSlider.getValue();
         }
         //action Performed is only called on the first tick when picking up the slider
-        if (scaleSlider.getValue() != module.scale){
-            module.scale = (float) scaleSlider.getValue()/10;
+        if (scaleSlider.getValue() != module.getScale()){
+            module.setScale((float) scaleSlider.getValue()/10);
         }
         if(module.getName().equals("SUGGESTION")) {
             if(lengthSlider.getValue() != BazaarNotifier.config.suggestionListLength) {

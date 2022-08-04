@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 
 import java.io.IOException;
 
@@ -39,7 +40,7 @@ public class SettingsGui extends GuiScreen {
     }
 
     @Override
-    protected void actionPerformed(GuiButton Button) throws IOException {
+    protected void actionPerformed(GuiButton Button) {
         if (Button.id < BazaarNotifier.modules.size()) {
             BazaarNotifier.guiToOpen = "module"+ Button.id;
         }else if (Button.id ==  BazaarNotifier.modules.size()){
@@ -80,10 +81,10 @@ public class SettingsGui extends GuiScreen {
             if(Utils.validateApiKey(key)){
                 BazaarNotifier.config.api = key;
                 Minecraft.getMinecraft().thePlayer.addChatMessage(
-                        new ChatComponentText(BazaarNotifier.prefix + "A new Api-Key has been set"));
+                        new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN +"A new API-Key has been set."));
             }else{
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                        BazaarNotifier.prefix + "Your API-Key was not saved because it was invalid"));
+                        BazaarNotifier.prefix + EnumChatFormatting.RED + "Your API-Key was not saved because it was invalid."));
             }
 
         } catch (IOException e) {
