@@ -1329,6 +1329,32 @@
 					1
 				],
 				"collection": "NONE"
+			},
+			"MOLTEN_POWDER": {
+				"material": [
+					"DERELICT_ASHE",
+					128,
+					"AMALGAMATED_CRIMSONITE_NEW",
+					1
+				],
+				"collection": "blaze_2"
+			},
+			"AMALGAMATED_CRIMSONITE_NEW": {
+				"material": [
+					"ENCHANTED_RED_SAND",
+					8
+					"ENCHANTED_MYCELIUM",
+					8,
+					"ENCHANTED_GLOWSTONE_DUST",
+					32,
+					"ENCHANTED_MAGMA_CREAM",
+					32,
+					"ENCHANTED_BLAZE_POWDER",
+					32,
+					"ENCHANTED_NETHER_STALK",
+					32
+				],
+				"collection": "NONE"
 			}
 		}
 	}
