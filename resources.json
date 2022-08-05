@@ -361,7 +361,8 @@
 		"OPTICAL_LENS": "Optical Lens",
 		"HOT_BAIT": "Hot Bait",
 		"BEATING_HEART": "Beating Heart",
-		"AMALGAMATED_CRIMSONITE": "Amalgamated Crimsonite",
+		"AMALGAMATED_CRIMSONITE_NEW": "Amalgamated Crimsonite",
+		"AMALGAMATED_CRIMSONITE": "Amalgamated Crimsonite (Old)",
 		"TOIL_LOG": "Toil Log",
 		"SALMON_OPAL": "Salmon Opal",
 		"AOTE_STONE": "Warped Stone",
@@ -413,7 +414,8 @@
 		"WITHER_BLOOD": "Wither Blood",
 		"BLAZE_WAX": "Blaze Wax",
 		"LAPIS_CRYSTAL": "Lapis Crystal",
-		"SHINY_PRISM": "Shiny Prism"
+		"SHINY_PRISM": "Shiny Prism",
+		"CHILI_PEPPER": "Chili Pepper"
 	},
 	"enchantCraftingList": {
 		"normal": {
