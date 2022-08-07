@@ -415,7 +415,8 @@
 		"BLAZE_WAX": "Blaze Wax",
 		"LAPIS_CRYSTAL": "Lapis Crystal",
 		"SHINY_PRISM": "Shiny Prism",
-		"CHILI_PEPPER": "Chili Pepper"
+		"CHILI_PEPPER": "Chili Pepper",
+		"ENTROPY_SUPPRESSOR": "Entropy Suppressor"
 	},
 	"enchantCraftingList": {
 		"normal": {
