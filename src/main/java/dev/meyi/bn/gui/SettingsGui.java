@@ -26,10 +26,10 @@ public class SettingsGui extends GuiScreen {
             buttonId++;
         }
         buttonList.add(new GuiButton(buttonId, getButtonX(buttonId),getButtonY(buttonId),
-                BazaarNotifier.activeBazaar ? "Mod active" : "Mod disabled"));
+                "Mod: " + getOnOff(BazaarNotifier.activeBazaar)));
         buttonId++;
         buttonList.add(new GuiButton(buttonId, getButtonX(buttonId), getButtonY(buttonId),
-                BazaarNotifier.config.showChatMessages? "Chat messages enabled" : "Chat messages disabled"));
+                 "Chat Messages: "+getOnOff(BazaarNotifier.config.showChatMessages)));
         buttonId++;
         apiKey = new GuiTextField(buttonId, fontRendererObj, getButtonX(buttonId), getButtonY(buttonId), 200, 20);
         apiKey.setMaxStringLength(40);
@@ -45,10 +45,10 @@ public class SettingsGui extends GuiScreen {
             BazaarNotifier.guiToOpen = "module"+ Button.id;
         }else if (Button.id ==  BazaarNotifier.modules.size()){
             BazaarNotifier.activeBazaar ^= true;
-            Button.displayString = BazaarNotifier.activeBazaar ? "Mod active" : "Mod disabled";
+            Button.displayString = "Mod: " + getOnOff(BazaarNotifier.activeBazaar);
         }else if (Button.id ==  BazaarNotifier.modules.size()+1){
             BazaarNotifier.config.showChatMessages ^= true;
-            Button.displayString = BazaarNotifier.config.showChatMessages? "Chat messages enabled" : "Chat messages disabled";
+            Button.displayString = "Chat Messages: " + getOnOff(BazaarNotifier.config.showChatMessages);
         }
     }
 
@@ -92,6 +92,9 @@ public class SettingsGui extends GuiScreen {
         } catch (NullPointerException ignored){
             //this only happens if the GUI is closed during initialising
         }
+    }
+    String getOnOff(boolean b){
+        return b ? "ON" : "OFF";
     }
 
     public int getButtonX(int id){

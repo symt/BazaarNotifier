@@ -64,7 +64,7 @@ public class EventHandler {
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
-            BankCalculator.bazaarProfit -= BazaarNotifier.orders.get(orderToRemove).orderValue;
+
           }
         }
       } else if (message.startsWith("[Bazaar] Your Sell Offer")) {
@@ -78,7 +78,6 @@ public class EventHandler {
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
-            BankCalculator.bazaarProfit += BazaarNotifier.orders.get(orderToRemove).orderValue;
           }
         }
       }
@@ -127,12 +126,6 @@ public class EventHandler {
       ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
       // ChestTickHandler.updateBazaarOrders(
       //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
-    } else if (message.startsWith("Bazaar! Bought") || message.startsWith("[Bazaar] Bought")) {
-      BankCalculator.bazaarProfit -=
-          Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",", ""));
-    } else if (message.startsWith("Bazaar! Sold") || message.startsWith("[Bazaar] Sold")) {
-      BankCalculator.bazaarProfit +=
-          Double.parseDouble(message.split(" for ")[1].split(" coins")[0].replaceAll(",", ""));
     } else if (message.startsWith("Welcome to Hypixel SkyBlock!")) {
       BankCalculator.getPurse();
     } else if (message.startsWith("Your new API key is")) {
