@@ -39,8 +39,8 @@ public class ModuleSettingsGui extends GuiScreen {
                 buttonList.get(3).enabled = false;
             }
             buttonList.add(new GuiButton(ButtonIds.SELLING_OPTION.id, getButtonX(ButtonIds.SELLING_OPTION.id),
-                    getButtonY(ButtonIds.SELLING_OPTION.id), BazaarNotifier.config.craftingSortingOption == 0 ?
-                    "Instant Sell" : BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer":"Profit Per Million" ));
+                    getButtonY(ButtonIds.SELLING_OPTION.id), "Sort By: " + (BazaarNotifier.config.craftingSortingOption == 0 ?
+                    "Instant Sell" : BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer":"Profit Per Million" )));
             buttonList.add(new GuiButton(ButtonIds.INSTANT_SELL_PROFIT.id, getButtonX(ButtonIds.INSTANT_SELL_PROFIT.id),
                     getButtonY(ButtonIds.INSTANT_SELL_PROFIT.id), "Instant Sell Profit: " +
                     getOnOff(BazaarNotifier.config.showInstantSellProfit)));
@@ -51,8 +51,8 @@ public class ModuleSettingsGui extends GuiScreen {
                     getButtonY(ButtonIds.PROFIT_PER_MILLION.id), "Profit Per Million: " +
                     getOnOff(BazaarNotifier.config.showProfitPerMil)));
             buttonList.add(new GuiButton(ButtonIds.MATERIAL_BUYING_OPTION.id, getButtonX(ButtonIds.MATERIAL_BUYING_OPTION.id),
-                    getButtonY(ButtonIds.MATERIAL_BUYING_OPTION.id), BazaarNotifier.config.useBuyOrders ?
-                    "Buy order materials" : "Instant buy materials"));
+                    getButtonY(ButtonIds.MATERIAL_BUYING_OPTION.id), "Materials: " +
+                    (BazaarNotifier.config.useBuyOrders? "Buy Order" : "Instant Buy")));
 
         }
 
@@ -77,8 +77,8 @@ public class ModuleSettingsGui extends GuiScreen {
             Button.displayString = "Collection Check: " + getOnOff(BazaarNotifier.config.collectionCheckDisabled);
         } else if (Button.id == ButtonIds.SELLING_OPTION.id) {
             CraftingCalculator.toggleCrafting();
-            Button.displayString = BazaarNotifier.config.craftingSortingOption == 0 ? "Instant Sell" :
-                    BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer":"Profit Per Million";
+            Button.displayString ="Sort By: " + (BazaarNotifier.config.craftingSortingOption == 0 ? "Instant Sell" :
+                    BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer":"Profit Per Million");
         } else if (Button.id == ButtonIds.INSTANT_SELL_PROFIT.id) {
             BazaarNotifier.config.showInstantSellProfit ^= true;
             Button.displayString = "Instant Sell Profit: " + getOnOff(BazaarNotifier.config.showInstantSellProfit);
@@ -90,8 +90,8 @@ public class ModuleSettingsGui extends GuiScreen {
             Button.displayString = "Profit Per Million: " + getOnOff(BazaarNotifier.config.showProfitPerMil);
         } else if (Button.id == ButtonIds.MATERIAL_BUYING_OPTION.id) {
             BazaarNotifier.config.useBuyOrders ^= true;
-            Button.displayString =  BazaarNotifier.config.useBuyOrders ?
-                    "Buy order materials" : "Instant buy materials";
+            Button.displayString = "Materials: " + (BazaarNotifier.config.useBuyOrders?
+                    "Buy Order" : "Instant Buy");
         } else if (Button.id == ButtonIds.BACK.id){
             BazaarNotifier.guiToOpen = "settings";
         }

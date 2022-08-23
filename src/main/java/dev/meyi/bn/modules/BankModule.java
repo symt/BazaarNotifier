@@ -7,7 +7,7 @@ import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import net.minecraft.client.Minecraft;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class BankModule extends Module {
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;
-    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 3) * scale);
+    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 2) * scale);
   }
 
   @Override
