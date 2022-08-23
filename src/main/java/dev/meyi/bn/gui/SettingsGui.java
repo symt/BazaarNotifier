@@ -35,7 +35,7 @@ public class SettingsGui extends GuiScreen {
         apiKey.setMaxStringLength(40);
         apiKey.setFocused(true);
         apiKey.setCanLoseFocus(false);
-        apiKey.setText(BazaarNotifier.config.api);
+        apiKey.setText(BazaarNotifier.config.api.equals("") ? "Api key missing": "Api key set");
         previousApiKey = BazaarNotifier.config.api;
     }
 
@@ -75,7 +75,8 @@ public class SettingsGui extends GuiScreen {
         super.onGuiClosed();
         try {
             String key = apiKey.getText();
-            if(key.equals("") || key.equals(previousApiKey)){
+            key = key.replaceAll(" ", "");
+            if(key.equals("") || key.equals(previousApiKey) || key.equals("Api key missing") || key.equals("Api key set")){
                 return;
             }
             if(Utils.validateApiKey(key)){
@@ -91,7 +92,7 @@ public class SettingsGui extends GuiScreen {
             e.printStackTrace();
         } catch (NullPointerException ignored){
             //this only happens if the GUI is closed during initialising
-        }
+        } catch (IllegalArgumentException ignored){}
     }
     String getOnOff(boolean b){
         return b ? "ON" : "OFF";
