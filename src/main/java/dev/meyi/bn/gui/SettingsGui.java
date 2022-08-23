@@ -75,10 +75,10 @@ public class SettingsGui extends GuiScreen {
         super.onGuiClosed();
         try {
             String key = apiKey.getText();
-            key = key.replaceAll(" ", "");
             if(key.equals("") || key.equals(previousApiKey) || key.equals("Api key missing") || key.equals("Api key set")){
                 return;
             }
+            key = key.replaceAll(" ", "");
             if(Utils.validateApiKey(key)){
                 BazaarNotifier.config.api = key;
                 Minecraft.getMinecraft().thePlayer.addChatMessage(
