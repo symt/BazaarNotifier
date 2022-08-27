@@ -3,7 +3,7 @@ const client = new Client({intents: 32767});
 require('dotenv').config()
 
 const prefix = "~";
-const channel = process.env.channel;
+const channel = process.env.CHANNEL;
 client.on("ready", () => {
     const { cacheUpdate } = require("./bazaar/bazaar.js");
     cacheUpdate();
