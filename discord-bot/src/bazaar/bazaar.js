@@ -1,5 +1,5 @@
-const schedule = require("node-schedule");
-const Discord = require("discord.js");
+const { MessageEmbed } = require('discord.js');
+const { client, prefix, channel } = require('../index');
 const axios = require("axios").default;
 const bazaarConversions = require("./bazaarConversions.json");
 const performance = require("./performance.js");
@@ -12,28 +12,24 @@ const toTitleCase = (phrase) => {
     .join(" ");
 };
 
-const Bazaar = (discordClient, text) => {
-  let client = discordClient,
-    channel = text;
   let inRequest = false;
   let bazaarCache = {};
 
-  client.on("message", (message) => {
+  client.on("messageCreate", (message) => {
     if (
-      !message.content.startsWith("~") ||
+      !message.content.startsWith(prefix) ||
       !message.channel.id === "733213711157821452"
     )
       return;
 
-    if (
-      message.content.startsWith("~find") &&
-      message.content.split(" ").length >= 2
-    ) {
+    if (message.content.startsWith(prefix + "find") && message.content.split(" ").length >= 2) {
+
       let item = message.content.slice(6).toLowerCase().trim();
       if (bazaarCache[item]) {
         let data = bazaarCache[item];
-        message.channel.send(
-          new Discord.MessageEmbed()
+        message.channel.send({
+          embeds: [
+            new MessageEmbed()
             .setTitle(toTitleCase(item))
             .setColor(Math.floor(Math.random() * 16777215))
             .setDescription(
@@ -47,16 +43,17 @@ const Bazaar = (discordClient, text) => {
                 Math.round(data.profitFlowPerMinute * 100) / 100
               }`
             )
-        );
+          ]
+            });
       } else {
-        message.reply(
-          `The item searched (**${item}**) doesn't exist. Maybe something went wrong on my end, but odds are you just messed up!`
-        );
+        message.reply({
+          content: `The item searched (**${item}**) doesn't exist. Maybe something went wrong on my end, but odds are you just messed up!`
+        });
       }
     }
   });
 
-  schedule.scheduleJob("*/30 * * * * *", async function () {
+  const cacheUpdate = async () => {
     try {
       if (client && !inRequest) {
         inRequest = true;
@@ -69,7 +66,7 @@ const Bazaar = (discordClient, text) => {
           .then((res) => {
             let products = res.data.products;
             let productIds = Object.keys(res.data.products);
-
+  
             productIds.forEach((id) => {
               let product = products[id];
               bazaarData.push({
@@ -90,15 +87,15 @@ const Bazaar = (discordClient, text) => {
           .catch((e) => {
             console.log(e);
           });
-
+  
         bazaarData = performance(bazaarData);
-
+  
         bazaarData.forEach((data) => {
           bazaarCache[data.productId.toLowerCase()] = data;
         });
-
+  
         bazaarData = bazaarData.slice(0, 16);
-
+  
         let fields = [];
         let i = 1;
         bazaarData.forEach((data) => {
@@ -111,20 +108,24 @@ const Bazaar = (discordClient, text) => {
             fields.push({ name: "\u200B", value: "\u200B", inline: true });
           }
         });
-        let embed = new Discord.MessageEmbed()
+        let embed = new MessageEmbed()
           .setTitle("Bazaar")
           .setColor(Math.floor(Math.random() * 16777215))
           .addFields(...fields)
-          .setFooter(
-            "EP is about how much money you'd make while flipping an item per minute of flipping. It assumes you miss no instants."
-          );
-        client.channels.cache.get(channel).send(embed);
+          .setFooter({
+            text:"EP is about how much money you'd make while flipping an item per minute of flipping. It assumes you miss no instants."
+          });
+        client.channels.cache.get(channel).send({embeds: [embed]});
         inRequest = false;
       }
     } catch (e) {
       inRequest = false;
       console.log(e);
     }
-  });
-};
-module.exports = Bazaar;
+  }
+
+  setInterval(cacheUpdate, 30000);
+
+
+
+module.exports = { cacheUpdate };
