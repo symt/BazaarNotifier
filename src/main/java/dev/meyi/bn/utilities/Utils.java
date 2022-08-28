@@ -9,6 +9,17 @@ import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.json.resp.BazaarResponse;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.lwjgl.opengl.GL11;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -21,15 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
@@ -334,4 +336,25 @@ public class Utils {
     }
   }
 
+  public static String getItemIdFromName(String userInput){
+    userInput = WordUtils.capitalize(userInput.replaceAll("-", " ").toLowerCase());
+    String[] userInputSplit = userInput.split(" ");
+    String userInputEnd = userInputSplit[userInputSplit.length-1].toUpperCase();
+    if (userInputSplit.length == 1){
+      return BazaarNotifier.bazaarConv.inverse().getOrDefault(userInput, "");
+    }
+    for (char c:userInputEnd.toCharArray()) {
+      if(c != 'I' && c != 'V' && c != 'X'){
+        return BazaarNotifier.bazaarConv.inverse().getOrDefault(userInput, "");
+      }
+    }
+    StringBuilder result = new StringBuilder("");
+    for(int i = 0; i < userInputSplit.length-1; i++){
+      result.append(userInputSplit[i]);
+      result.append(" ");
+    }
+    result.append(userInputEnd);
+    System.out.println(result);
+    return BazaarNotifier.bazaarConv.inverse().getOrDefault(result.toString(), "");
+  }
 }

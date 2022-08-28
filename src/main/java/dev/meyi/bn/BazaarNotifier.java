@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 @Mod(modid = BazaarNotifier.MODID, version = BazaarNotifier.VERSION)
@@ -100,8 +101,8 @@ public class BazaarNotifier {
         resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
         resources = gson.fromJson(resourcesString, JsonObject.class);
       } else {
-        Reader reader = new InputStreamReader(
-            BazaarNotifier.class.getResourceAsStream("/resources.json"), StandardCharsets.UTF_8);
+        Reader reader = new InputStreamReader(Objects.requireNonNull(
+                BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
         resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {

@@ -17,7 +17,7 @@ public class Defaults {
   public static final boolean INSTANT_SELL_PROFIT = true;
   public static final boolean SELL_OFFER_PROFIT = true;
   public static final boolean PROFIT_PER_MIL = true;
-  public static final boolean COLLECTION_CHECKING = false;
+  public static final boolean COLLECTION_CHECKING = true;
   public static final boolean SEND_CHAT_MESSAGES = true;
   public static final  boolean USE_BUY_ORDERS = true;
 }
