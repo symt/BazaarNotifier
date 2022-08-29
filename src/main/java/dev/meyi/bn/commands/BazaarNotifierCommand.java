@@ -252,7 +252,7 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Use the following format: /bn find (item)"));
         } else {
-          String itemName = String.join(" ", args).substring(5);
+          String itemName = WordUtils.capitalize(String.join(" ", args).substring(5).replaceAll("-", " "));
           if (BazaarNotifier.bazaarDataRaw != null) {
             String itemConv = Utils.getItemIdFromName(itemName);
             System.out.println(itemConv);

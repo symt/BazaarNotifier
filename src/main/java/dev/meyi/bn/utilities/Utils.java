@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.json.resp.BazaarResponse;
@@ -264,11 +265,15 @@ public class Utils {
     response = client.execute(request);
     result = IOUtils
         .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-    BazaarNotifier.resources = gson.fromJson(result, JsonObject.class).getAsJsonObject();
-    BazaarNotifier.bazaarConv = jsonToBimap(
-        BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
-    BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
-        .getAsJsonObject("enchantCraftingList");
+    try {
+      BazaarNotifier.resources = gson.fromJson(result, JsonObject.class).getAsJsonObject();
+      BazaarNotifier.bazaarConv = jsonToBimap(
+              BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
+      BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
+              .getAsJsonObject("enchantCraftingList");
+    }catch (JsonSyntaxException e){
+      e.printStackTrace();
+    }
   }
 
   public static BiMap<String, String> jsonToBimap(JsonObject jsonObject) {
