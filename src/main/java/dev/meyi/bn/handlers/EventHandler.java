@@ -253,17 +253,6 @@ public class EventHandler {
     BazaarNotifier.guiToOpen = "";
   }
 
-  @SubscribeEvent
-  public void renderEvent(TickEvent e) {
-    if (BazaarNotifier.guiToOpen.contains("settings")) {
-      Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
-    } else if (BazaarNotifier.guiToOpen.contains("module")) {
-      int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
-      Minecraft.getMinecraft()
-          .displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
-    }
-    BazaarNotifier.guiToOpen = "";
-  }
 
   // TODO: Look for fix to old animations?
 }

@@ -7,23 +7,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.MalformedJsonException;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.json.resp.BazaarResponse;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
@@ -35,9 +20,22 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.lwjgl.opengl.GL11;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 public class Utils {
 
-  private static Pattern uuidMatcher = Pattern.compile("/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
+  private static final Pattern uuidMatcher = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
   private static String playerUUID = "";
   private static long recipeCooldown = 0;
 
@@ -211,14 +209,17 @@ public class Utils {
   public static boolean validateApiKey(String key) throws IOException {
     Gson gson = new Gson();
     if (uuidMatcher.matcher(key).find()) {
-      return gson.fromJson(IOUtils.toString(new BufferedReader
-          (new InputStreamReader(
-              HttpClientBuilder.create().build().execute(new HttpGet(
-                  "https://api.hypixel.net/key?key=" + key)).getEntity()
-                  .getContent()))), JsonObject.class).getAsJsonObject().get("success")
+      try {
+        return gson.fromJson(IOUtils.toString(new BufferedReader
+          (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
+          "https://api.hypixel.net/key?key=" + key)).getEntity()
+          .getContent()))), JsonObject.class).getAsJsonObject().get("success")
           .getAsBoolean();
+      }catch (JsonSyntaxException e){
+        return false;
+      }
     }
-    return false
+    return false;
   }
 
   public static boolean validateApiKey() throws IOException {
