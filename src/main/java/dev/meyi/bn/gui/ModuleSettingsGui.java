@@ -44,13 +44,13 @@ public class ModuleSettingsGui extends GuiScreen {
                     "Instant Sell" : BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer":"Profit Per Million" )));
             buttonList.add(new GuiButton(ButtonIds.INSTANT_SELL_PROFIT.id, getButtonX(),
                     getButtonY(), "Instant Sell Profit: " +
-                    getOnOff(BazaarNotifier.config.showInstantSellProfit)));
+                    getOnOff(BazaarNotifier.config.isShowInstantSellProfit())));
             buttonList.add(new GuiButton(ButtonIds.SELL_OFFER_PROFIT.id, getButtonX(),
                     getButtonY(),"Sell Offer Profit: " +
-                    getOnOff(BazaarNotifier.config.showSellOfferProfit)));
+                    getOnOff(BazaarNotifier.config.isShowSellOfferProfit())));
             buttonList.add(new GuiButton(ButtonIds.PROFIT_PER_MILLION.id, getButtonX(),
                     getButtonY(), "Profit Per Million: " +
-                    getOnOff(BazaarNotifier.config.showProfitPerMil)));
+                    getOnOff(BazaarNotifier.config.isShowProfitPerMil())));
             buttonList.add(new GuiButton(ButtonIds.MATERIAL_BUYING_OPTION.id, getButtonX(),
                     getButtonY(), "Materials: " +
                     (BazaarNotifier.config.useBuyOrders? "Buy Order" : "Instant Buy")));
@@ -83,14 +83,14 @@ public class ModuleSettingsGui extends GuiScreen {
             Button.displayString ="Sort By: " + (BazaarNotifier.config.craftingSortingOption == 0 ? "Instant Sell" :
                     BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer":"Profit Per Million");
         } else if (Button.id == ButtonIds.INSTANT_SELL_PROFIT.id) {
-            BazaarNotifier.config.showInstantSellProfit ^= true;
-            Button.displayString = "Instant Sell Profit: " + getOnOff(BazaarNotifier.config.showInstantSellProfit);
+            BazaarNotifier.config.setShowInstantSellProfit(!BazaarNotifier.config.isShowInstantSellProfit());
+            Button.displayString = "Instant Sell Profit: " + getOnOff(BazaarNotifier.config.isShowInstantSellProfit());
         } else if (Button.id == ButtonIds.SELL_OFFER_PROFIT.id) {
-            BazaarNotifier.config.showSellOfferProfit ^= true;
-            Button.displayString = "Sell Offer Profit: " + getOnOff(BazaarNotifier.config.showSellOfferProfit);
+            BazaarNotifier.config.setShowSellOfferProfit(!BazaarNotifier.config.isShowSellOfferProfit());
+            Button.displayString = "Sell Offer Profit: " + getOnOff(BazaarNotifier.config.isShowSellOfferProfit());
         } else if (Button.id == ButtonIds.PROFIT_PER_MILLION.id) {
-            BazaarNotifier.config.showProfitPerMil ^= true;
-            Button.displayString = "Profit Per Million: " + getOnOff(BazaarNotifier.config.showProfitPerMil);
+            BazaarNotifier.config.setShowProfitPerMil(!BazaarNotifier.config.isShowProfitPerMil());
+            Button.displayString = "Profit Per Million: " + getOnOff(BazaarNotifier.config.isShowProfitPerMil());
         } else if (Button.id == ButtonIds.MATERIAL_BUYING_OPTION.id) {
             BazaarNotifier.config.useBuyOrders ^= true;
             Button.displayString = "Materials: " + (BazaarNotifier.config.useBuyOrders?

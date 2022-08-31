@@ -42,11 +42,11 @@ public class CraftingModule extends Module {
       width[0] =
               Minecraft.getMinecraft().fontRendererObj.getStringWidth(
                       BazaarNotifier.config.useBuyOrders ? "   Profits (Buy Orders) -" : "   Profits (Instant Buy) -");
-      width[1] = BazaarNotifier.config.showInstantSellProfit ?
+      width[1] = BazaarNotifier.config.isShowInstantSellProfit() ?
               Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") : 0;
-      width[2] = BazaarNotifier.config.showSellOfferProfit ?
+      width[2] = BazaarNotifier.config.isShowSellOfferProfit() ?
               Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Sell Offer ") : 0;
-      width[3] = BazaarNotifier.config.showProfitPerMil ?
+      width[3] = BazaarNotifier.config.isShowProfitPerMil() ?
               Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ 1m Instant") : 0;
 
       for (int i : width) {
@@ -78,25 +78,25 @@ public class CraftingModule extends Module {
     helperLine.clear();
     helperLine.put("   ", Color.MAGENTA);
     helperLine.put(BazaarNotifier.config.useBuyOrders ? "Profits (Buy Orders)" : "Profits (Instant Buy)", Color.LIGHT_GRAY);
-    if (BazaarNotifier.config.showProfitPerMil || BazaarNotifier.config.showInstantSellProfit
-            || BazaarNotifier.config.showSellOfferProfit) {
+    if (BazaarNotifier.config.isShowProfitPerMil() || BazaarNotifier.config.isShowInstantSellProfit()
+            || BazaarNotifier.config.isShowSellOfferProfit()) {
       helperLine.put(" - ", Color.GRAY);
     }
-    if (BazaarNotifier.config.showInstantSellProfit) {
+    if (BazaarNotifier.config.isShowInstantSellProfit()) {
       helperLine.put(" Instant Sell", BazaarNotifier.config.craftingSortingOption == 0 ?
               new Color(141, 152, 201) : Color.LIGHT_GRAY);
-      if (BazaarNotifier.config.showSellOfferProfit) {
+      if (BazaarNotifier.config.isShowSellOfferProfit()) {
         helperLine.put(" /", Color.GRAY);
       }
     }
-    if (BazaarNotifier.config.showSellOfferProfit) {
+    if (BazaarNotifier.config.isShowSellOfferProfit()) {
       helperLine.put(" Sell Offer", BazaarNotifier.config.craftingSortingOption == 1 ?
               new Color(141, 152, 201) : Color.LIGHT_GRAY);
-      if (BazaarNotifier.config.showProfitPerMil) {
+      if (BazaarNotifier.config.isShowProfitPerMil()) {
         helperLine.put(" / ", Color.GRAY);
       }
     }
-    if (BazaarNotifier.config.showProfitPerMil) {
+    if (BazaarNotifier.config.isShowProfitPerMil()) {
       helperLine.put("1m Instant", BazaarNotifier.config.craftingSortingOption == 2 ?
               new Color(141, 152, 201) : Color.LIGHT_GRAY);
     }
@@ -122,29 +122,29 @@ public class CraftingModule extends Module {
             message.put(". ", Color.MAGENTA);
             message.put(itemNameConverted, Color.CYAN);
 
-            if (BazaarNotifier.config.showProfitPerMil
-                    || BazaarNotifier.config.showInstantSellProfit
-                    || BazaarNotifier.config.showSellOfferProfit) {
+            if (BazaarNotifier.config.isShowProfitPerMil()
+                    || BazaarNotifier.config.isShowInstantSellProfit()
+                    || BazaarNotifier.config.isShowSellOfferProfit()) {
               message.put(" - ", Color.GRAY);
             }
 
-            if (BazaarNotifier.config.showInstantSellProfit) {
+            if (BazaarNotifier.config.isShowInstantSellProfit()) {
               message.put(BazaarNotifier.df.format(profitInstaSell),
                       getColor(profitInstaSell.intValue()));
             }
-            if (BazaarNotifier.config.showInstantSellProfit
-                    && BazaarNotifier.config.showSellOfferProfit) {
+            if (BazaarNotifier.config.isShowInstantSellProfit()
+                    && BazaarNotifier.config.isShowSellOfferProfit()) {
               message.put(" / ", Color.GRAY);
             }
-            if (BazaarNotifier.config.showSellOfferProfit) {
+            if (BazaarNotifier.config.isShowSellOfferProfit()) {
               message.put(BazaarNotifier.df.format(profitSellOffer),
                       getColor(profitSellOffer.intValue()));
             }
-            if (BazaarNotifier.config.showSellOfferProfit
-                    && BazaarNotifier.config.showProfitPerMil) {
+            if (BazaarNotifier.config.isShowSellOfferProfit()
+                    && BazaarNotifier.config.isShowProfitPerMil()) {
               message.put(" /  ", Color.GRAY);
             }
-            if (BazaarNotifier.config.showProfitPerMil) {
+            if (BazaarNotifier.config.isShowProfitPerMil()) {
               message.put(BazaarNotifier.df.format(pricePerMil),
                       getColorForMil(pricePerMil.intValue()));
             }

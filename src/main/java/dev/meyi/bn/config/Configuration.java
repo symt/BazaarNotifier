@@ -18,9 +18,10 @@ public class Configuration {
   public boolean collectionCheckDisabled;
   public int craftingSortingOption;
   public int craftingListLength;
-  public boolean showInstantSellProfit;
-  public boolean showSellOfferProfit;
-  public boolean showProfitPerMil;
+
+  private boolean showInstantSellProfit;
+  private boolean showSellOfferProfit;
+  private boolean showProfitPerMil;
   public int suggestionListLength;
   public boolean showChatMessages;
   public boolean useBuyOrders;
@@ -77,4 +78,39 @@ public class Configuration {
         Defaults.USE_BUY_ORDERS, c);
   }
 
+  public void setShowInstantSellProfit(boolean showInstantSellProfit) {
+    this.showInstantSellProfit = showInstantSellProfit;
+    if(checkIfDisabled()){
+      this.showInstantSellProfit = true;
+    }
+  }
+
+  public boolean isShowSellOfferProfit() {
+    return showSellOfferProfit;
+  }
+
+  public void setShowSellOfferProfit(boolean showSellOfferProfit) {
+    this.showSellOfferProfit = showSellOfferProfit;
+    if(checkIfDisabled()){
+      this.showSellOfferProfit = true;
+    }
+  }
+
+  public boolean isShowProfitPerMil() {
+    return showProfitPerMil;
+  }
+
+  public void setShowProfitPerMil(boolean showProfitPerMil) {
+    this.showProfitPerMil = showProfitPerMil;
+    if(checkIfDisabled()){
+      this.showProfitPerMil = true;
+    }
+  }
+  public boolean isShowInstantSellProfit() {
+    return showInstantSellProfit;
+  }
+
+  private boolean checkIfDisabled(){
+    return !showProfitPerMil && !showSellOfferProfit && !showInstantSellProfit;
+  }
 }

@@ -84,19 +84,19 @@ public class CraftingCalculator {
 
   public static String editCraftingModuleGUI(String craftingValue) {
     if (craftingValue.equalsIgnoreCase("instant_sell")) {
-      BazaarNotifier.config.showInstantSellProfit = !BazaarNotifier.config.showInstantSellProfit;
+      BazaarNotifier.config.setShowInstantSellProfit(!BazaarNotifier.config.isShowInstantSellProfit());
       return
-              (BazaarNotifier.config.showInstantSellProfit ? EnumChatFormatting.GREEN
+              (BazaarNotifier.config.isShowInstantSellProfit() ? EnumChatFormatting.GREEN
                       : EnumChatFormatting.RED)
                       + "Toggled profit column (Instant Sell)";
     } else if (craftingValue.equalsIgnoreCase("sell_offer")) {
-      BazaarNotifier.config.showSellOfferProfit = !BazaarNotifier.config.showSellOfferProfit;
-      return (BazaarNotifier.config.showSellOfferProfit ? EnumChatFormatting.GREEN
+      BazaarNotifier.config.setShowSellOfferProfit(!BazaarNotifier.config.isShowSellOfferProfit());
+      return (BazaarNotifier.config.isShowSellOfferProfit() ? EnumChatFormatting.GREEN
               : EnumChatFormatting.RED)
               + "Toggled profit column (Sell Offer)";
     } else if (craftingValue.equalsIgnoreCase("ppm")) {
-      BazaarNotifier.config.showProfitPerMil = !BazaarNotifier.config.showProfitPerMil;
-      return (BazaarNotifier.config.showProfitPerMil ? EnumChatFormatting.GREEN
+      BazaarNotifier.config.setShowProfitPerMil(!BazaarNotifier.config.isShowProfitPerMil());
+      return (BazaarNotifier.config.isShowProfitPerMil() ? EnumChatFormatting.GREEN
               : EnumChatFormatting.RED)
               + "Toggled profit column (Profit per 1M)";
     } else {
