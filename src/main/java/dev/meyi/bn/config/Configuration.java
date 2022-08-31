@@ -18,10 +18,6 @@ public class Configuration {
   public boolean collectionCheckDisabled;
   public int craftingSortingOption;
   public int craftingListLength;
-
-  private boolean showInstantSellProfit;
-  private boolean showSellOfferProfit;
-  private boolean showProfitPerMil;
   public int suggestionListLength;
   public boolean showChatMessages;
   public boolean useBuyOrders;
@@ -29,10 +25,15 @@ public class Configuration {
   public String version;
   public ModuleConfig[] modules;
 
+  private boolean showInstantSellProfit;
+  private boolean showSellOfferProfit;
+  private boolean showProfitPerMil;
+
   public Configuration(boolean collectionCheckDisabled, int craftingSortingOption,
       int craftingListLength,
       boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
-      int suggestionListLength, boolean showChatMessages, String apiKey,boolean useBuyOrders, ModuleConfig[] modules) {
+      int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders,
+      ModuleConfig[] modules) {
     this.collectionCheckDisabled = collectionCheckDisabled;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
@@ -78,20 +79,13 @@ public class Configuration {
         Defaults.USE_BUY_ORDERS, c);
   }
 
-  public void setShowInstantSellProfit(boolean showInstantSellProfit) {
-    this.showInstantSellProfit = showInstantSellProfit;
-    if(checkIfDisabled()){
-      this.showInstantSellProfit = true;
-    }
-  }
-
   public boolean isShowSellOfferProfit() {
     return showSellOfferProfit;
   }
 
   public void setShowSellOfferProfit(boolean showSellOfferProfit) {
     this.showSellOfferProfit = showSellOfferProfit;
-    if(checkIfDisabled()){
+    if (checkIfDisabled()) {
       this.showSellOfferProfit = true;
     }
   }
@@ -102,15 +96,23 @@ public class Configuration {
 
   public void setShowProfitPerMil(boolean showProfitPerMil) {
     this.showProfitPerMil = showProfitPerMil;
-    if(checkIfDisabled()){
+    if (checkIfDisabled()) {
       this.showProfitPerMil = true;
     }
   }
+
   public boolean isShowInstantSellProfit() {
     return showInstantSellProfit;
   }
 
-  private boolean checkIfDisabled(){
+  public void setShowInstantSellProfit(boolean showInstantSellProfit) {
+    this.showInstantSellProfit = showInstantSellProfit;
+    if (checkIfDisabled()) {
+      this.showInstantSellProfit = true;
+    }
+  }
+
+  private boolean checkIfDisabled() {
     return !showProfitPerMil && !showSellOfferProfit && !showInstantSellProfit;
   }
 }

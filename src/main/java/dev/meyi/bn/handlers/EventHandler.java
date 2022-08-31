@@ -7,6 +7,8 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
+import java.math.BigDecimal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
@@ -21,9 +23,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-
 public class EventHandler {
 
   static Order verify = null;
@@ -37,7 +36,9 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
-    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith("[Bazaar] Sell Offer Setup!")) {
+    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message
+        .startsWith("[Bazaar] Buy Order Setup!") || message
+        .startsWith("[Bazaar] Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConv.inverse()
               .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
@@ -240,13 +241,15 @@ public class EventHandler {
       GL11.glTranslated(0, 0, -1);
     }
   }
+
   @SubscribeEvent
-  public void renderEvent(TickEvent e){
-    if(BazaarNotifier.guiToOpen.contains("settings")){
+  public void renderEvent(TickEvent e) {
+    if (BazaarNotifier.guiToOpen.contains("settings")) {
       Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
-    }else if(BazaarNotifier.guiToOpen.contains("module")){
+    } else if (BazaarNotifier.guiToOpen.contains("module")) {
       int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
-      Minecraft.getMinecraft().displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
+      Minecraft.getMinecraft()
+          .displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
     }
     BazaarNotifier.guiToOpen = "";
   }

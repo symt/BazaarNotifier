@@ -11,11 +11,11 @@ import org.lwjgl.input.Mouse;
 
 public class ModuleList extends ArrayList<Module> {
 
+  Module movingModule = null;
+
   public ModuleList() {
     this(BazaarNotifier.config);
   }
-
-  Module movingModule = null;
 
   public ModuleList(Configuration config) {
 

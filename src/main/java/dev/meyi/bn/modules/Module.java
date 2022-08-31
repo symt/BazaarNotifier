@@ -85,13 +85,14 @@ public abstract class Module {
     return (Display.getHeight() - Mouse.getY()) / new ScaledResolution(Minecraft.getMinecraft())
         .getScaleFactor();
   }
-  public String getReadableName(){
+
+  public String getReadableName() {
     String name = StringUtils.lowerCase(name());
     return StringUtils.capitalize(name) + " Module";
   }
 
-  public String getName(){
-    return  name();
+  public String getName() {
+    return name();
   }
 
   public float getScale() {

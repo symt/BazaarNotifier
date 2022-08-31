@@ -5,13 +5,13 @@ public class Order {
 
   public String product;
   public int startAmount;
-  private int amountRemaining;
   public double pricePerUnit;
   public String priceString;
   public OrderType orderStatus = OrderType.BEST;
   public double orderValue;
   public String type;
   public String currentNotification;
+  private int amountRemaining;
 
   public Order(String product, int startAmount, double pricePerUnit, String priceString,
       String type) {
@@ -24,13 +24,13 @@ public class Order {
     orderValue = startAmount * pricePerUnit;
   }
 
+  public int getAmountRemaining() {
+    return amountRemaining;
+  }
+
   public void setAmountRemaining(int amountRemaining) {
     this.amountRemaining = amountRemaining;
     orderValue = amountRemaining * pricePerUnit;
-  }
-
-  public int getAmountRemaining() {
-    return amountRemaining;
   }
 
   public enum OrderType {BEST, MATCHED, OUTDATED}
