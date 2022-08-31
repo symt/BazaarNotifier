@@ -86,7 +86,7 @@ public class EventHandler {
       } else {
         System.err.println("There is some error in removing your order from the list!!!");
       }
-    } else if (message.startsWith("Cancelled!") || message.startsWith("[Bazaar] Cancelled!")) {
+    } else if (message.startsWith("Cancelled!") || message.startsWith("[Bazaar] Cancelled!") || message.startsWith("[Bazaar] Cancelled!")) {
       double refund = 0;
       int refundAmount = 0;
       String itemRefunded = "";
