@@ -18,11 +18,13 @@ public class Configuration {
   public boolean collectionCheckDisabled;
   public int craftingSortingOption;
   public int craftingListLength;
-  public boolean showInstantSellProfit;
-  public boolean showSellOfferProfit;
-  public boolean showProfitPerMil;
+
+  private boolean showInstantSellProfit;
+  private boolean showSellOfferProfit;
+  private boolean showProfitPerMil;
   public int suggestionListLength;
   public boolean showChatMessages;
+  public boolean useBuyOrders;
   public String api = "";
   public String version;
   public ModuleConfig[] modules;
@@ -30,7 +32,7 @@ public class Configuration {
   public Configuration(boolean collectionCheckDisabled, int craftingSortingOption,
       int craftingListLength,
       boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
-      int suggestionListLength, boolean showChatMessages, String apiKey, ModuleConfig[] modules) {
+      int suggestionListLength, boolean showChatMessages, String apiKey,boolean useBuyOrders, ModuleConfig[] modules) {
     this.collectionCheckDisabled = collectionCheckDisabled;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
@@ -43,6 +45,7 @@ public class Configuration {
     this.version = BazaarNotifier.VERSION;
     this.modules = modules;
     this.showChatMessages = showChatMessages;
+    this.useBuyOrders = useBuyOrders;
   }
 
 
@@ -72,7 +75,42 @@ public class Configuration {
         Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
         Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
         Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
-        c);
+        Defaults.USE_BUY_ORDERS, c);
   }
 
+  public void setShowInstantSellProfit(boolean showInstantSellProfit) {
+    this.showInstantSellProfit = showInstantSellProfit;
+    if(checkIfDisabled()){
+      this.showInstantSellProfit = true;
+    }
+  }
+
+  public boolean isShowSellOfferProfit() {
+    return showSellOfferProfit;
+  }
+
+  public void setShowSellOfferProfit(boolean showSellOfferProfit) {
+    this.showSellOfferProfit = showSellOfferProfit;
+    if(checkIfDisabled()){
+      this.showSellOfferProfit = true;
+    }
+  }
+
+  public boolean isShowProfitPerMil() {
+    return showProfitPerMil;
+  }
+
+  public void setShowProfitPerMil(boolean showProfitPerMil) {
+    this.showProfitPerMil = showProfitPerMil;
+    if(checkIfDisabled()){
+      this.showProfitPerMil = true;
+    }
+  }
+  public boolean isShowInstantSellProfit() {
+    return showInstantSellProfit;
+  }
+
+  private boolean checkIfDisabled(){
+    return !showProfitPerMil && !showSellOfferProfit && !showInstantSellProfit;
+  }
 }

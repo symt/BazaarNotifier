@@ -1,19 +1,16 @@
 package dev.meyi.bn.modules.calc;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.CraftingModule;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.util.EnumChatFormatting;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import net.minecraft.util.EnumChatFormatting;
-import org.apache.commons.lang3.text.WordUtils;
 
 
 public class CraftingCalculator {
@@ -22,120 +19,40 @@ public class CraftingCalculator {
 
 
   public static void getBestEnchantRecipes() {
-    ArrayList<ArrayList<String>> list = new ArrayList<>();
+    ArrayList<String[]> list = new ArrayList<>();
     if (BazaarNotifier.enchantCraftingList == null
-        || BazaarNotifier.bazaarDataRaw.products.size() == 0) {
+            || BazaarNotifier.bazaarDataRaw.products.size() == 0) {
       return;
     }
+
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList
-        .getAsJsonObject("normal").entrySet()) {
+            .getAsJsonObject("other").entrySet()) {
+
       String itemName = keys.getKey();
-      if (!BazaarNotifier.bazaarDataRaw.products.containsKey(itemName)) {
+
+      if ((!unlockedRecipes.contains(
+              BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
+                      .get("collection").getAsString()) || !BazaarNotifier.enchantCraftingList
+              .getAsJsonObject("other").getAsJsonObject(itemName).get("collection").getAsString().equals("NONE"))
+              && !BazaarNotifier.config.collectionCheckDisabled) {
         continue;
       }
-      if (unlockedRecipes.contains(
-          BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").getAsJsonObject(itemName)
-              .get("collection").getAsString()) || Objects.equals(
-          BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").getAsJsonObject(itemName)
-              .get("collection").getAsString(), "NONE")
-          || BazaarNotifier.config.collectionCheckDisabled) {
-        if (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() > 0 &&
-            BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() > 0) {
-          String material = BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
-              .getAsJsonObject(itemName).get("material").getAsString();
-          double price1 =
-              (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).pricePerUnit)
-                  -
-                  (BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary
-                      .get(0).pricePerUnit
-                      * 160);
-          double price2 =
-              BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).pricePerUnit -
-                  (BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary
-                      .get(0).pricePerUnit
-                      * 160);
-          double profitPerMilC = 1000000 / (
-              BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(0).pricePerUnit
-                  * 160);
-          double profitPerMil =
-              profitPerMilC * BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
-                  .get(0).pricePerUnit
-                  - (BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary
-                  .get(0).pricePerUnit
-                  * 160);
-
-          list.add(new ArrayList<>(Arrays
-              .asList(Double.toString(price1), Double.toString(price2),
-                  Double.toString(profitPerMil), itemName)));
-        } else {
-          list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
-        }
-      }
+      list.add(getEnchantCraft(itemName));
     }
-
-    for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList
-        .getAsJsonObject("other").entrySet()) {
-
-      String itemName = keys.getKey();
-      if (unlockedRecipes.contains(
-          BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-              .get("collection").getAsString()) || Objects.equals(
-          BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-              .get("collection").getAsString(), "NONE")
-          || BazaarNotifier.config.collectionCheckDisabled) {
-        if (BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() > 0 &&
-            BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() > 0) {
-          try {
-            double itemSellPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
-                .get(0).pricePerUnit;
-            double itemBuyPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary
-                .get(0).pricePerUnit;
-            double ingredientPrice = 0d;
-            int ingredientCount;
-            double P = 0d;
-
-            for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
-              if (h % 2 == 0) {
-                ingredientPrice = BazaarNotifier.bazaarDataRaw.products.get(
-                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                        .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())
-                    .sell_summary.get(0).pricePerUnit;
-              } else {
-                ingredientCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                    .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsInt();
-                P += (ingredientPrice * ingredientCount);
-              }
-            }
-
-            double profitInstaSell = itemSellPrice - P;
-            double profitSellOffer = itemBuyPrice - P;
-            double countPerMil = 1000000 / P;
-            double pricePerMil = countPerMil * profitInstaSell;
-            list.add(new ArrayList<>(Arrays
-                .asList(String.valueOf(profitInstaSell), Double.toString(profitSellOffer),
-                    Double.toString(pricePerMil), itemName)));
-          } catch (JsonIOException e) {
-            e.printStackTrace();
-          }
-        } else {
-          list.add(new ArrayList<>(Arrays.asList("0", "0", "0", itemName)));
-        }
-      }
-    }
+    int i = BazaarNotifier.config.useBuyOrders?0:3;
 
     list.sort((o1, o2) -> {
       ArrayList<Double> list1 = new ArrayList<>();
       ArrayList<Double> list2 = new ArrayList<>();
-      list1.add(Double.valueOf(o1.get(0)));
-      list1.add(Double.valueOf(o1.get(1)));
-      list1.add(Double.valueOf(o1.get(2)));
-      list2.add(Double.valueOf(o2.get(0)));
-      list2.add(Double.valueOf(o2.get(1)));
-      list2.add(Double.valueOf(o2.get(2)));
+      list1.add(Double.valueOf(o1[i]));
+      list1.add(Double.valueOf(o1[i+1]));
+      list1.add(Double.valueOf(o1[i+2]));
+      list2.add(Double.valueOf(o2[i]));
+      list2.add(Double.valueOf(o2[i+1]));
+      list2.add(Double.valueOf(o2[i+2]));
 
       return list1.get(BazaarNotifier.config.craftingSortingOption).compareTo(list2.get(
-          BazaarNotifier.config.craftingSortingOption));
+              BazaarNotifier.config.craftingSortingOption));
     });
     Collections.reverse(list);
     CraftingModule.list = list;
@@ -157,7 +74,7 @@ public class CraftingCalculator {
 
   public static String setCraftingLength(int length) {
     if (length > BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").entrySet().size()
-        + BazaarNotifier.enchantCraftingList.getAsJsonObject("other").entrySet().size()) {
+            + BazaarNotifier.enchantCraftingList.getAsJsonObject("other").entrySet().size()) {
       return length + " is too long";
     } else {
       BazaarNotifier.config.craftingListLength = length;
@@ -167,98 +84,95 @@ public class CraftingCalculator {
 
   public static String editCraftingModuleGUI(String craftingValue) {
     if (craftingValue.equalsIgnoreCase("instant_sell")) {
-      BazaarNotifier.config.showInstantSellProfit = !BazaarNotifier.config.showInstantSellProfit;
+      BazaarNotifier.config.setShowInstantSellProfit(!BazaarNotifier.config.isShowInstantSellProfit());
       return
-          (BazaarNotifier.config.showInstantSellProfit ? EnumChatFormatting.GREEN
-              : EnumChatFormatting.RED)
-              + "Toggled profit column (Instant Sell)";
+              (BazaarNotifier.config.isShowInstantSellProfit() ? EnumChatFormatting.GREEN
+                      : EnumChatFormatting.RED)
+                      + "Toggled profit column (Instant Sell)";
     } else if (craftingValue.equalsIgnoreCase("sell_offer")) {
-      BazaarNotifier.config.showSellOfferProfit = !BazaarNotifier.config.showSellOfferProfit;
-      return (BazaarNotifier.config.showSellOfferProfit ? EnumChatFormatting.GREEN
-          : EnumChatFormatting.RED)
-          + "Toggled profit column (Sell Offer)";
+      BazaarNotifier.config.setShowSellOfferProfit(!BazaarNotifier.config.isShowSellOfferProfit());
+      return (BazaarNotifier.config.isShowSellOfferProfit() ? EnumChatFormatting.GREEN
+              : EnumChatFormatting.RED)
+              + "Toggled profit column (Sell Offer)";
     } else if (craftingValue.equalsIgnoreCase("ppm")) {
-      BazaarNotifier.config.showProfitPerMil = !BazaarNotifier.config.showProfitPerMil;
-      return (BazaarNotifier.config.showProfitPerMil ? EnumChatFormatting.GREEN
-          : EnumChatFormatting.RED)
-          + "Toggled profit column (Profit per 1M)";
+      BazaarNotifier.config.setShowProfitPerMil(!BazaarNotifier.config.isShowProfitPerMil());
+      return (BazaarNotifier.config.isShowProfitPerMil() ? EnumChatFormatting.GREEN
+              : EnumChatFormatting.RED)
+              + "Toggled profit column (Profit per 1M)";
     } else {
       return EnumChatFormatting.RED + "This value does not exist";
     }
   }
 
-  public static String[] getEnchantCraft(String itemU) {
-    String itemName = BazaarNotifier.bazaarConv.inverse()
-        .get(WordUtils.capitalize(itemU.toLowerCase()));
-    String[] values = new String[3];
-    if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").has(itemName)) {
-      if (BazaarNotifier.bazaarDataRaw.products.size() != 0) {
-        String material = BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
-            .getAsJsonObject(itemName).get("material").getAsString();
-        double price1 =
-            BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.get(0).pricePerUnit -
-                BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(1).pricePerUnit
-                    * 160;
-        double price2 =
-            BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.get(0).pricePerUnit -
-                BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(1).pricePerUnit
-                    * 160;
-        double profitPerMilCount = 1000000 / (
-            BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(0).pricePerUnit
-                * 160);
-        double profitPerMil =
-            profitPerMilCount * BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
-                .get(0).pricePerUnit -
-                BazaarNotifier.bazaarDataRaw.products.get(material).sell_summary.get(1).pricePerUnit
-                    * 160;
-
-        values[0] = BazaarNotifier.df.format(price1);
-        values[1] = BazaarNotifier.df.format(price2);
-        values[2] = BazaarNotifier.df.format(profitPerMil);
-      } else {
-        values[0] = BazaarNotifier.df.format(0);
-        values[1] = BazaarNotifier.df.format(0);
-        values[2] = BazaarNotifier.df.format(0);
-      }
-    } else if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemName)) {
+  public static String[] getEnchantCraft(String itemName) {
+    String[] values = new String[7];
+    if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.products.size() != 0) {
         double itemSellPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
-            .get(0).pricePerUnit;
+                .get(0).getPriceWithTax();
         double itemBuyPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary
-            .get(0).pricePerUnit;
+                .get(0).getPriceWithTax();
         double ingredientPrice = 0d;
         int ingredientCount;
         double materialCost = 0d;
+        double ingredientPrice2 = 0d;
+        int ingredientCount2;
+        double materialCost2 = 0d;
 
-        for (int h = 0;
-            h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                .getAsJsonObject(itemName)
-                .getAsJsonArray("material").size(); h++) {
+        //Buy orders
+        for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
           if (h % 2 == 0) {
             ingredientPrice = BazaarNotifier.bazaarDataRaw.products.get(
-                BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                    .getAsJsonObject(itemName)
-                    .getAsJsonArray("material").get(h).getAsString()).sell_summary
-                .get(0).pricePerUnit;
+                            BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                                    .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())
+                    .sell_summary.get(0).pricePerUnit;
           } else {
             ingredientCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsInt();
+                    .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsInt();
             materialCost += (ingredientPrice * ingredientCount);
           }
         }
+
+        //Instant buy
+        for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
+          if (h % 2 == 0) {
+            ingredientPrice2 = BazaarNotifier.bazaarDataRaw.products.get(
+                            BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                                    .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())
+                    .buy_summary.get(0).pricePerUnit;
+          } else {
+            ingredientCount2 = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                    .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsInt();
+            materialCost2 += (ingredientPrice2 * ingredientCount2);
+          }
+        }
+
 
         double profitInstaSell = itemSellPrice - materialCost;
         double profitSellOffer = itemBuyPrice - materialCost;
         double CountPerMil = 1000000 / materialCost;
         double profitPerMil = CountPerMil * profitInstaSell;
-        values[0] = BazaarNotifier.df.format(profitInstaSell);
-        values[1] = BazaarNotifier.df.format(profitSellOffer);
-        values[2] = BazaarNotifier.df.format(profitPerMil);
+        double profitInstaSell2 = itemSellPrice - materialCost2;
+        double profitSellOffer2 = itemBuyPrice - materialCost2;
+        double CountPerMil2 = 1000000 / materialCost2;
+        double profitPerMil2 = CountPerMil2 * profitInstaSell2;
+        values[0] = String.valueOf(profitInstaSell);
+        values[1] = String.valueOf(profitSellOffer);
+        values[2] = String.valueOf(profitPerMil);
+        values[3] = String.valueOf(profitInstaSell2);
+        values[4] = String.valueOf(profitSellOffer2);
+        values[5] = String.valueOf(profitPerMil2);
       } else {
-        values[0] = BazaarNotifier.df.format(0);
-        values[1] = BazaarNotifier.df.format(0);
-        values[2] = BazaarNotifier.df.format(0);
+        values[0] = String.valueOf(0);
+        values[1] = String.valueOf(0);
+        values[2] = String.valueOf(0);
+        values[3] = String.valueOf(0);
+        values[4] = String.valueOf(0);
+        values[5] = String.valueOf(0);
       }
+      values[6] = itemName;
     }
 
     return values;

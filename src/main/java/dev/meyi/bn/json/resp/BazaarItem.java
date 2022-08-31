@@ -31,6 +31,10 @@ public class BazaarItem {
       this.pricePerUnit = pricePerUnit;
       this.orders = orders;
     }
+
+    public double getPriceWithTax(){
+      return pricePerUnit * 0.9875d;
+    }
   }
 
   public static class BazaarItemSummary {

@@ -1,27 +1,28 @@
 package dev.meyi.bn.modules;
 
-import com.google.gson.JsonIOException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Mouse;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import org.lwjgl.input.Mouse;
 
 
 public class CraftingModule extends Module {
 
   public static final ModuleName type = ModuleName.CRAFTING;
+  private static boolean mouseButtonDown;
   private final LinkedHashMap<String, Color> helperLine = new LinkedHashMap<>();
   int longestXString;
-  public static ArrayList<ArrayList<String>> list = new ArrayList<>();
+  public static ArrayList<String[]> list = new ArrayList<>();
   int lastHovered = 0;
 
 
@@ -34,49 +35,70 @@ public class CraftingModule extends Module {
   }
 
   private void generateHelperLine() {
-    if (Mouse.isButtonDown(1)) {
-      int width1 =
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth("   Profits (Buy Orders) -") + x;
-      int width2 =
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") + width1;
-      int width3 =
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth(" / Sell Offer") + width2;
-      int width4 =
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth(" / 1m Instant") + width3;
-      if (getMouseCoordinateY() > y - 2 && getMouseCoordinateY() < y + 10) {
-        if (getMouseCoordinateX() > width1 && getMouseCoordinateX() < width2) {
-          BazaarNotifier.config.craftingSortingOption = 0;
+    if (Mouse.isButtonDown(1) && getMouseCoordinateY() > y - 2 && getMouseCoordinateY() < y + 10) {
+      int[] width = new int[4];
+      int totalWidth = 0;
+      int relativeX = getMouseCoordinateX() - x;
+      width[0] =
+              Minecraft.getMinecraft().fontRendererObj.getStringWidth(
+                      BazaarNotifier.config.useBuyOrders ? "   Profits (Buy Orders) -" : "   Profits (Instant Buy) -");
+      width[1] = BazaarNotifier.config.isShowInstantSellProfit() ?
+              Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") : 0;
+      width[2] = BazaarNotifier.config.isShowSellOfferProfit() ?
+              Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Sell Offer ") : 0;
+      width[3] = BazaarNotifier.config.isShowProfitPerMil() ?
+              Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ 1m Instant") : 0;
+
+      for (int i : width) {
+        totalWidth += i;
+      }
+
+      for (int i = 3; i >= 0; i--) {
+        totalWidth -= width[i];
+        if(totalWidth < relativeX && inMovementBox()){
+          switch (i){
+            case 0: if(mouseButtonDown){
+                        BazaarNotifier.config.useBuyOrders ^= true;
+                        mouseButtonDown = false;
+                    }
+            case 1: BazaarNotifier.config.craftingSortingOption = 0;
+                    break;
+            case 2: BazaarNotifier.config.craftingSortingOption = 1;
+                    break;
+            case 3: BazaarNotifier.config.craftingSortingOption = 2;
+                    break;
+          }
           CraftingCalculator.getBestEnchantRecipes();
-        } else if (getMouseCoordinateX() > width2 && getMouseCoordinateX() < width3) {
-          BazaarNotifier.config.craftingSortingOption = 1;
-          CraftingCalculator.getBestEnchantRecipes();
-        } else if (getMouseCoordinateX() > width3 && getMouseCoordinateX() < width4) {
-          BazaarNotifier.config.craftingSortingOption = 2;
-          CraftingCalculator.getBestEnchantRecipes();
+          break;
         }
       }
+    } else if (!Mouse.isButtonDown(1)) {
+      mouseButtonDown = true;
     }
     helperLine.clear();
     helperLine.put("   ", Color.MAGENTA);
-    helperLine.put("Profits (Buy Orders)", Color.LIGHT_GRAY);
-    if (BazaarNotifier.config.showProfitPerMil || BazaarNotifier.config.showInstantSellProfit
-        || BazaarNotifier.config.showSellOfferProfit) {
+    helperLine.put(BazaarNotifier.config.useBuyOrders ? "Profits (Buy Orders)" : "Profits (Instant Buy)", Color.LIGHT_GRAY);
+    if (BazaarNotifier.config.isShowProfitPerMil() || BazaarNotifier.config.isShowInstantSellProfit()
+            || BazaarNotifier.config.isShowSellOfferProfit()) {
       helperLine.put(" - ", Color.GRAY);
     }
-    if (BazaarNotifier.config.showInstantSellProfit) {
-      helperLine.put(" Instant Sell", Color.LIGHT_GRAY);
-      if (BazaarNotifier.config.showSellOfferProfit) {
+    if (BazaarNotifier.config.isShowInstantSellProfit()) {
+      helperLine.put(" Instant Sell", BazaarNotifier.config.craftingSortingOption == 0 ?
+              new Color(141, 152, 201) : Color.LIGHT_GRAY);
+      if (BazaarNotifier.config.isShowSellOfferProfit()) {
         helperLine.put(" /", Color.GRAY);
       }
     }
-    if (BazaarNotifier.config.showSellOfferProfit) {
-      helperLine.put(" Sell Offer", Color.LIGHT_GRAY);
-      if (BazaarNotifier.config.showProfitPerMil) {
+    if (BazaarNotifier.config.isShowSellOfferProfit()) {
+      helperLine.put(" Sell Offer", BazaarNotifier.config.craftingSortingOption == 1 ?
+              new Color(141, 152, 201) : Color.LIGHT_GRAY);
+      if (BazaarNotifier.config.isShowProfitPerMil()) {
         helperLine.put(" / ", Color.GRAY);
       }
     }
-    if (BazaarNotifier.config.showProfitPerMil) {
-      helperLine.put("1m Instant", Color.LIGHT_GRAY);
+    if (BazaarNotifier.config.isShowProfitPerMil()) {
+      helperLine.put("1m Instant", BazaarNotifier.config.craftingSortingOption == 2 ?
+              new Color(141, 152, 201) : Color.LIGHT_GRAY);
     }
   }
 
@@ -89,43 +111,42 @@ public class CraftingModule extends Module {
       for (int i = shift; i < BazaarNotifier.config.craftingListLength + shift; i++) {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
         if (i < list.size()) {
-          if (!list.get(i).isEmpty()) {
-
-            Double profitInstaSell = Double.valueOf(list.get(i).get(0));
-            Double profitSellOffer = Double.valueOf(list.get(i).get(1));
-            Double pricePerMil = Double.valueOf(list.get(i).get(2));
-            String itemName = list.get(i).get(3);
+          if (list.get(i).length != 0) {
+            Double profitInstaSell = Double.valueOf(list.get(i)[0]);
+            Double profitSellOffer = Double.valueOf(list.get(i)[1]);
+            Double pricePerMil = Double.valueOf(list.get(i)[2]);
+            String itemName = list.get(i)[6];
 
             String itemNameConverted = BazaarNotifier.bazaarConv.get(itemName);
             message.put(String.valueOf(i + 1), Color.MAGENTA);
             message.put(". ", Color.MAGENTA);
             message.put(itemNameConverted, Color.CYAN);
 
-            if (BazaarNotifier.config.showProfitPerMil
-                || BazaarNotifier.config.showInstantSellProfit
-                || BazaarNotifier.config.showSellOfferProfit) {
+            if (BazaarNotifier.config.isShowProfitPerMil()
+                    || BazaarNotifier.config.isShowInstantSellProfit()
+                    || BazaarNotifier.config.isShowSellOfferProfit()) {
               message.put(" - ", Color.GRAY);
             }
 
-            if (BazaarNotifier.config.showInstantSellProfit) {
+            if (BazaarNotifier.config.isShowInstantSellProfit()) {
               message.put(BazaarNotifier.df.format(profitInstaSell),
-                  getColor(profitInstaSell.intValue()));
+                      getColor(profitInstaSell.intValue()));
             }
-            if (BazaarNotifier.config.showInstantSellProfit
-                && BazaarNotifier.config.showSellOfferProfit) {
+            if (BazaarNotifier.config.isShowInstantSellProfit()
+                    && BazaarNotifier.config.isShowSellOfferProfit()) {
               message.put(" / ", Color.GRAY);
             }
-            if (BazaarNotifier.config.showSellOfferProfit) {
+            if (BazaarNotifier.config.isShowSellOfferProfit()) {
               message.put(BazaarNotifier.df.format(profitSellOffer),
-                  getColor(profitSellOffer.intValue()));
+                      getColor(profitSellOffer.intValue()));
             }
-            if (BazaarNotifier.config.showSellOfferProfit
-                && BazaarNotifier.config.showProfitPerMil) {
+            if (BazaarNotifier.config.isShowSellOfferProfit()
+                    && BazaarNotifier.config.isShowProfitPerMil()) {
               message.put(" /  ", Color.GRAY);
             }
-            if (BazaarNotifier.config.showProfitPerMil) {
+            if (BazaarNotifier.config.isShowProfitPerMil()) {
               message.put(BazaarNotifier.df.format(pricePerMil),
-                  getColorForMil(pricePerMil.intValue()));
+                      getColorForMil(pricePerMil.intValue()));
             }
           } else {
             message.put("Error, just wait", Color.RED);
@@ -142,8 +163,8 @@ public class CraftingModule extends Module {
       boundsX = (int) X;
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * (BazaarNotifier.config.craftingListLength + 1)
-        + (BazaarNotifier.config.craftingListLength + 1) * 2 * scale - 2;
+            * (BazaarNotifier.config.craftingListLength + 1)
+            + (BazaarNotifier.config.craftingListLength + 1) * 2 * scale - 2;
     boundsY = (int) Y;
   }
 
@@ -198,8 +219,8 @@ public class CraftingModule extends Module {
     int mouseXFormatted = getMouseCoordinateX();
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
     if (this.longestXString != 0) {
-      if (mouseXFormatted >= x && mouseXFormatted <= x + (longestXString / 2)
-          && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
+      if (mouseXFormatted >= x && mouseXFormatted <= x + longestXString
+              && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
         return (int) relativeYMouse + shift;
       } else {
         return -1;
@@ -209,60 +230,49 @@ public class CraftingModule extends Module {
     }
   }
 
-  protected void renderMaterials(int hoveredText, ArrayList<ArrayList<String>> list) {
+  protected void renderMaterials(int hoveredText, ArrayList<String[]> list) {
     checkMouseMovement();
     List<LinkedHashMap<String, Color>> material = new ArrayList<>();
     LinkedHashMap<String, Color> text = new LinkedHashMap<>();
 
     if (hoveredText > -1) {
       if (hoveredText < list.size()) {
-        if (BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
-            .has(list.get(hoveredText).get(3))) {
-          try {
-            text.put(mouseWheelShift * 160 + "x ", Color.LIGHT_GRAY);
-            text.put(BazaarNotifier.bazaarConv.get(
-                BazaarNotifier.enchantCraftingList.getAsJsonObject("normal")
-                    .getAsJsonObject(list.get(hoveredText).get(3)).get("material").getAsString()),
-                Color.LIGHT_GRAY);
-          } catch (JsonIOException e) {
-            text.put("Error", Color.RED);
-          }
-        } else {
-          int materialCount;
+
+        int materialCount;
+        materialCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material").size();
+        for (int b = 0; b < materialCount / 2; b++) {
           StringBuilder _material = new StringBuilder();
-          materialCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-              .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").size();
-          for (int b = 0; b < materialCount / 2; b++) {
-            if (b == 0) {
-              _material.append((BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                  .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material").get(1)
-                  .getAsInt()
-                  * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConv
-                  .get(BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                      .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
-                      .get(0).getAsString()));
-            } else {
-              _material.append(" | ").append(
-                  BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                      .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
-                      .get(b * 2 + 1).getAsInt() * mouseWheelShift).append("x ").append(
-                  BazaarNotifier.bazaarConv.get(
-                      BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                          .getAsJsonObject(list.get(hoveredText).get(3)).getAsJsonArray("material")
-                          .get(b * 2).getAsString()));
-            }
+          if (b == 0) {
+            _material.append((BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                    .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material").get(1)
+                    .getAsInt()
+                    * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConv
+                    .get(BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                            .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material")
+                            .get(0).getAsString()));
+          } else {
+            _material.append(" | ").append(
+                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                            .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material")
+                            .get(b * 2 + 1).getAsInt() * mouseWheelShift).append("x ").append(
+                    BazaarNotifier.bazaarConv.get(
+                            BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                                    .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material")
+                                    .get(b * 2).getAsString()));
           }
+
           text.put(_material.toString(), Color.LIGHT_GRAY);
         }
         material.add(text);
-        int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
-            getMouseCoordinateY() - (int) (8 * scale), scale);
+        int longestXString =  ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
+                getMouseCoordinateY() - (int) (8 * scale), scale);
         Gui.drawRect(getMouseCoordinateX() - padding,
-            getMouseCoordinateY() - (int) (8 * scale) - (int) (padding * scale),
-            (int) (getMouseCoordinateX() + longestXString + padding * scale),
-            (int) (getMouseCoordinateY() + padding * scale), 0xFF404040);
+                getMouseCoordinateY() - (int) (8 * scale) - (int) (padding * scale),
+                (int) (getMouseCoordinateX() + longestXString + padding * scale),
+                (int) (getMouseCoordinateY() + padding * scale), 0xFF404040);
         ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
-            getMouseCoordinateY() - (int) (8 * scale), scale);
+                getMouseCoordinateY() - (int) (8 * scale), scale);
       }
     }
   }

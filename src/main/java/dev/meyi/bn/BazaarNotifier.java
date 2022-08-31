@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.ChestTickHandler;
@@ -15,6 +16,13 @@ import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,19 +32,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import java.util.Objects;
 
 
 @Mod(modid = BazaarNotifier.MODID, version = BazaarNotifier.VERSION)
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.5.0-beta8";
+  public static final String VERSION = "1.5.0-beta9";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -59,6 +62,7 @@ public class BazaarNotifier {
   public static Configuration config;
   public static JsonObject resources;
 
+  public static String guiToOpen = "";
 
   public static JsonObject enchantCraftingList;
   public static BiMap<String, String> bazaarConv = HashBiMap.create();
@@ -87,19 +91,31 @@ public class BazaarNotifier {
     Gson gson = new Gson();
     try {
       if (configFile.isFile()) {
-        configString = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
-        config = gson.fromJson(configString, Configuration.class);
+        try {
+          configString = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
+          config = gson.fromJson(configString, Configuration.class);
+        }catch (JsonSyntaxException e){
+          e.printStackTrace();
+          config = Configuration.createDefaultConfig();
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
     try {
       if (resourcesFile.isFile()) {
-        resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
-        resources = gson.fromJson(resourcesString, JsonObject.class);
+        try {
+          resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
+          resources = gson.fromJson(resourcesString, JsonObject.class);
+        }catch (JsonSyntaxException e){
+          e.printStackTrace();
+          Reader reader = new InputStreamReader(Objects.requireNonNull(
+                  BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
+          resources = gson.fromJson(reader, JsonObject.class);
+        }
       } else {
-        Reader reader = new InputStreamReader(
-            BazaarNotifier.class.getResourceAsStream("/resources.json"), StandardCharsets.UTF_8);
+        Reader reader = new InputStreamReader(Objects.requireNonNull(
+                BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
         resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {

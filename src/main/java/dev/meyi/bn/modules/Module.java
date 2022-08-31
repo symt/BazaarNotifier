@@ -4,6 +4,7 @@ import dev.meyi.bn.config.ModuleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
@@ -84,5 +85,28 @@ public abstract class Module {
     return (Display.getHeight() - Mouse.getY()) / new ScaledResolution(Minecraft.getMinecraft())
         .getScaleFactor();
   }
+  public String getReadableName(){
+    String name = StringUtils.lowerCase(name());
+    return StringUtils.capitalize(name) + " Module";
+  }
 
+  public String getName(){
+    return  name();
+  }
+
+  public float getScale() {
+    return scale;
+  }
+
+  public void setScale(float scale) {
+    this.scale = scale;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
 }

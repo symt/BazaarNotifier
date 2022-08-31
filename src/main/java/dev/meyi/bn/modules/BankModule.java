@@ -5,11 +5,12 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import net.minecraft.client.Minecraft;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import net.minecraft.client.Minecraft;
 
 public class BankModule extends Module {
 
@@ -34,16 +35,12 @@ public class BankModule extends Module {
     items.add(message);
     LinkedHashMap<String, Color> message2 = new LinkedHashMap<>();
     message2.put("Bazaar profit: ", Color.CYAN);
-    message2.put(BazaarNotifier.df.format(BankCalculator.bazaarProfit), Color.MAGENTA);
+    message2.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.MAGENTA);
     items.add(message2);
-    LinkedHashMap<String, Color> message3 = new LinkedHashMap<>();
-    message3.put("Bazaar profit2: ", Color.CYAN);
-    message3.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.MAGENTA);
-    items.add(message3);
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;
-    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 3) * scale);
+    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 2) * scale);
   }
 
   @Override
