@@ -37,7 +37,9 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
-    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith("[Bazaar] Sell Offer Setup!")) {
+    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message
+        .startsWith("[Bazaar] Buy Order Setup!") || message
+        .startsWith("[Bazaar] Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
           .equals(BazaarNotifier.bazaarConv.inverse()
               .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
@@ -247,6 +249,18 @@ public class EventHandler {
     }else if(BazaarNotifier.guiToOpen.contains("module")){
       int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
       Minecraft.getMinecraft().displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
+    }
+    BazaarNotifier.guiToOpen = "";
+  }
+
+  @SubscribeEvent
+  public void renderEvent(TickEvent e) {
+    if (BazaarNotifier.guiToOpen.contains("settings")) {
+      Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
+    } else if (BazaarNotifier.guiToOpen.contains("module")) {
+      int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
+      Minecraft.getMinecraft()
+          .displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
     }
     BazaarNotifier.guiToOpen = "";
   }

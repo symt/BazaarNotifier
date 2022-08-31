@@ -7,6 +7,9 @@ import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,10 +20,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.text.WordUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class BazaarNotifierCommand extends CommandBase {
@@ -252,7 +251,8 @@ public class BazaarNotifierCommand extends CommandBase {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Use the following format: /bn find (item)"));
         } else {
-          String itemName = WordUtils.capitalize(String.join(" ", args).substring(5).replaceAll("-", " "));
+          String itemName = WordUtils
+              .capitalize(String.join(" ", args).substring(5).replaceAll("-", " "));
           if (BazaarNotifier.bazaarDataRaw != null) {
             String itemConv = Utils.getItemIdFromName(itemName);
             System.out.println(itemConv);
@@ -275,16 +275,20 @@ public class BazaarNotifierCommand extends CommandBase {
                   EnumChatFormatting.RED + BazaarNotifier.df
                   .format(SuggestionCalculator.calculateEP(item)) + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
-                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + "Buy order materials / Instant buy materials" + "\n" +
+                  EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD
+                  + "Buy order materials / Instant buy materials" + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(Double.parseDouble(prices[0])) + " / " +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[3])) + "\n" +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(Double.parseDouble(prices[0]))
+                  + " / " +
+                  BazaarNotifier.df.format(Double.parseDouble(prices[3])) + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(Double.parseDouble(prices[1])) + " / " +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[4])) + "\n" +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(Double.parseDouble(prices[1]))
+                  + " / " +
+                  BazaarNotifier.df.format(Double.parseDouble(prices[4])) + "\n" +
                   EnumChatFormatting.DARK_RED + "Profit per 1M: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(Double.parseDouble(prices[2])) + " / " +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[5]))  + "\n" +
+                  EnumChatFormatting.RED + BazaarNotifier.df.format(Double.parseDouble(prices[2]))
+                  + " / " +
+                  BazaarNotifier.df.format(Double.parseDouble(prices[5])) + "\n" +
                   BazaarNotifier.prefix
               ));
             } else if (BazaarNotifier.bazaarConv.containsKey(itemConv)) {
@@ -304,8 +308,8 @@ public class BazaarNotifierCommand extends CommandBase {
               ));
             } else {
               player.addChatMessage(new ChatComponentText(
-                      BazaarNotifier.prefix + EnumChatFormatting.RED
-                              + "Please provide a valid item to find."));
+                  BazaarNotifier.prefix + EnumChatFormatting.RED
+                      + "Please provide a valid item to find."));
             }
 
 
@@ -315,16 +319,16 @@ public class BazaarNotifierCommand extends CommandBase {
                     + "Please wait a moment for the mod to get bazaar information"));
           }
         }
-      }else if(args.length == 1 && args[0].equalsIgnoreCase("help")){
+      } else if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
         player.addChatMessage(new ChatComponentText(
-                BazaarNotifier.prefix + "\n" + EnumChatFormatting.RED + "/bn reset (value)\n"
-                        + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED
-                        + "/bn toggle\n"
-                        + EnumChatFormatting.RED
-                        + "/bn settings (setting) [value]\n"
-                        + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED
-                        + "/bn discord\n"
-                        + BazaarNotifier.prefix
+            BazaarNotifier.prefix + "\n" + EnumChatFormatting.RED + "/bn reset (value)\n"
+                + EnumChatFormatting.RED + "/bn api (key)\n\n" + EnumChatFormatting.RED
+                + "/bn toggle\n"
+                + EnumChatFormatting.RED
+                + "/bn settings (setting) [value]\n"
+                + EnumChatFormatting.RED + "/bn find (item)\n" + EnumChatFormatting.RED
+                + "/bn discord\n"
+                + BazaarNotifier.prefix
         ));
       } else if (args.length == 1 && args[0].equalsIgnoreCase("__force")) {
         BazaarNotifier.forceRender ^= true;
@@ -357,18 +361,18 @@ public class BazaarNotifierCommand extends CommandBase {
 
       } else if (args.length == 1 && args[0].equalsIgnoreCase("update")) {
         if (date < System.currentTimeMillis() - (10 * 60 * 1000)) {
-          try {
-            Utils.updateResources();
+            new Thread(() -> {
+              try {
+                Utils.updateResources();
+              } catch (IOException e) {
+                date = System.currentTimeMillis();
+                player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED + "Resource update failed. Please try again."));
+              }
+            }).start();
             player.addChatMessage(
                 new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
-                    + "Successfully updated required resources from GitHub"));
-            date = System.currentTimeMillis();
-          } catch (IOException ignored) {
-            player
-                .addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
-                    + "There was an error when updating your resources. Try again later"));
-            date = System.currentTimeMillis();
-          }
+                    + "Updating required resources from GitHub"));
+
         } else {
           player.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED
               + "Please wait 10 minutes before running that command again"));

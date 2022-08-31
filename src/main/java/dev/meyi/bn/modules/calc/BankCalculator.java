@@ -4,6 +4,9 @@ package dev.meyi.bn.modules.calc;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.meyi.bn.BazaarNotifier;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.scoreboard.Score;
@@ -12,36 +15,26 @@ import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 
 public class BankCalculator {
 
   public static double purseLast = 0;
-  private static double bazaarProfit2 = 0;
   public static boolean orderWait = false;
+  public static double purseInBank = 0; //fix for personal bank
+  public static boolean isOnDangerousPage = false; //a page that can instantly close the bank gui without opening it again
+  public static double bank = 0;
+  private static double bazaarProfit2 = 0;
   private static double purseBackup = 0;
-
+  private static boolean personalBankInitialised = false;
+  private static boolean coopBankInitialised = false;
+  private static boolean purseInitialised = false;
+  private static double moneyOnStartup = 0;
 
   public static double getBazaarProfit() {
     bazaarProfit2 += getPurse() - purseLast;
     purseLast = getPurse();
     return bazaarProfit2;
   }
-
-
-  public static double purseInBank = 0; //fix for personal bank
-  public static boolean isOnDangerousPage = false; //a page that can instantly close the bank gui without opening it again
-
-  private static boolean personalBankInitialised = false;
-  private static boolean coopBankInitialised = false;
-  private static boolean purseInitialised = false;
-
-
-  public static double bank = 0;
-  private static double moneyOnStartup = 0;
 
   public static double calculateProfit() {
     return getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank

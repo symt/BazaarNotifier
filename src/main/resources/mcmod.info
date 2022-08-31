@@ -5,10 +5,10 @@
   "description": "Notifies when your bazaar orders are outdated.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
+  "url": "https://github.com/symt/BazaarNotifier",
+  "updateUrl": "https://github.com/symt/BazaarNotifier/releases",
   "authorList": ["meyi"],
-  "credits": "",
+  "credits": "meyi",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

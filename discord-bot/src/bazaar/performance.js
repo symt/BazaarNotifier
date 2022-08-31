@@ -6,9 +6,7 @@ module.exports = bazaarData => {
         product.profitFlowPerMinute = ((product.sellCount + product.buyCount) === 0) ? 0 : (product.sellCount * product.buyCount)/(10080 * (product.sellCount + product.buyCount)) * diff;
     });
 
-    bazaarData.sort((a, b) => {
-        return (b.profitFlowPerMinute - a.profitFlowPerMinute);
-    });
+    bazaarData.sort((a, b) => b.profitFlowPerMinute - a.profitFlowPerMinute);
     return bazaarData;
 }
 

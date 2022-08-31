@@ -7,20 +7,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.MalformedJsonException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.json.resp.BazaarResponse;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -33,10 +23,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
-
+  private static Pattern uuidMatcher = Pattern.compile("/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
   private static String playerUUID = "";
   private static long recipeCooldown = 0;
 
@@ -55,9 +56,11 @@ public class Utils {
         (new InputStreamReader(
             response.getEntity().getContent())));
 
-    JsonObject j = gson.fromJson(result, JsonObject.class).getAsJsonObject();
-    return new BazaarResponse(j.get("success").getAsBoolean(), j.get("lastUpdated").getAsLong(),
-        jsonToMap(j.getAsJsonObject("products")));
+    if (isJSONValid(result)) {
+      return gson.fromJson(result, BazaarResponse.class);
+    } else {
+      return new BazaarResponse(false, 0, null);
+    }
   }
 
 
@@ -207,11 +210,15 @@ public class Utils {
 
   public static boolean validateApiKey(String key) throws IOException {
     Gson gson = new Gson();
-    return gson.fromJson(IOUtils.toString(new BufferedReader
-        (new InputStreamReader(
-            HttpClientBuilder.create().build().execute(new HttpGet(
-                "https://api.hypixel.net/key?key=" + key)).getEntity()
-                .getContent()))), JsonObject.class).getAsJsonObject().get("success").getAsBoolean();
+    if (uuidMatcher.matcher(key).find()) {
+      return gson.fromJson(IOUtils.toString(new BufferedReader
+          (new InputStreamReader(
+              HttpClientBuilder.create().build().execute(new HttpGet(
+                  "https://api.hypixel.net/key?key=" + key)).getEntity()
+                  .getContent()))), JsonObject.class).getAsJsonObject().get("success")
+          .getAsBoolean();
+    }
+    return false
   }
 
   public static boolean validateApiKey() throws IOException {
@@ -268,10 +275,10 @@ public class Utils {
     try {
       BazaarNotifier.resources = gson.fromJson(result, JsonObject.class).getAsJsonObject();
       BazaarNotifier.bazaarConv = jsonToBimap(
-              BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
+          BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
       BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
-              .getAsJsonObject("enchantCraftingList");
-    }catch (JsonSyntaxException e){
+          .getAsJsonObject("enchantCraftingList");
+    } catch (JsonSyntaxException e) {
       e.printStackTrace();
     }
   }
@@ -288,46 +295,6 @@ public class Utils {
     return b;
   }
 
-  public static Map<String, BazaarItem> jsonToMap(JsonObject bazaarProducts) {
-    Map<String, BazaarItem> products = new HashMap<>();
-    for (Map.Entry<String, JsonElement> keys : bazaarProducts.entrySet()) {
-      String itemName = keys.getKey();
-
-      List<BazaarItem.BazaarSubItem> sellSummary = new ArrayList<>();
-      for (int i = 0;
-          i < bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("sell_summary").size(); i++) {
-        JsonObject j = bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("sell_summary")
-            .get(i).getAsJsonObject();
-        sellSummary.add(new BazaarItem.BazaarSubItem(j.get("amount").getAsInt(),
-            j.get("pricePerUnit").getAsDouble(), j.get("orders").getAsInt()));
-      }
-      List<BazaarItem.BazaarSubItem> buySummary = new ArrayList<>();
-      for (int i = 0;
-          i < bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("buy_summary").size(); i++) {
-        JsonObject j = bazaarProducts.getAsJsonObject(itemName).getAsJsonArray("buy_summary").get(i)
-            .getAsJsonObject();
-        buySummary.add(new BazaarItem.BazaarSubItem(j.get("amount").getAsInt(),
-            j.get("pricePerUnit").getAsDouble(), j.get("orders").getAsInt()));
-      }
-
-      JsonObject JsonQuickStatus = bazaarProducts.getAsJsonObject(itemName)
-          .getAsJsonObject("quick_status");
-      BazaarItem.BazaarItemSummary quickStatus = new BazaarItem.BazaarItemSummary(itemName,
-          JsonQuickStatus.get("sellPrice").getAsDouble(),
-          JsonQuickStatus.get("sellVolume").getAsLong(),
-          JsonQuickStatus.get("sellMovingWeek").getAsLong(),
-          JsonQuickStatus.get("sellOrders").getAsLong(),
-          JsonQuickStatus.get("buyPrice").getAsDouble(),
-          JsonQuickStatus.get("buyVolume").getAsLong(),
-          JsonQuickStatus.get("buyMovingWeek").getAsLong(),
-          JsonQuickStatus.get("buyOrders").getAsLong());
-
-      products.put(itemName, new BazaarItem(itemName, sellSummary, buySummary, quickStatus));
-    }
-    return products;
-  }
-
-
   public static void saveResources(File file, JsonObject resources) {
     Gson gson = new Gson();
     try {
@@ -341,20 +308,20 @@ public class Utils {
     }
   }
 
-  public static String getItemIdFromName(String userInput){
+  public static String getItemIdFromName(String userInput) {
     userInput = WordUtils.capitalize(userInput.replaceAll("-", " ").toLowerCase());
     String[] userInputSplit = userInput.split(" ");
-    String userInputEnd = userInputSplit[userInputSplit.length-1].toUpperCase();
-    if (userInputSplit.length == 1){
+    String userInputEnd = userInputSplit[userInputSplit.length - 1].toUpperCase();
+    if (userInputSplit.length == 1) {
       return BazaarNotifier.bazaarConv.inverse().getOrDefault(userInput, "");
     }
-    for (char c:userInputEnd.toCharArray()) {
-      if(c != 'I' && c != 'V' && c != 'X'){
+    for (char c : userInputEnd.toCharArray()) {
+      if (c != 'I' && c != 'V' && c != 'X') {
         return BazaarNotifier.bazaarConv.inverse().getOrDefault(userInput, "");
       }
     }
-    StringBuilder result = new StringBuilder("");
-    for(int i = 0; i < userInputSplit.length-1; i++){
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < userInputSplit.length - 1; i++) {
       result.append(userInputSplit[i]);
       result.append(" ");
     }

@@ -32,7 +32,7 @@ public class BazaarItem {
       this.orders = orders;
     }
 
-    public double getPriceWithTax(){
+    public double getPriceWithTax() {
       return pricePerUnit * 0.9875d;
     }
   }
