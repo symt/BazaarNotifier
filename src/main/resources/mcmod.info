@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [
 {
   "modid": "BazaarNotifier",
@@ -15,21 +14,3 @@
   "dependencies": []
 }
 ]
-=======
-[
-{
-  "modid": "BazaarNotifier",
-  "name": "BazaarNotifier",
-  "description": "Notifies when your bazaar orders are outdated.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "https://github.com/symt/BazaarNotifier",
-  "updateUrl": "https://github.com/symt/BazaarNotifier/releases",
-  "authorList": ["meyi"],
-  "credits": "meyi",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
-]
->>>>>>> master
