@@ -36,7 +36,7 @@ public class ModuleSettingsGui extends GuiScreen {
           100, BazaarNotifier.config.craftingListLength, false, true));
       buttonList.add(new GuiButton(ButtonIds.COLLECTION_CHECK.id, getButtonX(),
           getButtonY(), "Collection Check: " +
-          getOnOff(BazaarNotifier.config.collectionCheckDisabled)));
+          getOnOff(!BazaarNotifier.config.collectionCheckDisabled)));
       if (!BazaarNotifier.validApiKey) {
         buttonList.get(3).enabled = false;
       }
@@ -80,7 +80,7 @@ public class ModuleSettingsGui extends GuiScreen {
     } else if (Button.id == ButtonIds.COLLECTION_CHECK.id) {
       BazaarNotifier.config.collectionCheckDisabled ^= true;
       Button.displayString =
-          "Collection Check: " + getOnOff(BazaarNotifier.config.collectionCheckDisabled);
+          "Collection Check: " + getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
     } else if (Button.id == ButtonIds.SELLING_OPTION.id) {
       CraftingCalculator.toggleCrafting();
       Button.displayString =
