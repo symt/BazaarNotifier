@@ -5,11 +5,12 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
+import net.minecraft.client.Minecraft;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import net.minecraft.client.Minecraft;
 
 public class BankModule extends Module {
 
