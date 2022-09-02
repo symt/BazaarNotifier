@@ -24,7 +24,6 @@ public class CraftingCalculator {
         || BazaarNotifier.bazaarDataRaw.products.size() == 0) {
       return;
     }
-    System.out.println(unlockedRecipes);
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList
         .getAsJsonObject("other").entrySet()) {
 
