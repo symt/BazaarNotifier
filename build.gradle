@@ -9,13 +9,11 @@ buildscript {
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
         classpath 'com.github.asbyth:ForgeGradle:6f53277'
     }
 }
 apply plugin: 'java'
 apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: 'com.github.johnrengelman.shadow'
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -32,8 +30,26 @@ minecraft {
     makeObfSourceJar = false
 }
 
-dependencies {
+def resourcesFile = "${sourceSets.main.resources.srcDirs[0]}/resources.json"
 
+task destroyResources {
+    doLast {
+        if (new File(resourcesFile).exists()) {
+            project.delete(files("${sourceSets.main.resources.srcDirs[0]}/resources.json"))
+        }
+    }
+}
+
+task retrieveResources {
+    doLast {
+        def f = new File(resourcesFile)
+
+        if (f.exists()) {
+            project.delete(files("${sourceSets.main.resources.srcDirs[0]}/resources.json"))
+        }
+        new URL("https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json")
+                .withInputStream {i -> f.withOutputStream {it << i}}
+    }
 }
 
 jar {
@@ -55,10 +71,9 @@ processResources
             }
             rename '(.+_at.cfg)', 'META-INF/$1'
         }
+processResources.dependsOn retrieveResources
+processResources.finalizedBy destroyResources
 
-shadowJar {
-    classifier = ""
-}
+processResources.outputs.upToDateWhen { false }
 
-reobf { shadowJar { mappingType = "SEARGE" } }
-tasks.reobfShadowJar.mustRunAfter shadowJar
+tasks.destroyResources.outputs.upToDateWhen { false }
