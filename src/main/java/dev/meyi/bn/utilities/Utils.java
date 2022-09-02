@@ -147,7 +147,7 @@ public class Utils {
         Set<Map.Entry<String, JsonElement>> set2 = slayer.getAsJsonObject(entry.getKey())
             .getAsJsonObject("claimed_levels").entrySet();
         for (Map.Entry<String, JsonElement> entry2 : set2) {
-          unlockedCollections.add(entry.getKey() + entry2.getKey().replace("level", ""));
+          unlockedCollections.add(entry.getKey().toUpperCase() + entry2.getKey().replace("level", "").toUpperCase());
         }
       }
       return unlockedCollections;

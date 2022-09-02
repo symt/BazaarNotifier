@@ -811,7 +811,7 @@
 					"ENCHANTED_OBSIDIAN",
 					32
 				],
-				"collection": "None"
+				"collection": "ENDERMAN_4"
 			},
 			"ENCHANTED_BROWN_MUSHROOM": {
 				"material": [
@@ -1441,7 +1441,7 @@
 					"AMALGAMATED_CRIMSONITE_NEW",
 					1
 				],
-				"collection": "None"
+				"collection": "BLAZE_2"
 			},
 			"ABSOLUTE_ENDER_PEARL": {
 				"material": [
@@ -1610,7 +1610,7 @@
 					"ENCHANTED_STRING",
 					32
 				],
-				"collection": "None"
+				"collection": "ZOMBIE_4"
 			},
 			"ENCHANTED_GUNPOWDER": {
 				"material": [
@@ -1807,7 +1807,7 @@
 					"ENCHANTED_GOLD",
 					32
 				],
-				"collection": "None"
+				"collection": "WOLF_4"
 			},
 			"TARANTULA_SILK": {
 				"material": [
@@ -1816,7 +1816,7 @@
 					"ENCHANTED_FLINT",
 					32
 				],
-				"collection": "None"
+				"collection": "SPIDER_4"
 			},
 			"ENCHANTED_SEEDS": {
 				"material": [

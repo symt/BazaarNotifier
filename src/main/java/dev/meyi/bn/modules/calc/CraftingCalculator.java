@@ -4,12 +4,13 @@ import com.google.gson.JsonElement;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.CraftingModule;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.util.EnumChatFormatting;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.util.EnumChatFormatting;
 
 
 public class CraftingCalculator {
@@ -23,17 +24,14 @@ public class CraftingCalculator {
         || BazaarNotifier.bazaarDataRaw.products.size() == 0) {
       return;
     }
-
     for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList
         .getAsJsonObject("other").entrySet()) {
 
       String itemName = keys.getKey();
+      String collection = BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
+              .get("collection").getAsString();
 
-      if ((!unlockedRecipes.contains(
-          BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-              .get("collection").getAsString()) || !BazaarNotifier.enchantCraftingList
-          .getAsJsonObject("other").getAsJsonObject(itemName).get("collection").getAsString()
-          .equals("NONE"))
+      if (!(unlockedRecipes.contains(collection) ||collection.equals("NONE"))
           && !BazaarNotifier.config.collectionCheckDisabled) {
         continue;
       }
