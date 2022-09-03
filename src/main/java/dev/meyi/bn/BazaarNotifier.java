@@ -16,6 +16,13 @@ import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.ModuleList;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,12 +33,6 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 
 @Mod(modid = BazaarNotifier.MODID, version = BazaarNotifier.VERSION)
@@ -106,7 +107,7 @@ public class BazaarNotifier {
         try {
           resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
           resources = gson.fromJson(resourcesString, JsonObject.class);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | ClassCastException e) {
           e.printStackTrace();
           Reader reader = new InputStreamReader(Objects.requireNonNull(
               BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
