@@ -778,7 +778,22 @@
 		"ENCHANTMENT_TURBO_POTATO_1": "Turbo-Potato I",
 		"ENCHANTMENT_ULTIMATE_WISDOM_2": "Wisdom II",
 		"ENCHANTMENT_ULTIMATE_WISDOM_3": "Wisdom III",
-		"ENCHANTMENT_TURBO_POTATO_2": "Turbo-Potato II"
+		"ENCHANTMENT_TURBO_POTATO_2": "Turbo-Potato II",
+  		"LAVA_WATER_ORB": "Lava Water Orb",
+  		"WATER_ORB": "Water Orb",
+  		"BOBBIN_SCRIPTURES": "Bobbin' Scriptures",
+  		"SPOOKY_WATER_ORB": "Spooky Water Orb",
+  		"GLOWY_CHUM_BAIT": "Glowy Chum Bait",
+  		"PITCHIN_KOI": "Pitchin' Koi",
+  		"BLUE_ICE_HUNK": "Hunk of Blue Ice",
+  		"ENCHANTMENT_PISCARY_6": "Piscary VI",
+  		"SHARK_WATER_ORB": "Shark Water Orb",
+  		"ENCHANTMENT_ULTIMATE_BOBBIN_TIME_3": "Bobbin' Time III",
+  		"ENCHANTMENT_ULTIMATE_BOBBIN_TIME_4": "Bobbin' Time IV",
+  		"ENCHANTMENT_ULTIMATE_BOBBIN_TIME_5": "Bobbin' Time V",
+  		"ICE_HUNK": "Hunk of Ice",
+  		"DIVER_FRAGMENT": "Emperor's Skull",
+  		"WINTER_WATER_ORB": "Winter Water Orb"
 	},
 	"enchantCraftingList": {
 		"normal": {},
