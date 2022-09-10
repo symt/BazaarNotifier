@@ -15,4 +15,8 @@ public class ModuleConfig {
     this.scale = scale;
     this.active = active;
   }
+
+  public static ModuleConfig generateDefaultConfig(String name) {
+    return new ModuleConfig(name, 10, 10, 1, true);
+  }
 }

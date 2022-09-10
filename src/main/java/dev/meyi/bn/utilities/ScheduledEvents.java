@@ -32,7 +32,7 @@ public class ScheduledEvents {
 
   public void craftingLoop() {
     Executors.newScheduledThreadPool(1)
-        .scheduleAtFixedRate(CraftingCalculator::getBestEnchantRecipes, 5, 5, TimeUnit.SECONDS);
+        .scheduleAtFixedRate(CraftingCalculator::getBestEnchantRecipes, 8, 5, TimeUnit.SECONDS);
   }
 
   public void suggestionLoop() {
@@ -47,7 +47,7 @@ public class ScheduledEvents {
 
   public void purseLoop() {
     Executors.newScheduledThreadPool(1)
-        .scheduleAtFixedRate(BankCalculator::getPurse, 5, 5, TimeUnit.SECONDS);
+        .scheduleAtFixedRate(BankCalculator::getPurse, 7, 5, TimeUnit.SECONDS);
   }
 
   public void outdatedNotification() {

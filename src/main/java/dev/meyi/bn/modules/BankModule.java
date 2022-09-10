@@ -29,6 +29,9 @@ public class BankModule extends Module {
   protected void draw() {
     List<LinkedHashMap<String, Color>> items = new ArrayList<>();
 
+    LinkedHashMap<String, Color> header = new LinkedHashMap<>();
+    header.put("Bank Module (Experimental)", Color.GRAY);
+    items.add(header);
     LinkedHashMap<String, Color> message = new LinkedHashMap<>();
     message.put("Total profit: ", Color.CYAN);
     message.put(BazaarNotifier.df.format((int) BankCalculator.calculateProfit()), Color.MAGENTA);
@@ -40,7 +43,7 @@ public class BankModule extends Module {
 
     int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;
-    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 2) * scale);
+    boundsY = (int) (y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 3) * scale + 3*scale-2);
   }
 
   @Override

@@ -2,7 +2,6 @@ package dev.meyi.bn.config;
 
 import com.google.gson.Gson;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.Defaults;
 import java.io.File;
@@ -55,6 +54,7 @@ public class Configuration {
     BazaarNotifier.config.modules = BazaarNotifier.modules.generateConfig();
     try {
       if (!file.isFile()) {
+        //noinspection ResultOfMethodCallIgnored
         file.createNewFile();
       }
       Files.write(Paths.get(file.getAbsolutePath()),
@@ -66,11 +66,9 @@ public class Configuration {
 
   public static Configuration createDefaultConfig() {
     ModuleConfig[] c = new ModuleConfig[MODULE_LENGTH];
-    // TODO: Change this to enhanced-for loop so we don't have to call .values every single time
-    for (int i = 0; i < ModuleName.values().length; i++) {
-      // TODO: Change this to use static methods so we aren't unnecessarily creating Module objects
-      Module m = ModuleName.values()[i].returnDefaultModule();
-      c[i] = m.generateDefaultConfig();
+    int i = 0;
+    for (ModuleName moduleName : ModuleName.values()) {
+      c[i++] = ModuleConfig.generateDefaultConfig(moduleName.name());
     }
     return new Configuration(Defaults.COLLECTION_CHECKING_DISABLED,
         Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,

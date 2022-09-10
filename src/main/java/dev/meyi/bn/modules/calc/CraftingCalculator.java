@@ -4,10 +4,9 @@ import com.google.gson.JsonElement;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.CraftingModule;
 import dev.meyi.bn.utilities.Utils;
-import net.minecraft.util.EnumChatFormatting;
-
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 public class CraftingCalculator {
 
-  private static String unlockedRecipes = "";
+  private static List<String> unlockedRecipes = new ArrayList<>();
 
 
   public static void getBestEnchantRecipes() {
@@ -28,11 +27,12 @@ public class CraftingCalculator {
         .getAsJsonObject("other").entrySet()) {
 
       String itemName = keys.getKey();
-      String collection = BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-              .get("collection").getAsString();
+      String collection = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+          .getAsJsonObject(itemName)
+          .get("collection").getAsString();
 
-      if (!(unlockedRecipes.contains(collection) ||collection.equals("NONE"))
-          && !BazaarNotifier.config.collectionCheckDisabled) {
+      if (!BazaarNotifier.config.collectionCheckDisabled && !(unlockedRecipes.contains(collection)
+          || collection.equals("NONE"))) {
         continue;
       }
       list.add(getEnchantCraft(itemName));
@@ -57,50 +57,9 @@ public class CraftingCalculator {
   }
 
 
-  public static String toggleCrafting() {
-    if (BazaarNotifier.config.craftingSortingOption == 0) {
-      BazaarNotifier.config.craftingSortingOption = 1;
-      return "Crafting now sorts by sell offer";
-    } else if (BazaarNotifier.config.craftingSortingOption == 1) {
-      BazaarNotifier.config.craftingSortingOption = 2;
-      return "Crafting now sorts by profit per million";
-    } else {
-      BazaarNotifier.config.craftingSortingOption = 0;
-      return "Crafting now sorts by instant sell";
-    }
-  }
-
-  public static String setCraftingLength(int length) {
-    if (length > BazaarNotifier.enchantCraftingList.getAsJsonObject("normal").entrySet().size()
-        + BazaarNotifier.enchantCraftingList.getAsJsonObject("other").entrySet().size()) {
-      return length + " is too long";
-    } else {
-      BazaarNotifier.config.craftingListLength = length;
-      return "Item list size set to " + length;
-    }
-  }
-
-  public static String editCraftingModuleGUI(String craftingValue) {
-    if (craftingValue.equalsIgnoreCase("instant_sell")) {
-      BazaarNotifier.config
-          .setShowInstantSellProfit(!BazaarNotifier.config.isShowInstantSellProfit());
-      return
-          (BazaarNotifier.config.isShowInstantSellProfit() ? EnumChatFormatting.GREEN
-              : EnumChatFormatting.RED)
-              + "Toggled profit column (Instant Sell)";
-    } else if (craftingValue.equalsIgnoreCase("sell_offer")) {
-      BazaarNotifier.config.setShowSellOfferProfit(!BazaarNotifier.config.isShowSellOfferProfit());
-      return (BazaarNotifier.config.isShowSellOfferProfit() ? EnumChatFormatting.GREEN
-          : EnumChatFormatting.RED)
-          + "Toggled profit column (Sell Offer)";
-    } else if (craftingValue.equalsIgnoreCase("ppm")) {
-      BazaarNotifier.config.setShowProfitPerMil(!BazaarNotifier.config.isShowProfitPerMil());
-      return (BazaarNotifier.config.isShowProfitPerMil() ? EnumChatFormatting.GREEN
-          : EnumChatFormatting.RED)
-          + "Toggled profit column (Profit per 1M)";
-    } else {
-      return EnumChatFormatting.RED + "This value does not exist";
-    }
+  public static void toggleCrafting() {
+    BazaarNotifier.config.craftingSortingOption =
+        (BazaarNotifier.config.craftingSortingOption + 1) % 3;
   }
 
   public static String[] getEnchantCraft(String itemName) {
@@ -163,12 +122,7 @@ public class CraftingCalculator {
         values[4] = String.valueOf(profitSellOffer2);
         values[5] = String.valueOf(profitPerMil2);
       } else {
-        values[0] = String.valueOf(0);
-        values[1] = String.valueOf(0);
-        values[2] = String.valueOf(0);
-        values[3] = String.valueOf(0);
-        values[4] = String.valueOf(0);
-        values[5] = String.valueOf(0);
+        Arrays.fill(values, "0");
       }
       values[6] = itemName;
     }
@@ -181,7 +135,7 @@ public class CraftingCalculator {
     try {
       List<String> s = Utils.unlockedRecipes();
       if (s != null) {
-        unlockedRecipes = s.toString();
+        unlockedRecipes = s;
       }
     } catch (IOException e) {
       e.printStackTrace();

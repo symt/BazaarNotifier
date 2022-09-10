@@ -39,9 +39,8 @@ public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
   public static final String VERSION = "1.5.0-beta9";
-  public static final String prefix =
-      EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
-          + "] " + EnumChatFormatting.RESET;
+  public static final String prefix = EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
+  public static final String header = EnumChatFormatting.GOLD + "" + EnumChatFormatting.BOLD + "" + EnumChatFormatting.STRIKETHROUGH + "-------" + EnumChatFormatting.RESET + "" + EnumChatFormatting.GOLD + "" + EnumChatFormatting.BOLD + " [ " + EnumChatFormatting.YELLOW + "BazaarNotifier" + EnumChatFormatting.GOLD + "" + EnumChatFormatting.BOLD + " ] " + EnumChatFormatting.STRIKETHROUGH + "-------";
   public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json";
   public static DecimalFormat df = new DecimalFormat("#,##0.0");
   public static DecimalFormat dfNoDecimal = new DecimalFormat("#,###");
@@ -51,7 +50,7 @@ public class BazaarNotifier {
   public static boolean inBank = false;
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
-  public static boolean apiKeyDisabled = true;// Change this if an api key is ever required to access the bazaar again.
+  public static boolean apiKeyDisabled = true;
 
 
   public static ArrayList<Order> orders = new ArrayList<>();
@@ -82,11 +81,11 @@ public class BazaarNotifier {
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
     File bnDir = new File(event.getModConfigurationDirectory(), "BazaarNotifier");
+    //noinspection ResultOfMethodCallIgnored
     bnDir.mkdirs();
     configFile = new File(bnDir, "config.json");
     resourcesFile = new File(bnDir, "resources.json");
     String configString = null;
-    String resourcesString = null;
     Gson gson = new Gson();
     try {
       if (configFile.isFile()) {
@@ -104,9 +103,9 @@ public class BazaarNotifier {
     try {
       if (resourcesFile.isFile()) {
         try {
-          resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
+          String resourcesString = new String(Files.readAllBytes(Paths.get(resourcesFile.getPath())));
           resources = gson.fromJson(resourcesString, JsonObject.class);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | ClassCastException e) {
           e.printStackTrace();
           Reader reader = new InputStreamReader(Objects.requireNonNull(
               BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
@@ -121,12 +120,12 @@ public class BazaarNotifier {
       e.printStackTrace();
     }
 
-    if (configString == null) {
+    if (configString != null) {
+      modules = new ModuleList(config);
+    } else {
       config = Configuration.createDefaultConfig();
       modules = new ModuleList();
       modules.resetAll();
-    } else {
-      modules = new ModuleList(config);
     }
 
     try {

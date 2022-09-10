@@ -73,10 +73,6 @@ public abstract class Module {
     return new ModuleConfig(name(), x, y, scale, active);
   }
 
-  public ModuleConfig generateDefaultConfig() {
-    return new ModuleConfig(name(), 10, 10, 1, true);
-  }
-
   protected int getMouseCoordinateX() {
     return Mouse.getX() / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
   }
