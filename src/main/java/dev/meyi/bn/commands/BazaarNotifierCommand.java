@@ -115,18 +115,22 @@ public class BazaarNotifierCommand extends CommandBase {
             BazaarItem item = BazaarNotifier.bazaarDataRaw.products.get(itemConv);
             String findItemString = BazaarNotifier.prefix + EnumChatFormatting.RED
                 + "Please provide a valid item to find.";
+
+            String bulletPoint = EnumChatFormatting.WHITE + "\u2022 ";
+            String separator = EnumChatFormatting.RED + " / ";
+
             if (BazaarNotifier.bazaarConv.containsKey(itemConv)) {
               findItemString = BazaarNotifier.header + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils
-                  .capitalize(itemName) + "\n" +
-                  EnumChatFormatting.DARK_RED + "Buy Order: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(item.sell_summary.size() == 0 ?
-                  0 : item.sell_summary.get(0).pricePerUnit) + "\n" +
-                  EnumChatFormatting.DARK_RED + "Sell Offer: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df.format(item.buy_summary.size() == 0 ?
-                  0 : item.buy_summary.get(0).pricePerUnit) + "\n" +
-                  EnumChatFormatting.DARK_RED + "Estimated Profit: " +
-                  EnumChatFormatting.RED + BazaarNotifier.df
+                  .capitalize(itemName) + "\n  " + bulletPoint +
+                  EnumChatFormatting.RED + "Buy Order: " +
+                  EnumChatFormatting.GRAY + BazaarNotifier.df.format(item.sell_summary.size() == 0 ?
+                  0 : item.sell_summary.get(0).pricePerUnit) + "\n  " + bulletPoint +
+                  EnumChatFormatting.RED + "Sell Offer: " +
+                  EnumChatFormatting.GRAY + BazaarNotifier.df.format(item.buy_summary.size() == 0 ?
+                  0 : item.buy_summary.get(0).pricePerUnit) + "\n  " + bulletPoint +
+                  EnumChatFormatting.RED + "Estimated Profit: " +
+                  EnumChatFormatting.GRAY + BazaarNotifier.df
                   .format(SuggestionCalculator.calculateEP(item)) + "\n";
             }
 
@@ -135,23 +139,24 @@ public class BazaarNotifierCommand extends CommandBase {
               String[] prices = CraftingCalculator.getEnchantCraft(itemConv);
 
               findItemString +=
-                  EnumChatFormatting.DARK_RED + "" + EnumChatFormatting.BOLD + "Crafting:" + "\n" +
-                      EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD
-                      + "Buy order materials / Instant buy materials" + "\n" +
-                      EnumChatFormatting.DARK_RED + "Profit (Instant Sell): " +
-                      EnumChatFormatting.RED + BazaarNotifier.df
-                      .format(Double.parseDouble(prices[0]))
-                      + " / " +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[3])) + "\n" +
-                      EnumChatFormatting.DARK_RED + "Profit (Sell Offer): " +
-                      EnumChatFormatting.RED + BazaarNotifier.df
-                      .format(Double.parseDouble(prices[1]))
-                      + " / " +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[4])) + "\n" +
-                      EnumChatFormatting.DARK_RED + "Profit per 1M: " +
-                      EnumChatFormatting.RED + BazaarNotifier.df
-                      .format(Double.parseDouble(prices[2]))
-                      + " / " +
+                  EnumChatFormatting.DARK_RED + "" + EnumChatFormatting.BOLD + "Crafting (" +
+                      EnumChatFormatting.GRAY
+                      + "Buy order" + separator + EnumChatFormatting.GRAY + "Instant buy"
+                      + EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD +  ")" + "\n  " +
+                      bulletPoint +
+                      EnumChatFormatting.RED + "Profit (Instant Sell): " +
+                      EnumChatFormatting.GRAY + BazaarNotifier.df
+                      .format(Double.parseDouble(prices[0])) + separator + EnumChatFormatting.GRAY +
+                      BazaarNotifier.df.format(Double.parseDouble(prices[3])) + "\n  " + bulletPoint
+                      +
+                      EnumChatFormatting.RED + "Profit (Sell Offer): " +
+                      EnumChatFormatting.GRAY + BazaarNotifier.df
+                      .format(Double.parseDouble(prices[1])) + separator + EnumChatFormatting.GRAY +
+                      BazaarNotifier.df.format(Double.parseDouble(prices[4])) + "\n  " + bulletPoint
+                      +
+                      EnumChatFormatting.RED + "Profit per 1M: " +
+                      EnumChatFormatting.GRAY + BazaarNotifier.df
+                      .format(Double.parseDouble(prices[2])) + separator + EnumChatFormatting.GRAY +
                       BazaarNotifier.df.format(Double.parseDouble(prices[5])) + "\n" +
                       BazaarNotifier.header;
 

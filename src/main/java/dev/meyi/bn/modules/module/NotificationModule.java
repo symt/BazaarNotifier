@@ -1,8 +1,10 @@
-package dev.meyi.bn.modules;
+package dev.meyi.bn.modules.module;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.json.Order;
+import dev.meyi.bn.modules.Module;
+import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;

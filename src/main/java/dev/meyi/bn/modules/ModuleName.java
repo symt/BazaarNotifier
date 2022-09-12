@@ -1,5 +1,10 @@
 package dev.meyi.bn.modules;
 
+import dev.meyi.bn.modules.module.BankModule;
+import dev.meyi.bn.modules.module.CraftingModule;
+import dev.meyi.bn.modules.module.NotificationModule;
+import dev.meyi.bn.modules.module.SuggestionModule;
+
 public enum ModuleName {
   SUGGESTION, BANK, NOTIFICATION, CRAFTING;
 

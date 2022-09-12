@@ -2,7 +2,7 @@ package dev.meyi.bn.modules.calc;
 
 import com.google.gson.JsonElement;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.modules.CraftingModule;
+import dev.meyi.bn.modules.module.CraftingModule;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -3,7 +3,7 @@ package dev.meyi.bn.modules.calc;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
-import dev.meyi.bn.modules.SuggestionModule;
+import dev.meyi.bn.modules.module.SuggestionModule;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
