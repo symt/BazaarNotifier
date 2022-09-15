@@ -37,7 +37,6 @@ public class Utils {
       .compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$",
           Pattern.CASE_INSENSITIVE);
   private static String playerUUID = "";
-  private static long recipeCooldown = 0;
 
   public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
@@ -64,12 +63,6 @@ public class Utils {
 
   public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
-    if (recipeCooldown + 300000 < System.currentTimeMillis()) {
-      return null;
-    } else {
-      recipeCooldown = System.currentTimeMillis();
-    }
-
     if (!BazaarNotifier.config.api.isEmpty() && (BazaarNotifier.validApiKey
         || (BazaarNotifier.validApiKey = validateApiKey()))) {
 

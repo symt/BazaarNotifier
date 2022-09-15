@@ -136,6 +136,8 @@ public class CraftingCalculator {
       List<String> s = Utils.unlockedRecipes();
       if (s != null) {
         unlockedRecipes = s;
+      } else {
+        BazaarNotifier.config.collectionCheckDisabled = true;
       }
     } catch (IOException e) {
       e.printStackTrace();
