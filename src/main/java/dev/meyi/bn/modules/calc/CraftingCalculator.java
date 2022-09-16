@@ -136,6 +136,11 @@ public class CraftingCalculator {
       List<String> s = Utils.unlockedRecipes();
       if (s != null) {
         unlockedRecipes = s;
+
+        // Honestly, if this is empty, we should just assume something went wrong and disable the collection check.
+        if (unlockedRecipes.size() == 0) {
+          BazaarNotifier.config.collectionCheckDisabled = true;
+        }
       } else {
         BazaarNotifier.config.collectionCheckDisabled = true;
       }

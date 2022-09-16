@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.5.0-beta10";
+  public static final String VERSION = "1.5.0-beta11";
   public static final String prefix = EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD + "] " + EnumChatFormatting.RESET;
   public static final String header = EnumChatFormatting.GOLD + "" + EnumChatFormatting.BOLD + "" + EnumChatFormatting.STRIKETHROUGH + "-------" + EnumChatFormatting.RESET + "" + EnumChatFormatting.GOLD + "" + EnumChatFormatting.BOLD + " [ " + EnumChatFormatting.YELLOW + "BazaarNotifier" + EnumChatFormatting.GOLD + "" + EnumChatFormatting.BOLD + " ] " + EnumChatFormatting.STRIKETHROUGH + "-------";
   public static final String RESOURCE_LOCATION = "https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json";
@@ -92,6 +92,7 @@ public class BazaarNotifier {
         try {
           configString = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
           config = gson.fromJson(configString, Configuration.class);
+          config.version = BazaarNotifier.VERSION;
         } catch (JsonSyntaxException e) {
           e.printStackTrace();
           config = Configuration.createDefaultConfig();
