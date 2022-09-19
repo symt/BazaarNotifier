@@ -252,7 +252,4 @@ public class EventHandler {
     }
     BazaarNotifier.guiToOpen = "";
   }
-
-
-  // TODO: Look for fix to old animations?
 }

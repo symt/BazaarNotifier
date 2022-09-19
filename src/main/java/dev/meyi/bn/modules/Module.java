@@ -14,14 +14,14 @@ public abstract class Module {
   protected int x;
   protected int y;
   protected float scale;
-  int lastMouseX, lastMouseY;
-  int boundsX, boundsY;
-  int padding = 3;
-  int shift = 0;
-  int mouseWheelShift = 0;
-  boolean moving = false;
-  boolean active = true;
-  boolean needsToMove = false;
+  protected int boundsX, boundsY;
+  protected int shift = 0;
+  protected boolean moving = false;
+  protected boolean active = true;
+  protected boolean needsToMove = false;
+  protected int mouseWheelShift = 0;
+  protected int padding = 3;
+  private int lastMouseX, lastMouseY;
 
   public Module() {
     this.x = 0;
@@ -71,10 +71,6 @@ public abstract class Module {
 
   public ModuleConfig generateModuleConfig() {
     return new ModuleConfig(name(), x, y, scale, active);
-  }
-
-  public ModuleConfig generateDefaultConfig() {
-    return new ModuleConfig(name(), 10, 10, 1, true);
   }
 
   protected int getMouseCoordinateX() {

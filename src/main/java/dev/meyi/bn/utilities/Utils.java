@@ -3,23 +3,11 @@ package dev.meyi.bn.utilities;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarResponse;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -32,12 +20,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
-  private static final Pattern uuidMatcher = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
+  private static final Pattern uuidMatcher = Pattern
+      .compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          Pattern.CASE_INSENSITIVE);
   private static String playerUUID = "";
-  private static long recipeCooldown = 0;
 
   public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
@@ -64,30 +63,22 @@ public class Utils {
 
   public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
-    if (recipeCooldown + 300000 > System.currentTimeMillis()) {
-      return null;
-    } else {
-      recipeCooldown = System.currentTimeMillis();
-    }
-    if (!BazaarNotifier.validApiKey) {
-      BazaarNotifier.validApiKey = validateApiKey();
-    }
-    if (!BazaarNotifier.config.api.equals("") && BazaarNotifier.validApiKey) {
+    if (!BazaarNotifier.config.api.isEmpty() && (BazaarNotifier.validApiKey
+        || (BazaarNotifier.validApiKey = validateApiKey()))) {
 
       HttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
         HttpGet request = new HttpGet(
             "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft()
-                .getSession().getUsername()); //Chance this to your Username
+                .getSession().getUsername()); // Change this to your username if testing
         HttpResponse response = client.execute(request);
 
         String uuidResponse = IOUtils
             .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
 
         try {
-          playerUUID = gson.fromJson(uuidResponse, JsonObject.class).getAsJsonObject().get("id")
-              .getAsString();
-        } catch (Exception e) {
+          playerUUID = gson.fromJson(uuidResponse, JsonObject.class).get("id").getAsString();
+        } catch (JsonSyntaxException e) {
           return null;
         }
       }
@@ -107,47 +98,36 @@ public class Utils {
       }
 
       for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
-        if (results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members")
-            .getAsJsonObject()
-            .get(playerUUID).getAsJsonObject().has("last_save")) {
-          if (results.get("profiles").getAsJsonArray().get(i).getAsJsonObject().get("members")
-              .getAsJsonObject()
-              .get(playerUUID).getAsJsonObject().get("last_save").getAsLong() > lastSaved) {
-            lastSaved = results.get("profiles").getAsJsonArray().get(i).getAsJsonObject()
-                .get("members").getAsJsonObject()
-                .get(playerUUID).getAsJsonObject().get("last_save").getAsLong();
+        JsonObject playerDataFromAPI = results.getAsJsonArray("profiles").get(i).getAsJsonObject()
+            .getAsJsonObject("members").getAsJsonObject(playerUUID);
+        if (playerDataFromAPI.has("last_save")) {
+          if (playerDataFromAPI.getAsJsonObject().get("last_save").getAsLong() > lastSaved) {
+            lastSaved = playerDataFromAPI.get("last_save").getAsLong();
             profileIndex = i;
           }
         }
       }
-      BazaarNotifier.playerDataFromAPI = results.get("profiles").getAsJsonArray()
-          .get(profileIndex).getAsJsonObject().get("members").getAsJsonObject().get(playerUUID)
-          .getAsJsonObject();
-      if (!results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
-          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject()
-          .has("unlocked_coll_tiers")
-          || !results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
-          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject()
-          .has("slayer_bosses")) {
+      BazaarNotifier.playerDataFromAPI = results.getAsJsonArray("profiles")
+          .get(profileIndex).getAsJsonObject().getAsJsonObject("members")
+          .getAsJsonObject(playerUUID);
+      if (!BazaarNotifier.playerDataFromAPI.has("unlocked_coll_tiers")
+          || !BazaarNotifier.playerDataFromAPI.has("slayer_bosses")) {
         System.out.println("could not load unlocked collection tiers from API");
         return null;
       }
       List<String> unlockedCollections = new ArrayList<>();
 
-      results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
-          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject()
-          .get("unlocked_coll_tiers")
-          .getAsJsonArray().forEach(cmd -> unlockedCollections.add(cmd.getAsString()));
+      BazaarNotifier.playerDataFromAPI.getAsJsonArray("unlocked_coll_tiers")
+          .forEach(cmd -> unlockedCollections.add(cmd.getAsString()));
 
-      JsonObject slayer = results.getAsJsonArray("profiles").get(profileIndex).getAsJsonObject()
-          .get("members").getAsJsonObject().get(playerUUID).getAsJsonObject().get("slayer_bosses")
-          .getAsJsonObject();
+      JsonObject slayer = BazaarNotifier.playerDataFromAPI.getAsJsonObject("slayer_bosses");
       Set<Map.Entry<String, JsonElement>> set = slayer.entrySet();
       for (Map.Entry<String, JsonElement> entry : set) {
         Set<Map.Entry<String, JsonElement>> set2 = slayer.getAsJsonObject(entry.getKey())
             .getAsJsonObject("claimed_levels").entrySet();
         for (Map.Entry<String, JsonElement> entry2 : set2) {
-          unlockedCollections.add(entry.getKey().toUpperCase() + entry2.getKey().replace("level", "").toUpperCase());
+          unlockedCollections.add(
+              entry.getKey().toUpperCase() + entry2.getKey().replace("level", "").toUpperCase());
         }
       }
       return unlockedCollections;
@@ -156,44 +136,6 @@ public class Utils {
 
       return null;
     }
-  }
-
-
-  public static boolean isInteger(String s) {
-    return isInteger(s, 10);
-  }
-
-  public static boolean isInteger(String s, int radix) {
-    if (s.isEmpty()) {
-      return false;
-    }
-    for (int i = 0; i < s.length(); i++) {
-      if (i == 0 && s.charAt(i) == '-') {
-        if (s.length() == 1) {
-          return false;
-        } else {
-          continue;
-        }
-      }
-      if (Character.digit(s.charAt(i), radix) < 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-
-  public static JsonArray sortJSONArray(JsonArray jsonArr, String key) {
-    List<JsonObject> jsonValues = new ArrayList<>();
-    for (int i = 0; i < jsonArr.size(); i++) {
-      jsonValues.add(jsonArr.get(i).getAsJsonObject());
-    }
-    jsonValues.sort(new JSONComparator(key));
-    JsonArray sortedJsonArray = new JsonArray();
-    for (int i = 0; i < jsonArr.size(); i++) {
-      sortedJsonArray.add(jsonValues.get(i));
-    }
-    return sortedJsonArray;
   }
 
   public static boolean isJSONValid(String jsonInString) {
@@ -211,11 +153,11 @@ public class Utils {
     if (uuidMatcher.matcher(key).find()) {
       try {
         return gson.fromJson(IOUtils.toString(new BufferedReader
-          (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
-          "https://api.hypixel.net/key?key=" + key)).getEntity()
-          .getContent()))), JsonObject.class).getAsJsonObject().get("success")
-          .getAsBoolean();
-      }catch (JsonSyntaxException e){
+            (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
+                "https://api.hypixel.net/key?key=" + key)).getEntity()
+                .getContent()))), JsonObject.class).getAsJsonObject().get("success")
+            .getAsBoolean();
+      } catch (JsonSyntaxException e) {
         return false;
       }
     }
@@ -300,6 +242,7 @@ public class Utils {
     Gson gson = new Gson();
     try {
       if (!file.isFile()) {
+        //noinspection ResultOfMethodCallIgnored
         file.createNewFile();
       }
       Files.write(Paths.get(file.getAbsolutePath()),
@@ -309,25 +252,24 @@ public class Utils {
     }
   }
 
-  public static String getItemIdFromName(String userInput) {
-    userInput = WordUtils.capitalize(userInput.replaceAll("-", " ").toLowerCase());
-    String[] userInputSplit = userInput.split(" ");
-    String userInputEnd = userInputSplit[userInputSplit.length - 1].toUpperCase();
-    if (userInputSplit.length == 1) {
-      return BazaarNotifier.bazaarConv.inverse().getOrDefault(userInput, "");
-    }
-    for (char c : userInputEnd.toCharArray()) {
-      if (c != 'I' && c != 'V' && c != 'X') {
-        return BazaarNotifier.bazaarConv.inverse().getOrDefault(userInput, "");
+  public static String[] getItemIdFromName(String userInput) {
+    int threshold = userInput.length() / 3;
+    String closestConversion = "";
+    int minLevenshteinDistance = threshold + 1;
+
+    for (String key : BazaarNotifier.bazaarConv.values()) {
+      int levenshteinDistance = StringUtils.getLevenshteinDistance(userInput.toLowerCase(), key.toLowerCase(), threshold);
+      if (levenshteinDistance != -1) {
+        if (minLevenshteinDistance > levenshteinDistance) {
+          minLevenshteinDistance = levenshteinDistance;
+          closestConversion = key;
+          if (levenshteinDistance == 0) {
+            break;
+          }
+        }
       }
     }
-    StringBuilder result = new StringBuilder();
-    for (int i = 0; i < userInputSplit.length - 1; i++) {
-      result.append(userInputSplit[i]);
-      result.append(" ");
-    }
-    result.append(userInputEnd);
-    System.out.println(result);
-    return BazaarNotifier.bazaarConv.inverse().getOrDefault(result.toString(), "");
+
+    return new String[]{closestConversion, BazaarNotifier.bazaarConv.inverse().getOrDefault(closestConversion, "")};
   }
 }

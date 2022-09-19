@@ -15,6 +15,7 @@ public class SettingsGui extends GuiScreen {
 
   GuiTextField apiKey;
   String previousApiKey;
+  boolean textCleared;
 
 
   @Override
@@ -39,6 +40,7 @@ public class SettingsGui extends GuiScreen {
     apiKey.setCanLoseFocus(false);
     apiKey.setText(BazaarNotifier.config.api.equals("") ? "Api key missing" : "Api key set");
     previousApiKey = BazaarNotifier.config.api;
+    textCleared = false;
   }
 
   @Override
@@ -69,7 +71,14 @@ public class SettingsGui extends GuiScreen {
   @Override
   protected void keyTyped(char typedChar, int keyCode) throws IOException {
     super.keyTyped(typedChar, keyCode);
-    apiKey.textboxKeyTyped(typedChar, keyCode);
+    if (apiKey.isFocused()) {
+      if (!textCleared && (apiKey.getText().equalsIgnoreCase("Api key set")
+          || apiKey.getText().equals("Api key missing"))) {
+        apiKey.setText("");
+        textCleared = true;
+      }
+      apiKey.textboxKeyTyped(typedChar, keyCode);
+    }
   }
 
   @Override

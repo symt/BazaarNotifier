@@ -4,8 +4,11 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fml.client.config.GuiSlider;
 
 public class ModuleSettingsGui extends GuiScreen {
@@ -81,6 +84,17 @@ public class ModuleSettingsGui extends GuiScreen {
       BazaarNotifier.config.collectionCheckDisabled ^= true;
       Button.displayString =
           "Collection Check: " + getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
+
+      if (!BazaarNotifier.config.collectionCheckDisabled) {
+        new Thread(() -> {
+          CraftingCalculator.getUnlockedRecipes();
+          Button.displayString =
+              "Collection Check: " + getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
+	  if (BazaarNotifier.config.collectionCheckDisabled) {
+          	Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED + "There was an error while enabling the collections check. Make sure your Collections API is enabled."));
+	  }
+        }).start();
+      }
     } else if (Button.id == ButtonIds.SELLING_OPTION.id) {
       CraftingCalculator.toggleCrafting();
       Button.displayString =
