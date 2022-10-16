@@ -8,6 +8,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarResponse;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.lwjgl.opengl.GL11;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -20,16 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
@@ -152,11 +153,16 @@ public class Utils {
     Gson gson = new Gson();
     if (uuidMatcher.matcher(key).find()) {
       try {
-        return gson.fromJson(IOUtils.toString(new BufferedReader
+        if(gson.fromJson(IOUtils.toString(new BufferedReader
             (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
                 "https://api.hypixel.net/key?key=" + key)).getEntity()
                 .getContent()))), JsonObject.class).getAsJsonObject().get("success")
-            .getAsBoolean();
+            .getAsBoolean()){
+          return true;
+        }else{
+          BazaarNotifier.config.collectionCheckDisabled = true;
+          return false;
+        }
       } catch (JsonSyntaxException e) {
         return false;
       }

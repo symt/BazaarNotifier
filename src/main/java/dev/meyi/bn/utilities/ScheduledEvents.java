@@ -5,9 +5,10 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
+import net.minecraft.client.Minecraft;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import net.minecraft.client.Minecraft;
 
 public class ScheduledEvents {
 
@@ -72,7 +73,6 @@ public class ScheduledEvents {
                       && diff == 0
                       && currentOrder.orderStatus != Order.OrderType.MATCHED) {
                     currentOrder.orderStatus = Order.OrderType.MATCHED;
-                    currentOrder.currentNotification = "MATCHED";
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(
@@ -85,7 +85,6 @@ public class ScheduledEvents {
                               Utils.chatNotification(price, i, "Buy Order", "OUTDATED"));
                     }
                     currentOrder.orderStatus = Order.OrderType.OUTDATED;
-                    currentOrder.currentNotification = "OUTDATED";
                   } else if (diff == 0 &&
                       BazaarNotifier.bazaarDataRaw.products.get(key).sell_summary.get(0).orders
                           == 1) {
@@ -105,7 +104,6 @@ public class ScheduledEvents {
                       &&
                       diff == 0 && currentOrder.orderStatus != Order.OrderType.MATCHED) {
                     currentOrder.orderStatus = Order.OrderType.MATCHED;
-                    currentOrder.currentNotification = "MATCHED";
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(
@@ -113,7 +111,6 @@ public class ScheduledEvents {
                     }
                   } else if (diff > 0 && currentOrder.orderStatus != Order.OrderType.OUTDATED) {
                     currentOrder.orderStatus = Order.OrderType.OUTDATED;
-                    currentOrder.currentNotification = "OUTDATED";
                     if (BazaarNotifier.config.showChatMessages) {
                       Minecraft.getMinecraft().thePlayer
                           .addChatMessage(

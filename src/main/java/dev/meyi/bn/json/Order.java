@@ -10,7 +10,6 @@ public class Order {
   public OrderType orderStatus = OrderType.BEST;
   public double orderValue;
   public String type;
-  public String currentNotification;
   private int amountRemaining;
 
   public Order(String product, int startAmount, double pricePerUnit, String priceString,

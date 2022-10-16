@@ -8,13 +8,14 @@ import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Mouse;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import org.lwjgl.input.Mouse;
 
 
 public class CraftingModule extends Module {
@@ -41,15 +42,15 @@ public class CraftingModule extends Module {
       int totalWidth = 0;
       int relativeX = getMouseCoordinateX() - x;
       width[0] =
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth(
-              BazaarNotifier.config.useBuyOrders ? "   Profits (Buy Orders) -"
-                  : "   Profits (Instant Buy) -");
+              (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth(
+                            BazaarNotifier.config.useBuyOrders ? "   Profits (Buy Orders) -"
+                                : "   Profits (Instant Buy) -")*scale);
       width[1] = BazaarNotifier.config.isShowInstantSellProfit() ?
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") : 0;
+              (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth("  Instant Sell ") * scale) : 0;
       width[2] = BazaarNotifier.config.isShowSellOfferProfit() ?
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Sell Offer ") : 0;
+              (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Sell Offer ") * scale) : 0;
       width[3] = BazaarNotifier.config.isShowProfitPerMil() ?
-          Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ 1m Instant") : 0;
+              (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ 1m Instant") * scale) : 0;
 
       for (int i : width) {
         totalWidth += i;
