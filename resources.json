@@ -793,7 +793,9 @@
   		"ENCHANTMENT_ULTIMATE_BOBBIN_TIME_5": "Bobbin' Time V",
   		"ICE_HUNK": "Hunk of Ice",
   		"DIVER_FRAGMENT": "Emperor's Skull",
-  		"WINTER_WATER_ORB": "Winter Water Orb"
+  		"WINTER_WATER_ORB": "Winter Water Orb",
+		"RITUAL_RESIDUE": "Ritual Residue",
+  		"MITE_GEL": "Mite Gel"
 	},
 	"enchantCraftingList": {
 		"normal": {},
