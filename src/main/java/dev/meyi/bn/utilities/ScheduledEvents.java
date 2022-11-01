@@ -5,7 +5,6 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
-
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +61,7 @@ public class ScheduledEvents {
     Executors.newScheduledThreadPool(1)
         .scheduleAtFixedRate(BankCalculator::getPurse, 7, 5, TimeUnit.SECONDS);
   }
+
 
 
   public void notificationLoop(){
