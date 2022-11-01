@@ -151,11 +151,16 @@ public class Utils {
     Gson gson = new Gson();
     if (uuidMatcher.matcher(key).find()) {
       try {
-        return gson.fromJson(IOUtils.toString(new BufferedReader
+        if(gson.fromJson(IOUtils.toString(new BufferedReader
             (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
                 "https://api.hypixel.net/key?key=" + key)).getEntity()
                 .getContent()))), JsonObject.class).getAsJsonObject().get("success")
-            .getAsBoolean();
+            .getAsBoolean()){
+          return true;
+        }else{
+          BazaarNotifier.config.collectionCheckDisabled = true;
+          return false;
+        }
       } catch (JsonSyntaxException e) {
         return false;
       }
