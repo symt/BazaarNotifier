@@ -58,10 +58,10 @@ public class ChestTickHandler {
             .compile("(BUY|SELL):? (.*)");
         Matcher m = p.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
         String displayName = "";
-        String type = "";
+        Order.OrderType type;
         if (m.find()) {
           displayName = m.group(2);
-          type = m.group(1).toLowerCase();
+          type = "sell".equalsIgnoreCase(m.group(1))? Order.OrderType.SELL: Order.OrderType.BUY;
         } else {
           System.out.println("Bazaar item header incorrect. Aborting!");
           return;
@@ -86,42 +86,28 @@ public class ChestTickHandler {
           for (int j = 0; j < BazaarNotifier.orders.size(); j++) {
             Order order = BazaarNotifier.orders.get(j);
             if (priceString.equalsIgnoreCase(order.priceString) && type
-                .equals(order.type)) {
+                .equals(order.type)) { // Todo check product also causing problems
               orderInQuestion = j;
               break;
             }
           }
           if (orderInQuestion != -1) {
             verifiedOrders[orderInQuestion] = 1;
-            boolean forceRemove = false;
             int totalAmount = BazaarNotifier.orders.get(orderInQuestion).startAmount;
             if (lore.get(3).startsWith("Filled:")) {
               if (lore.get(3).split(" ")[2].equals("100%")) {
                 amountLeft = 0;
               } else {
-                int amountFulfilled = 0;
-                for (int j = 8; j < lore.size(); j++) {
-                  if (lore.get(j).isEmpty()) {
-                    break;
-                  } else if (lore.get(j).startsWith(" + ") && lore.get(j).endsWith("others")) {
-                    forceRemove = true;
-                    break;
-                  }
-                  amountFulfilled += Integer.parseInt(
-                      lore.get(j).replaceAll(",", "").split("x ")[0].substring(2));
-                }
+                String intToParse = lore.get(3).split(" ")[1].split("/")[0];
+                intToParse = intToParse.contains(".")? intToParse.replace("k", "00"): intToParse.replace("k", "000");
+                intToParse = intToParse.replace(".", "");
+                int amountFulfilled = Integer.parseInt(intToParse);
                 amountLeft = totalAmount - amountFulfilled;
               }
+            }else{
+              amountLeft = BazaarNotifier.orders.get(orderInQuestion).startAmount;
             }
-            if (forceRemove) {
-              if (BazaarNotifier.config.showChatMessages) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                    BazaarNotifier.prefix + EnumChatFormatting.RED
-                        + "Because of the limitations of the bazaar's information, you had an order removed that exceeded the maximum number of buyers/sellers. If you want, you can cancel the missing order freely and put it back up."));
-              }
-              verifiedOrders[orderInQuestion] = 0;
-
-            } else if (amountLeft > 0) {
+            if (amountLeft > 0) {
               BazaarNotifier.orders.get(orderInQuestion).setAmountRemaining(amountLeft);
             }
           }
@@ -132,7 +118,6 @@ public class ChestTickHandler {
         }
       }
     }
-
     for (int i = verifiedOrders.length - 1; i >= 0; i--) {
       if (verifiedOrders[i] == 0) {
         BazaarNotifier.orders.remove(i);
@@ -168,6 +153,8 @@ public class ChestTickHandler {
                   .stripControlCodes(chest.getDisplayName().getUnformattedText());
               updateBazaarOrders(chest);
             }
+          }else if(chestName.contains("bazaar")){
+            lastScreenDisplayName = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText());
           }
         }
       } else if (BazaarNotifier.inBank && Minecraft
@@ -229,8 +216,8 @@ public class ChestTickHandler {
 
         EventHandler.productVerify[0] = productName;
         EventHandler.productVerify[1] = productWithAmount;
-        String type = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
-            .equalsIgnoreCase("Confirm Sell Offer") ? "sell" : "buy";
+        Order.OrderType type = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+            .equalsIgnoreCase("Confirm Sell Offer") ? Order.OrderType.SELL : Order.OrderType.BUY;
         EventHandler.verify = new Order(product, amount, price, priceString, type);
       }
     }

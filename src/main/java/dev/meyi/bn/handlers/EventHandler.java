@@ -22,7 +22,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 public class EventHandler {
 
@@ -61,7 +60,7 @@ public class EventHandler {
         for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
           Order order = BazaarNotifier.orders.get(i);
           if (order.product.equalsIgnoreCase(item)
-              && order.startAmount == amount && order.type.equals("buy")
+              && order.startAmount == amount && order.type.equals(Order.OrderType.BUY)
               && order.pricePerUnit > edgePrice) {
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
@@ -74,7 +73,7 @@ public class EventHandler {
         for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
           Order order = BazaarNotifier.orders.get(i);
           if (order.product.equalsIgnoreCase(item)
-              && order.startAmount == amount && order.type.equals("sell")
+              && order.startAmount == amount && order.type.equals(Order.OrderType.SELL)
               && order.pricePerUnit < edgePrice) {
 
             edgePrice = order.pricePerUnit;
@@ -92,13 +91,13 @@ public class EventHandler {
       double refund = 0;
       int refundAmount = 0;
       String itemRefunded = "";
-      if (message.endsWith("buy order!")) {
+      if (message.endsWith("Buy Order!")) {
         refund = Double
             .parseDouble(message.split("Refunded ")[1].split(" coins")[0].replaceAll(",", ""));
         if (refund >= 10000) {
           refund = Math.round(refund);
         }
-      } else if (message.endsWith("sell offer!")) {
+      } else if (message.endsWith("Sell Offer!")) {
         refundAmount = Integer
             .parseInt(message.split("Refunded ")[1].split("x ", 2)[0].replaceAll(",", ""));
         itemRefunded = message.split("x ", 2)[1].split(" from")[0];
@@ -106,16 +105,15 @@ public class EventHandler {
       }
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
         Order order = BazaarNotifier.orders.get(i);
-        if (message.endsWith("buy order!") && order.type.equals("buy")) {
-          if (BigDecimal.valueOf(refund >= 10000 ? Math.round(order.orderValue)
-              : order.orderValue)
-              .compareTo(BigDecimal.valueOf(refund)) == 0) {
-            //BankCalculator.bazaarProfit -= (order.startAmount -order.getAmountRemaining())*order.pricePerUnit;
+        if (message.endsWith("Buy Order!") && order.type.equals(Order.OrderType.BUY)) {
+          if ((refund >= 10000 ? Math.round(order.orderValue)
+              : order.orderValue )-refund <= 1) {
+
             BazaarNotifier.orders.remove(i);
 
             break;
           }
-        } else if (message.endsWith("sell offer!") && order.type.equals("sell")) {
+        } else if (message.endsWith("Sell Offer!") && order.type.equals(Order.OrderType.SELL)) {
           if (order.product.equalsIgnoreCase(itemRefunded)
               && order.getAmountRemaining() == refundAmount) {
             BazaarNotifier.orders.remove(i);

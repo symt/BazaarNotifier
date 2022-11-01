@@ -4,9 +4,7 @@ package dev.meyi.bn.modules.calc;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.meyi.bn.BazaarNotifier;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import dev.meyi.bn.json.Order;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.scoreboard.Score;
@@ -14,6 +12,10 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class BankCalculator {
@@ -46,7 +48,7 @@ public class BankCalculator {
     if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
-        if (BazaarNotifier.orders.get(i).type.equals("sell")) {
+        if (BazaarNotifier.orders.get(i).type.equals(Order.OrderType.SELL)) {
           orderWorth += BazaarNotifier.orders.get(i).orderValue;
         }
       }
@@ -59,7 +61,7 @@ public class BankCalculator {
     if (BazaarNotifier.orders.size() != 0) {
       double orderWorth = 0;
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
-        if (BazaarNotifier.orders.get(i).type.equals("buy")) {
+        if (BazaarNotifier.orders.get(i).type.equals(Order.OrderType.BUY)) {
           orderWorth += BazaarNotifier.orders.get(i).orderValue;
         }
       }
@@ -82,6 +84,9 @@ public class BankCalculator {
   }
 
   private static double getPurseFromSidebar() {
+    if (Minecraft.getMinecraft().theWorld == null){
+      return -1;
+    }
     Scoreboard scoreboard = Minecraft.getMinecraft().theWorld.getScoreboard();
     if (scoreboard == null) {
       return -1;

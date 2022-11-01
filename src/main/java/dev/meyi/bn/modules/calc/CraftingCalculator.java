@@ -81,6 +81,12 @@ public class CraftingCalculator {
         for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
             .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
           if (h % 2 == 0) {
+            if (BazaarNotifier.bazaarDataRaw.products.get(
+                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
+                    .getAsJsonArray("material").get(h).getAsString()).sell_summary.size() == 0){
+              Arrays.fill(values, "0");
+              return values;
+            }
             ingredientPrice = BazaarNotifier.bazaarDataRaw.products.get(
                 BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
                     .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())
@@ -96,6 +102,12 @@ public class CraftingCalculator {
         for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
             .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
           if (h % 2 == 0) {
+            if(BazaarNotifier.bazaarDataRaw.products.get(
+                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
+                    .getAsJsonArray("material").get(h).getAsString()).buy_summary.size() == 0){
+              Arrays.fill(values, "0");
+              return values;
+            }
             ingredientPrice2 = BazaarNotifier.bazaarDataRaw.products.get(
                 BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
                     .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())

@@ -33,6 +33,8 @@ public class ModuleSettingsGui extends GuiScreen {
       buttonList.add(lengthSlider = new GuiSlider(ButtonIds.ENTRIES_SLIDER.id, getButtonX(),
           getButtonY(), 200, 20, "Entries: ", "", 1,
           100, BazaarNotifier.config.suggestionListLength, false, true));
+      buttonList.add(new GuiButton(ButtonIds.USE_ENCHANTMENTS.id,getButtonX(),getButtonY(),
+              "Show Enchantments: " + getOnOff(BazaarNotifier.config.suggestionShowEnchantments)));
     } else if (module.getName().equals("CRAFTING")) {
       buttonList.add(lengthSlider = new GuiSlider(ButtonIds.ENTRIES_SLIDER.id, getButtonX(),
           getButtonY(), 200, 20, "Entries: ", "", 1,
@@ -91,7 +93,9 @@ public class ModuleSettingsGui extends GuiScreen {
           Button.displayString =
               "Collection Check: " + getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
 	  if (BazaarNotifier.config.collectionCheckDisabled) {
-          	Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.RED + "There was an error while enabling the collections check. Make sure your Collections API is enabled."));
+          	Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(BazaarNotifier.prefix +
+                    EnumChatFormatting.RED + "There was an error while enabling the collections check. " +
+                    "Make sure your Collections API is enabled. Try again in a few minutes."));
 	  }
         }).start();
       }
@@ -118,8 +122,12 @@ public class ModuleSettingsGui extends GuiScreen {
       BazaarNotifier.config.useBuyOrders ^= true;
       Button.displayString = "Materials: " + (BazaarNotifier.config.useBuyOrders ?
           "Buy Order" : "Instant Buy");
+      CraftingCalculator.getBestEnchantRecipes();
     } else if (Button.id == ButtonIds.RESET.id) {
       BankCalculator.reset();
+    } else if (Button.id == ButtonIds.USE_ENCHANTMENTS.id) {
+      BazaarNotifier.config.suggestionShowEnchantments ^= true;
+      Button.displayString = "Show Enchantments: " + getOnOff(BazaarNotifier.config.suggestionShowEnchantments);
     } else if (Button.id == ButtonIds.BACK.id) {
       BazaarNotifier.guiToOpen = "settings";
     }
@@ -188,6 +196,7 @@ public class ModuleSettingsGui extends GuiScreen {
     PROFIT_PER_MILLION(7),
     MATERIAL_BUYING_OPTION(8),
     RESET(9),
+    USE_ENCHANTMENTS(10),
 
     BACK(100);
 
