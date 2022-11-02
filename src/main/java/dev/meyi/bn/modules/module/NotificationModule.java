@@ -110,11 +110,11 @@ public class NotificationModule extends Module {
   }
 
   protected int checkHoveredText() {
-    float _y = y * scale;
-    float y2 = _y + (10 * 10 * scale);
+    float _y = y;
+    float y2 = _y + (10 * 11 * scale);
     int mouseYFormatted = getMouseCoordinateY();
     int mouseXFormatted = getMouseCoordinateX();
-    float relativeYMouse = (mouseYFormatted - _y) / (10 * scale);
+    float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
     if (this.longestXString != 0) {
       if (mouseXFormatted >= x && mouseXFormatted <= x + longestXString
               && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
@@ -170,7 +170,7 @@ public class NotificationModule extends Module {
 
           for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
             if (o.matches(BazaarNotifier.orders.get(hoveredText))) {
-              drawOnSlot(chest.getSizeInventory()+36, j, 0xff00ff00 );
+              drawOnSlot(chest.getSizeInventory(), j, 0xff00ff00 );
             }
           }
         }
@@ -179,7 +179,8 @@ public class NotificationModule extends Module {
   }
 
   //source dsm
-  public static void drawOnSlot(int size, int slot ,int color) {
+  public static void drawOnSlot(int chestSize, int slot ,int color) {
+    chestSize += 36;
     ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
     int guiLeft = (sr.getScaledWidth() - 176) / 2;
     int guiTop = (sr.getScaledHeight() - 222) / 2;
@@ -189,7 +190,7 @@ public class NotificationModule extends Module {
     int x = guiLeft + xSlotPos;
     int y = guiTop + ySlotPos;
     // Move down when chest isn't 6 rows
-    if (size != 90) y += (6 - (size - 36) / 9) * 9;
+    if (chestSize != 90) y += (6 - (chestSize - 36) / 9) * 9;
     GL11.glTranslated(0,0,1);
     Gui.drawRect(x, y,  x+16, y+16, color);
     GL11.glTranslated(0,0,-1);
