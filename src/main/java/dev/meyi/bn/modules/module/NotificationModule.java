@@ -20,7 +20,7 @@ import net.minecraft.util.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
