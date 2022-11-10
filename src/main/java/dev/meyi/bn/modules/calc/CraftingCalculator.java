@@ -66,6 +66,11 @@ public class CraftingCalculator {
     String[] values = new String[7];
     if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.products.size() != 0) {
+        if (BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() == 0
+        || BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() == 0){
+          Arrays.fill(values, "0");
+          return values;
+        }
         double itemSellPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary
             .get(0).getPriceWithTax();
         double itemBuyPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary
