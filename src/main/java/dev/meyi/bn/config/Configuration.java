@@ -20,6 +20,7 @@ public class Configuration {
   public int suggestionListLength;
   public boolean showChatMessages;
   public boolean useBuyOrders;
+  public boolean suggestionShowEnchantments;
   public String api = "";
   public String version;
   public ModuleConfig[] modules;
@@ -29,13 +30,14 @@ public class Configuration {
   private boolean showProfitPerMil;
 
   public Configuration(boolean collectionCheckDisabled, int craftingSortingOption,
-      int craftingListLength,
+      int craftingListLength, boolean suggestionShowEnchantments,
       boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
       int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders,
       ModuleConfig[] modules) {
     this.collectionCheckDisabled = collectionCheckDisabled;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
+    this.suggestionShowEnchantments = suggestionShowEnchantments;
     this.showInstantSellProfit = showInstantSellProfit;
     this.showSellOfferProfit = showSellOfferProfit;
     this.showProfitPerMil = showProfitPerMil;
@@ -71,7 +73,7 @@ public class Configuration {
       c[i++] = ModuleConfig.generateDefaultConfig(moduleName.name());
     }
     return new Configuration(Defaults.COLLECTION_CHECKING_DISABLED,
-        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
+        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH, Defaults.SUGGESTION_SHOW_ENCHANTMENTS,
         Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
         Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
         Defaults.USE_BUY_ORDERS, c);

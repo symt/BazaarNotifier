@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
@@ -92,18 +93,15 @@ public class Utils {
       String _results = IOUtils
           .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
       JsonObject results = gson.fromJson(_results, JsonObject.class);
-      long lastSaved = 0;
       int profileIndex = 0;
       if (!results.get("success").getAsBoolean() || !results.has("profiles")) {
         return null;
       }
 
       for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
-        JsonObject playerDataFromAPI = results.getAsJsonArray("profiles").get(i).getAsJsonObject()
-            .getAsJsonObject("members").getAsJsonObject(playerUUID);
-        if (playerDataFromAPI.has("last_save")) {
-          if (playerDataFromAPI.getAsJsonObject().get("last_save").getAsLong() > lastSaved) {
-            lastSaved = playerDataFromAPI.get("last_save").getAsLong();
+        JsonObject playerDataFromAPI = results.getAsJsonArray("profiles").get(i).getAsJsonObject();
+        if (playerDataFromAPI.has("selected")) {
+          if (playerDataFromAPI.get("selected").getAsBoolean()) {
             profileIndex = i;
           }
         }
@@ -171,35 +169,35 @@ public class Utils {
   }
 
   public static boolean validateApiKey() throws IOException {
-    return validateApiKey(BazaarNotifier.config.api);
+    if(validateApiKey(BazaarNotifier.config.api)){
+      return true;
+    }else{
+      BazaarNotifier.config.collectionCheckDisabled = true;
+      return false;
+    }
   }
 
 
-  /**
-   * @param price price per unit of order
-   * @param i index of order
-   * @param type Buy Order or Sell Offer (sets message color to dark purple vs blue)
-   * @param notification yellow notification message
-   * @return ChatComponentText completed message
-   */
-  public static ChatComponentText chatNotification(double price, int i, String type,
-      String notification) {
+  public static void chatNotification(Order order, String notification) {
+    if (!BazaarNotifier.config.showChatMessages){
+      return;
+    }
     EnumChatFormatting messageColor =
         (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
-            : type.equalsIgnoreCase("Buy Order") ? EnumChatFormatting.DARK_PURPLE
+            : order.type.equals(Order.OrderType.BUY) ? EnumChatFormatting.DARK_PURPLE
                 : EnumChatFormatting.BLUE);
-    return new ChatComponentText(
-        messageColor + type
+    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+        messageColor + order.type.longName
             + EnumChatFormatting.GRAY + " for "
             + messageColor + BazaarNotifier.dfNoDecimal
-            .format(BazaarNotifier.orders.get(i).startAmount)
+            .format(order.startAmount)
             + EnumChatFormatting.GRAY + "x " + messageColor
-            + BazaarNotifier.orders.get(i).product
+            + order.product
             + EnumChatFormatting.YELLOW
             + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + messageColor + BazaarNotifier.df.format(price)
+            + messageColor + BazaarNotifier.df.format(order.pricePerUnit)
             + EnumChatFormatting.GRAY + ")"
-    );
+    ));
   }
 
 
