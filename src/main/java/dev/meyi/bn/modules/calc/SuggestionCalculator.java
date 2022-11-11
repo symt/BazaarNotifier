@@ -17,11 +17,12 @@ public class SuggestionCalculator {
     try {
       if (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled) {
         List<String[]> list = new LinkedList<>();
-        for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products.entrySet()) {
+        for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products
+            .entrySet()) {
           String key = entry.getKey();
           BazaarItem product = BazaarNotifier.bazaarDataRaw.products.get(key);
 
-          if(!BazaarNotifier.config.suggestionShowEnchantments && key.startsWith("ENCHANTMENT")){
+          if (!BazaarNotifier.config.suggestionShowEnchantments && key.startsWith("ENCHANTMENT")) {
             continue;
           }
 

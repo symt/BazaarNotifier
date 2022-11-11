@@ -142,7 +142,7 @@ public class BazaarNotifierCommand extends CommandBase {
                   EnumChatFormatting.DARK_RED + "" + EnumChatFormatting.BOLD + "Crafting (" +
                       EnumChatFormatting.GRAY
                       + "Buy order" + separator + EnumChatFormatting.GRAY + "Instant buy"
-                      + EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD +  ")" + "\n  " +
+                      + EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + ")" + "\n  " +
                       bulletPoint +
                       EnumChatFormatting.RED + "Profit (Instant Sell): " +
                       EnumChatFormatting.GRAY + BazaarNotifier.df

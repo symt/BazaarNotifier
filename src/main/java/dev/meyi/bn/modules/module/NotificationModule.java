@@ -8,6 +8,10 @@ import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.Utils;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -20,11 +24,6 @@ import net.minecraft.util.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 public class NotificationModule extends Module {
 
   public static final ModuleName type = ModuleName.NOTIFICATION;
@@ -36,6 +35,26 @@ public class NotificationModule extends Module {
 
   public NotificationModule(ModuleConfig module) {
     super(module);
+  }
+
+  //source dsm
+  public static void drawOnSlot(int chestSize, int slot, int color) {
+    chestSize += 36;
+    ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+    int guiLeft = (sr.getScaledWidth() - 176) / 2;
+    int guiTop = (sr.getScaledHeight() - 222) / 2;
+    int xSlotPos = (slot % 9) * 18 + 8;
+    int ySlotPos = slot / 9;
+    ySlotPos = ySlotPos * 18 + 18;
+    int x = guiLeft + xSlotPos;
+    int y = guiTop + ySlotPos;
+    // Move down when chest isn't 6 rows
+    if (chestSize != 90) {
+      y += (6 - (chestSize - 36) / 9) * 9;
+    }
+    GL11.glTranslated(0, 0, 1);
+    Gui.drawRect(x, y, x + 16, y + 16, color);
+    GL11.glTranslated(0, 0, -1);
   }
 
   @Override
@@ -53,8 +72,10 @@ public class NotificationModule extends Module {
         LinkedHashMap<String, Color> message = new LinkedHashMap<>();
 
         Color typeSpecificColor =
-            currentOrder.orderStatus == Order.OrderStatus.BEST || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
-                    ? new Color(0x55FF55) : currentOrder.type.equals(Order.OrderType.BUY) ? new Color(0xFF55FF)
+            currentOrder.orderStatus == Order.OrderStatus.BEST
+                || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
+                ? new Color(0x55FF55)
+                : currentOrder.type.equals(Order.OrderType.BUY) ? new Color(0xFF55FF)
                     : new Color(0x55FFFF);
 
         String notification = currentOrder.orderStatus.name();
@@ -117,7 +138,7 @@ public class NotificationModule extends Module {
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
     if (this.longestXString != 0) {
       if (mouseXFormatted >= x && mouseXFormatted <= x + longestXString
-              && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
+          && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
         return Math.round(relativeYMouse + shift);
       } else {
         return -1;
@@ -133,7 +154,7 @@ public class NotificationModule extends Module {
     }
 
     if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar
-            && BazaarNotifier.activeBazaar) {
+        && BazaarNotifier.activeBazaar) {
       IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
       String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
 
@@ -147,52 +168,37 @@ public class NotificationModule extends Module {
           ItemStack item = items[j];
 
           if (item == null
-                  || Item.itemRegistry.getIDForObject(item.getItem()) == 160
-                  || Item.itemRegistry.getIDForObject(item.getItem()) == 102
-                  || Item.itemRegistry.getIDForObject(item.getItem()) == 262) {
+              || Item.itemRegistry.getIDForObject(item.getItem()) == 160
+              || Item.itemRegistry.getIDForObject(item.getItem()) == 102
+              || Item.itemRegistry.getIDForObject(item.getItem()) == 262) {
             continue;
           }
           Order.OrderType type = StringUtils.stripControlCodes(item.getDisplayName()).split(" ")[0]
-                  .equalsIgnoreCase("sell") ? Order.OrderType.SELL : Order.OrderType.BUY;
+              .equalsIgnoreCase("sell") ? Order.OrderType.SELL : Order.OrderType.BUY;
           String product = StringUtils.stripControlCodes(item.getDisplayName())
-                  .replaceAll("SELL ", "").replaceAll("BUY ", "");
-          NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display").getTagList("Lore", 8);
+              .replaceAll("SELL ", "").replaceAll("BUY ", "");
+          NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
+              .getTagList("Lore", 8);
           List<String> lore = new ArrayList<>();
           for (int k = 0; k < lorePreFilter.tagCount(); k++) {
             lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(k)));
           }
-          int amount = Integer.parseInt(lore.get(2).toLowerCase().split("amount: ")[1].replace(".", "").replaceAll("x", ""));
-          String ppu = lore.get(3).equals("")? lore.get(4):lore.get(5);
-          ppu = ppu.toLowerCase().replace("price per unit: ", "").replace(" coins","").replaceAll(",", "");
+          int amount = Integer.parseInt(
+              lore.get(2).toLowerCase().split("amount: ")[1].replace(".", "").replaceAll("x", ""));
+          String ppu = lore.get(3).equals("") ? lore.get(4) : lore.get(5);
+          ppu = ppu.toLowerCase().replace("price per unit: ", "").replace(" coins", "")
+              .replaceAll(",", "");
           double pricePerUnit = Double.parseDouble(ppu);
 
-          Order o = new Order(product, type,pricePerUnit,amount);
+          Order o = new Order(product, type, pricePerUnit, amount);
 
           for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
             if (o.matches(BazaarNotifier.orders.get(hoveredText))) {
-              drawOnSlot(chest.getSizeInventory(), j, 0xff00ff00 );
+              drawOnSlot(chest.getSizeInventory(), j, 0xff00ff00);
             }
           }
         }
       }
     }
-  }
-
-  //source dsm
-  public static void drawOnSlot(int chestSize, int slot ,int color) {
-    chestSize += 36;
-    ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-    int guiLeft = (sr.getScaledWidth() - 176) / 2;
-    int guiTop = (sr.getScaledHeight() - 222) / 2;
-    int xSlotPos = (slot%9)*18+8;
-    int ySlotPos = slot/9;
-    ySlotPos = ySlotPos*18+18;
-    int x = guiLeft + xSlotPos;
-    int y = guiTop + ySlotPos;
-    // Move down when chest isn't 6 rows
-    if (chestSize != 90) y += (6 - (chestSize - 36) / 9) * 9;
-    GL11.glTranslated(0,0,1);
-    Gui.drawRect(x, y,  x+16, y+16, color);
-    GL11.glTranslated(0,0,-1);
   }
 }

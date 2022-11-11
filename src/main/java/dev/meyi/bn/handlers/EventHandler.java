@@ -7,6 +7,7 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
@@ -20,8 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
-
-import java.io.IOException;
 
 public class EventHandler {
 
@@ -107,7 +106,7 @@ public class EventHandler {
         Order order = BazaarNotifier.orders.get(i);
         if (message.endsWith("Buy Order!") && order.type.equals(Order.OrderType.BUY)) {
           if ((refund >= 10000 ? Math.round(order.orderValue)
-              : order.orderValue )-refund <= 1) {
+              : order.orderValue) - refund <= 1) {
 
             BazaarNotifier.orders.remove(i);
 
@@ -240,13 +239,15 @@ public class EventHandler {
       GL11.glTranslated(0, 0, -1);
     }
   }
+
   @SubscribeEvent
-  public void renderEvent(TickEvent e){
-    if(BazaarNotifier.guiToOpen.contains("settings")){
+  public void renderEvent(TickEvent e) {
+    if (BazaarNotifier.guiToOpen.contains("settings")) {
       Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
-    }else if(BazaarNotifier.guiToOpen.contains("module")){
+    } else if (BazaarNotifier.guiToOpen.contains("module")) {
       int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
-      Minecraft.getMinecraft().displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
+      Minecraft.getMinecraft()
+          .displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
     }
     BazaarNotifier.guiToOpen = "";
   }
