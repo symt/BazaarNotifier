@@ -11,13 +11,12 @@ public class Order {
   public int startAmount;
   public double pricePerUnit;
   public String priceString;
-  public OrderStatus orderStatus = OrderStatus.BEST;
+  public OrderStatus orderStatus = OrderStatus.SEARCHING;
   public double orderValue;
   public OrderType type;
   private int amountRemaining;
 
-  public Order(String product, int startAmount, double pricePerUnit, String priceString,
-      OrderType type) {
+  public Order(String product, int startAmount, double pricePerUnit, String priceString, OrderType type) {
     this.product = product;
     this.startAmount = startAmount;
     amountRemaining = startAmount;
@@ -90,7 +89,7 @@ public class Order {
       BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.get(0);
       if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
-      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && this.amountRemaining == bazaarSubItem.amount && bazaarSubItem.orders == 1) {
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;
