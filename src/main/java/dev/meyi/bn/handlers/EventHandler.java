@@ -22,8 +22,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 
 public class EventHandler {
 
