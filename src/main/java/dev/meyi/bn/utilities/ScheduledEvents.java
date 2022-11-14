@@ -5,7 +5,6 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
-
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -36,9 +35,10 @@ public class ScheduledEvents {
         .scheduleAtFixedRate(CraftingCalculator::getBestEnchantRecipes, 5, 5, TimeUnit.SECONDS);
   }
 
-  public void getBazaarData(){
+  public void getBazaarData() {
     Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-      if (BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled)) {
+      if (BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey
+          || BazaarNotifier.apiKeyDisabled)) {
         try {
           BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
         } catch (IOException e) {
@@ -64,12 +64,12 @@ public class ScheduledEvents {
   }
 
 
-  public void notificationLoop(){
-    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(()->{
-       for (Order order:BazaarNotifier.orders) {
-         order.updateStatus();
-       }
-      }
-     , 0, 2, TimeUnit.SECONDS);
+  public void notificationLoop() {
+    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+          for (Order order : BazaarNotifier.orders) {
+            order.updateStatus();
+          }
+        }
+        , 0, 2, TimeUnit.SECONDS);
   }
 }

@@ -7,6 +7,7 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 public class EventHandler {
 
@@ -237,13 +239,15 @@ public class EventHandler {
       GL11.glTranslated(0, 0, -1);
     }
   }
+
   @SubscribeEvent
-  public void renderEvent(TickEvent e){
-    if(BazaarNotifier.guiToOpen.contains("settings")){
+  public void renderEvent(TickEvent e) {
+    if (BazaarNotifier.guiToOpen.contains("settings")) {
       Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
-    }else if(BazaarNotifier.guiToOpen.contains("module")){
+    } else if (BazaarNotifier.guiToOpen.contains("module")) {
       int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
-      Minecraft.getMinecraft().displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
+      Minecraft.getMinecraft()
+          .displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
     }
     BazaarNotifier.guiToOpen = "";
   }

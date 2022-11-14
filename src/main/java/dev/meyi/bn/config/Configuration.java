@@ -73,7 +73,8 @@ public class Configuration {
       c[i++] = ModuleConfig.generateDefaultConfig(moduleName.name());
     }
     return new Configuration(Defaults.COLLECTION_CHECKING_DISABLED,
-        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH, Defaults.SUGGESTION_SHOW_ENCHANTMENTS,
+        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
+        Defaults.SUGGESTION_SHOW_ENCHANTMENTS,
         Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
         Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
         Defaults.USE_BUY_ORDERS, c);

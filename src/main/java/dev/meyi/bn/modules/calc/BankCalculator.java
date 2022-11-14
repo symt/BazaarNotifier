@@ -5,6 +5,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.scoreboard.Score;
@@ -12,10 +15,6 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class BankCalculator {
@@ -84,7 +83,7 @@ public class BankCalculator {
   }
 
   private static double getPurseFromSidebar() {
-    if (Minecraft.getMinecraft().theWorld == null){
+    if (Minecraft.getMinecraft().theWorld == null) {
       return -1;
     }
     Scoreboard scoreboard = Minecraft.getMinecraft().theWorld.getScoreboard();
@@ -135,7 +134,7 @@ public class BankCalculator {
   }
 
   public static void extractBankFromItemDescription(IInventory chest, boolean isCoop) {
-    //Todo Test Check Coop
+    // TODO: Test co-op check
     if (chest != null) {
       if (chest.getStackInSlot(11) != null) {
         if (chest.getStackInSlot(11).getDisplayName().toLowerCase().contains("deposit coins")) {

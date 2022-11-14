@@ -9,17 +9,6 @@ import com.google.gson.JsonSyntaxException;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +21,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
@@ -151,13 +150,13 @@ public class Utils {
     Gson gson = new Gson();
     if (uuidMatcher.matcher(key).find()) {
       try {
-        if(gson.fromJson(IOUtils.toString(new BufferedReader
+        if (gson.fromJson(IOUtils.toString(new BufferedReader
             (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
                 "https://api.hypixel.net/key?key=" + key)).getEntity()
                 .getContent()))), JsonObject.class).getAsJsonObject().get("success")
-            .getAsBoolean()){
+            .getAsBoolean()) {
           return true;
-        }else{
+        } else {
           BazaarNotifier.config.collectionCheckDisabled = true;
           return false;
         }
@@ -169,9 +168,9 @@ public class Utils {
   }
 
   public static boolean validateApiKey() throws IOException {
-    if(validateApiKey(BazaarNotifier.config.api)){
+    if (validateApiKey(BazaarNotifier.config.api)) {
       return true;
-    }else{
+    } else {
       BazaarNotifier.config.collectionCheckDisabled = true;
       return false;
     }
@@ -179,7 +178,7 @@ public class Utils {
 
 
   public static void chatNotification(Order order, String notification) {
-    if (!BazaarNotifier.config.showChatMessages){
+    if (!BazaarNotifier.config.showChatMessages) {
       return;
     }
     EnumChatFormatting messageColor =
@@ -262,7 +261,8 @@ public class Utils {
     int minLevenshteinDistance = threshold + 1;
 
     for (String key : BazaarNotifier.bazaarConv.values()) {
-      int levenshteinDistance = StringUtils.getLevenshteinDistance(userInput.toLowerCase(), key.toLowerCase(), threshold);
+      int levenshteinDistance = StringUtils
+          .getLevenshteinDistance(userInput.toLowerCase(), key.toLowerCase(), threshold);
       if (levenshteinDistance != -1) {
         if (minLevenshteinDistance > levenshteinDistance) {
           minLevenshteinDistance = levenshteinDistance;
@@ -274,6 +274,7 @@ public class Utils {
       }
     }
 
-    return new String[]{closestConversion, BazaarNotifier.bazaarConv.inverse().getOrDefault(closestConversion, "")};
+    return new String[]{closestConversion,
+        BazaarNotifier.bazaarConv.inverse().getOrDefault(closestConversion, "")};
   }
 }

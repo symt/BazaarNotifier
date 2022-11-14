@@ -11,12 +11,13 @@ public class Order {
   public int startAmount;
   public double pricePerUnit;
   public String priceString;
-  public OrderStatus orderStatus = OrderStatus.SEARCHING;
+  public OrderStatus orderStatus = OrderStatus.BEST;
   public double orderValue;
   public OrderType type;
   private int amountRemaining;
 
-  public Order(String product, int startAmount, double pricePerUnit, String priceString, OrderType type) {
+  public Order(String product, int startAmount, double pricePerUnit, String priceString,
+      OrderType type) {
     this.product = product;
     this.startAmount = startAmount;
     amountRemaining = startAmount;
@@ -25,7 +26,8 @@ public class Order {
     this.type = type;
     orderValue = startAmount * pricePerUnit;
   }
-  public Order(String product, OrderType type, double pricePerUnit, int startAmount){
+
+  public Order(String product, OrderType type, double pricePerUnit, int startAmount) {
     this.product = product;
     this.type = type;
     this.pricePerUnit = pricePerUnit;
@@ -41,39 +43,34 @@ public class Order {
     orderValue = amountRemaining * pricePerUnit;
   }
 
-  public enum OrderStatus {BEST, MATCHED, OUTDATED, SEARCHING}
-  public enum OrderType {
-    BUY("Buy Order"),
-    SELL("Sell Offer");
-    public final String longName;
-    OrderType(String longName){
-      this.longName = longName;
-    }
+  public boolean matches(Order other) {
+    return other.type == this.type && other.product.equals(this.product)
+        && other.startAmount == this.startAmount &&
+        other.pricePerUnit == this.pricePerUnit;
   }
 
-  public boolean matches(Order other){
-    return other.type == this.type && other.product.equals(this.product) && other.startAmount == this.startAmount &&
-           other.pricePerUnit == this.pricePerUnit;
-  }
-
-  public String getProductId(){
+  public String getProductId() {
     return BazaarNotifier.bazaarConv.inverse().get(product);
   }
 
-  public void updateStatus(){
+  public void updateStatus() {
     OrderStatus newOrderStatus = null;
-    if (!(BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled))) {
+    if (!(BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey
+        || BazaarNotifier.apiKeyDisabled))) {
       return;
     }
-    if(OrderType.BUY.equals(this.type)) {
-      if(BazaarNotifier.bazaarDataRaw.products.get(getProductId()).sell_summary.size()==0){
+    if (OrderType.BUY.equals(this.type)) {
+      if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).sell_summary.size() == 0) {
         orderStatus = OrderStatus.SEARCHING;
         return;
       }
-      BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products.get(getProductId()).sell_summary.get(0);
+      BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
+          .get(getProductId()).sell_summary.get(0);
       if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
-      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit  && this.startAmount >=bazaarSubItem.amount && bazaarSubItem.orders == 1) { //&& this.amountRemaining <= bazaarSubItem.amount
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
+          && this.startAmount >= bazaarSubItem.amount
+          && bazaarSubItem.orders == 1) { //&& this.amountRemaining <= bazaarSubItem.amount
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;
@@ -82,25 +79,27 @@ public class Order {
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders > 1) {
         newOrderStatus = OrderStatus.MATCHED;
       }
-    }else {
-      if(BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.size()==0){
+    } else {
+      if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.size() == 0) {
         newOrderStatus = OrderStatus.SEARCHING;
       }
-      BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.get(0);
+      BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
+          .get(getProductId()).buy_summary.get(0);
       if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
-      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
+          && this.amountRemaining == bazaarSubItem.amount && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;
-      } else if (pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders ==1) {
+      } else if (pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.SEARCHING;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders > 1) {
         newOrderStatus = OrderStatus.MATCHED;
       }
     }
-    if(this.orderStatus != newOrderStatus) {
-      if (OrderStatus.BEST.equals(newOrderStatus) && this.orderStatus!=OrderStatus.SEARCHING){
+    if (this.orderStatus != newOrderStatus) {
+      if (OrderStatus.BEST.equals(newOrderStatus) && this.orderStatus != OrderStatus.SEARCHING) {
         Utils.chatNotification(this, "REVIVED");
       } else if (OrderStatus.MATCHED.equals(newOrderStatus)) {
         Utils.chatNotification(this, "MATCHED");
@@ -108,6 +107,18 @@ public class Order {
         Utils.chatNotification(this, "OUTDATED");
       }
       this.orderStatus = newOrderStatus;
+    }
+  }
+
+  public enum OrderStatus {BEST, MATCHED, OUTDATED, SEARCHING}
+
+  public enum OrderType {
+    BUY("Buy Order"),
+    SELL("Sell Offer");
+    public final String longName;
+
+    OrderType(String longName) {
+      this.longName = longName;
     }
   }
 

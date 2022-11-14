@@ -67,7 +67,7 @@ public class CraftingCalculator {
     if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.products.size() != 0) {
         if (BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() == 0
-        || BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() == 0){
+            || BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() == 0) {
           Arrays.fill(values, "0");
           return values;
         }
@@ -87,8 +87,9 @@ public class CraftingCalculator {
             .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
           if (h % 2 == 0) {
             if (BazaarNotifier.bazaarDataRaw.products.get(
-                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-                    .getAsJsonArray("material").get(h).getAsString()).sell_summary.size() == 0){
+                BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                    .getAsJsonObject(itemName)
+                    .getAsJsonArray("material").get(h).getAsString()).sell_summary.size() == 0) {
               Arrays.fill(values, "0");
               return values;
             }
@@ -107,9 +108,10 @@ public class CraftingCalculator {
         for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
             .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
           if (h % 2 == 0) {
-            if(BazaarNotifier.bazaarDataRaw.products.get(
-                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other").getAsJsonObject(itemName)
-                    .getAsJsonArray("material").get(h).getAsString()).buy_summary.size() == 0){
+            if (BazaarNotifier.bazaarDataRaw.products.get(
+                BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+                    .getAsJsonObject(itemName)
+                    .getAsJsonArray("material").get(h).getAsString()).buy_summary.size() == 0) {
               Arrays.fill(values, "0");
               return values;
             }

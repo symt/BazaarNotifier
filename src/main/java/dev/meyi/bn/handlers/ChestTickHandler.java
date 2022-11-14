@@ -4,6 +4,11 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.Utils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
@@ -16,12 +21,6 @@ import net.minecraft.util.StringUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class ChestTickHandler {
@@ -61,7 +60,7 @@ public class ChestTickHandler {
         Order.OrderType type;
         if (m.find()) {
           displayName = m.group(2);
-          type = "sell".equalsIgnoreCase(m.group(1))? Order.OrderType.SELL: Order.OrderType.BUY;
+          type = "sell".equalsIgnoreCase(m.group(1)) ? Order.OrderType.SELL : Order.OrderType.BUY;
         } else {
           System.out.println("Bazaar item header incorrect. Aborting!");
           return;
@@ -99,12 +98,13 @@ public class ChestTickHandler {
                 amountLeft = 0;
               } else {
                 String intToParse = lore.get(3).split(" ")[1].split("/")[0];
-                intToParse = intToParse.contains(".")? intToParse.replace("k", "00"): intToParse.replace("k", "000");
+                intToParse = intToParse.contains(".") ? intToParse.replace("k", "00")
+                    : intToParse.replace("k", "000");
                 intToParse = intToParse.replace(".", "");
                 int amountFulfilled = Integer.parseInt(intToParse);
                 amountLeft = totalAmount - amountFulfilled;
               }
-            }else{
+            } else {
               amountLeft = BazaarNotifier.orders.get(orderInQuestion).startAmount;
             }
             if (amountLeft > 0) {
@@ -153,8 +153,9 @@ public class ChestTickHandler {
                   .stripControlCodes(chest.getDisplayName().getUnformattedText());
               updateBazaarOrders(chest);
             }
-          }else if(chestName.contains("bazaar")){
-            lastScreenDisplayName = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText());
+          } else if (chestName.contains("bazaar")) {
+            lastScreenDisplayName = StringUtils
+                .stripControlCodes(chest.getDisplayName().getUnformattedText());
           }
         }
       } else if (BazaarNotifier.inBank && Minecraft
@@ -216,8 +217,10 @@ public class ChestTickHandler {
 
         EventHandler.productVerify[0] = productName;
         EventHandler.productVerify[1] = productWithAmount;
-        Order.OrderType type = StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
-            .equalsIgnoreCase("Confirm Sell Offer") ? Order.OrderType.SELL : Order.OrderType.BUY;
+        Order.OrderType type =
+            StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+                .equalsIgnoreCase("Confirm Sell Offer") ? Order.OrderType.SELL
+                : Order.OrderType.BUY;
         EventHandler.verify = new Order(product, amount, price, priceString, type);
       }
     }
