@@ -22,7 +22,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
 
-
 public class EventHandler {
 
   static Order verify = null;
