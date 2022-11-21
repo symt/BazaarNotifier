@@ -88,7 +88,7 @@ public class Order {
       if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
-          && this.amountRemaining == bazaarSubItem.amount && bazaarSubItem.orders == 1) {
+              && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;

@@ -105,18 +105,15 @@ public class EventHandler {
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
         Order order = BazaarNotifier.orders.get(i);
         if (message.endsWith("Buy Order!") && order.type.equals(Order.OrderType.BUY)) {
-          if ((refund >= 10000 ? Math.round(order.orderValue)
-              : order.orderValue) - refund <= 1) {
-
+          double remaining = (refund >= 10000 ? Math.round(order.orderValue) : order.orderValue ) - refund;
+          if (remaining <= 1 && remaining >=0) {
             BazaarNotifier.orders.remove(i);
-
             break;
           }
         } else if (message.endsWith("Sell Offer!") && order.type.equals(Order.OrderType.SELL)) {
           if (order.product.equalsIgnoreCase(itemRefunded)
               && order.getAmountRemaining() == refundAmount) {
             BazaarNotifier.orders.remove(i);
-
             break;
           }
         }
