@@ -5,6 +5,8 @@ import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -56,18 +58,18 @@ public class ChestTickHandler {
         Pattern p = Pattern
             .compile("(BUY|SELL):? (.*)");
         Matcher m = p.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
-        String displayName = "";
+        String displayName;
         Order.OrderType type;
         if (m.find()) {
           displayName = m.group(2);
           type = "sell".equalsIgnoreCase(m.group(1)) ? Order.OrderType.SELL : Order.OrderType.BUY;
         } else {
-          System.out.println("Bazaar item header incorrect. Aborting!");
+          System.err.println("Bazaar item header incorrect. Aborting!");
           return;
         }
 
         if (BazaarNotifier.bazaarConv.containsValue(displayName)) {
-          int amountLeft = -1;
+          int amountLeft;
 
           String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
@@ -98,11 +100,20 @@ public class ChestTickHandler {
                 amountLeft = 0;
               } else {
                 String intToParse = lore.get(3).split(" ")[1].split("/")[0];
-                intToParse = intToParse.contains(".") ? intToParse.replace("k", "00")
-                    : intToParse.replace("k", "000");
-                intToParse = intToParse.replace(".", "");
-                int amountFulfilled = Integer.parseInt(intToParse);
-                amountLeft = totalAmount - amountFulfilled;
+                int amountFulfilled = 0;
+
+                try {
+                  amountFulfilled = NumberFormat.getInstance().parse(intToParse).intValue();
+                } catch (ParseException e) {
+                  // Fallback on old method
+                  e.printStackTrace();
+                  intToParse = intToParse.contains(".") ? intToParse.replace("k", "00")
+                      : intToParse.replace("k", "000");
+                  intToParse = intToParse.replace(".", "");
+                  amountFulfilled = Integer.parseInt(intToParse);
+                } finally {
+                  amountLeft = totalAmount - amountFulfilled;
+                }
               }
             } else {
               amountLeft = BazaarNotifier.orders.get(orderInQuestion).startAmount;

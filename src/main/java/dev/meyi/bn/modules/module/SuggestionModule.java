@@ -4,9 +4,8 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
-import dev.meyi.bn.utilities.ColorUtils;
+import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,12 +41,12 @@ public class SuggestionModule extends Module {
         items.add(message);
       }
 
-      int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
+      int longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
 
       boundsX = x + longestXString;
 
     } else {
-      Utils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA, scale);
+      RenderUtils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA, scale);
       boundsX = x + 200;
     }
     float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale

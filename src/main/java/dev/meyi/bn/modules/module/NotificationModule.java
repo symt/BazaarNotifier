@@ -5,9 +5,8 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
-import dev.meyi.bn.utilities.ColorUtils;
+import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -94,10 +93,10 @@ public class NotificationModule extends Module {
         items.add(message);
       }
 
-      longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
+      longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + longestXString;
     } else {
-      Utils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
+      RenderUtils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
       float X = x + 200 * scale;
       boundsX = (int) X;
     }

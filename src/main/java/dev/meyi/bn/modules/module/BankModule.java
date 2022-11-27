@@ -5,7 +5,7 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
-import dev.meyi.bn.utilities.ColorUtils;
+import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class BankModule extends Module {
     message2.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.MAGENTA);
     items.add(message2);
 
-    int longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
+    int longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;
     boundsY = (int) (
         y + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 3) * scale + 3 * scale - 2);

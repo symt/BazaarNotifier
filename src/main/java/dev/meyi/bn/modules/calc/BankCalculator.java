@@ -138,27 +138,20 @@ public class BankCalculator {
     if (chest != null) {
       if (chest.getStackInSlot(11) != null) {
         if (chest.getStackInSlot(11).getDisplayName().toLowerCase().contains("deposit coins")) {
-          if (!isCoop) {
-            if (!personalBankInitialised) {
-              double p = Double.parseDouble(StringUtils.stripControlCodes(
-                  chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                      .getTagList("Lore", 8)
-                      .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
-              bank += p;
-              moneyOnStartup += p;
+          if ((!isCoop && !personalBankInitialised) || (isCoop && !coopBankInitialised)) {
+            double p = Double.parseDouble(StringUtils.stripControlCodes(
+                chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
+                    .getTagList("Lore", 8)
+                    .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
+            bank += p;
+            moneyOnStartup += p;
+            if (!isCoop) {
               personalBankInitialised = true;
-            }
-          } else {
-            if (!coopBankInitialised) {
-              double p = Double.parseDouble(StringUtils.stripControlCodes(
-                  chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                      .getTagList("Lore", 8)
-                      .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
-              bank += p;
-              moneyOnStartup += p;
+            } else {
               coopBankInitialised = true;
             }
           }
+
         }
       }
     }

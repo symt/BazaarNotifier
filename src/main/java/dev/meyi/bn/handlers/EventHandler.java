@@ -105,8 +105,9 @@ public class EventHandler {
       for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
         Order order = BazaarNotifier.orders.get(i);
         if (message.endsWith("Buy Order!") && order.type.equals(Order.OrderType.BUY)) {
-          double remaining = (refund >= 10000 ? Math.round(order.orderValue) : order.orderValue ) - refund;
-          if (remaining <= 1 && remaining >=0) {
+          double remaining =
+              (refund >= 10000 ? Math.round(order.orderValue) : order.orderValue) - refund;
+          if (remaining <= 1 && remaining >= 0) {
             BazaarNotifier.orders.remove(i);
             break;
           }

@@ -3,7 +3,7 @@ package dev.meyi.bn.json;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.utilities.RenderUtils;
 
 public class Order {
 
@@ -88,7 +88,7 @@ public class Order {
       if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
-              && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {
+          && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;
@@ -100,11 +100,11 @@ public class Order {
     }
     if (this.orderStatus != newOrderStatus) {
       if (OrderStatus.BEST.equals(newOrderStatus) && this.orderStatus != OrderStatus.SEARCHING) {
-        Utils.chatNotification(this, "REVIVED");
+        RenderUtils.chatNotification(this, "REVIVED");
       } else if (OrderStatus.MATCHED.equals(newOrderStatus)) {
-        Utils.chatNotification(this, "MATCHED");
+        RenderUtils.chatNotification(this, "MATCHED");
       } else if (OrderStatus.OUTDATED.equals(newOrderStatus)) {
-        Utils.chatNotification(this, "OUTDATED");
+        RenderUtils.chatNotification(this, "OUTDATED");
       }
       this.orderStatus = newOrderStatus;
     }

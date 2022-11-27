@@ -25,45 +25,49 @@ public class ModuleSettingsGui extends GuiScreen {
   public void initGui() {
     super.initGui();
     buttonList.add(new GuiButton(ButtonIds.IS_ACTIVE.id, getButtonX(),
-        getButtonY(), "Module: " + getOnOff(module.isActive())));
+        getButtonY(), "Module: " + SettingsGui.getOnOff(module.isActive())));
     buttonList.add(scaleSlider = new GuiSlider(ButtonIds.SCALE_SLIDER.id, getButtonX(),
         getButtonY(), 200, 20, "Scale: ", "", 1,
         30, module.getScale() * 10, false, true));
-    if (module.getName().equals("SUGGESTION")) {
-      buttonList.add(lengthSlider = new GuiSlider(ButtonIds.ENTRIES_SLIDER.id, getButtonX(),
-          getButtonY(), 200, 20, "Entries: ", "", 1,
-          100, BazaarNotifier.config.suggestionListLength, false, true));
-      buttonList.add(new GuiButton(ButtonIds.USE_ENCHANTMENTS.id, getButtonX(), getButtonY(),
-          "Show Enchantments: " + getOnOff(BazaarNotifier.config.suggestionShowEnchantments)));
-    } else if (module.getName().equals("CRAFTING")) {
-      buttonList.add(lengthSlider = new GuiSlider(ButtonIds.ENTRIES_SLIDER.id, getButtonX(),
-          getButtonY(), 200, 20, "Entries: ", "", 1,
-          100, BazaarNotifier.config.craftingListLength, false, true));
-      buttonList.add(new GuiButton(ButtonIds.COLLECTION_CHECK.id, getButtonX(),
-          getButtonY(), "Collection Check: " +
-          getOnOff(!BazaarNotifier.config.collectionCheckDisabled)));
-      if (!BazaarNotifier.validApiKey) {
-        buttonList.get(3).enabled = false;
-      }
-      buttonList.add(new GuiButton(ButtonIds.SELLING_OPTION.id, getButtonX(),
-          getButtonY(), "Sort By: " + (BazaarNotifier.config.craftingSortingOption == 0 ?
-          "Instant Sell" : BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer"
-          : "Profit Per Million")));
-      buttonList.add(new GuiButton(ButtonIds.INSTANT_SELL_PROFIT.id, getButtonX(),
-          getButtonY(), "Instant Sell Profit: " +
-          getOnOff(BazaarNotifier.config.isShowInstantSellProfit())));
-      buttonList.add(new GuiButton(ButtonIds.SELL_OFFER_PROFIT.id, getButtonX(),
-          getButtonY(), "Sell Offer Profit: " +
-          getOnOff(BazaarNotifier.config.isShowSellOfferProfit())));
-      buttonList.add(new GuiButton(ButtonIds.PROFIT_PER_MILLION.id, getButtonX(),
-          getButtonY(), "Profit Per Million: " +
-          getOnOff(BazaarNotifier.config.isShowProfitPerMil())));
-      buttonList.add(new GuiButton(ButtonIds.MATERIAL_BUYING_OPTION.id, getButtonX(),
-          getButtonY(), "Materials: " +
-          (BazaarNotifier.config.useBuyOrders ? "Buy Order" : "Instant Buy")));
+    switch (module.getName()) {
+      case "SUGGESTION":
+        buttonList.add(lengthSlider = new GuiSlider(ButtonIds.ENTRIES_SLIDER.id, getButtonX(),
+            getButtonY(), 200, 20, "Entries: ", "", 1,
+            100, BazaarNotifier.config.suggestionListLength, false, true));
+        buttonList.add(new GuiButton(ButtonIds.USE_ENCHANTMENTS.id, getButtonX(), getButtonY(),
+            "Show Enchantments: " + SettingsGui.getOnOff(BazaarNotifier.config.suggestionShowEnchantments)));
+        break;
+      case "CRAFTING":
+        buttonList.add(lengthSlider = new GuiSlider(ButtonIds.ENTRIES_SLIDER.id, getButtonX(),
+            getButtonY(), 200, 20, "Entries: ", "", 1,
+            100, BazaarNotifier.config.craftingListLength, false, true));
+        buttonList.add(new GuiButton(ButtonIds.COLLECTION_CHECK.id, getButtonX(),
+            getButtonY(), "Collection Check: " +
+            SettingsGui.getOnOff(!BazaarNotifier.config.collectionCheckDisabled)));
+        if (!BazaarNotifier.validApiKey) {
+          buttonList.get(3).enabled = false;
+        }
+        buttonList.add(new GuiButton(ButtonIds.SELLING_OPTION.id, getButtonX(),
+            getButtonY(), "Sort By: " + (BazaarNotifier.config.craftingSortingOption == 0 ?
+            "Instant Sell" : BazaarNotifier.config.craftingSortingOption == 1 ? "Sell Offer"
+            : "Profit Per Million")));
+        buttonList.add(new GuiButton(ButtonIds.INSTANT_SELL_PROFIT.id, getButtonX(),
+            getButtonY(), "Instant Sell Profit: " +
+            SettingsGui.getOnOff(BazaarNotifier.config.isShowInstantSellProfit())));
+        buttonList.add(new GuiButton(ButtonIds.SELL_OFFER_PROFIT.id, getButtonX(),
+            getButtonY(), "Sell Offer Profit: " +
+            SettingsGui.getOnOff(BazaarNotifier.config.isShowSellOfferProfit())));
+        buttonList.add(new GuiButton(ButtonIds.PROFIT_PER_MILLION.id, getButtonX(),
+            getButtonY(), "Profit Per Million: " +
+            SettingsGui.getOnOff(BazaarNotifier.config.isShowProfitPerMil())));
+        buttonList.add(new GuiButton(ButtonIds.MATERIAL_BUYING_OPTION.id, getButtonX(),
+            getButtonY(), "Materials: " +
+            (BazaarNotifier.config.useBuyOrders ? "Buy Order" : "Instant Buy")));
 
-    } else if (module.getName().equals("BANK")) {
-      buttonList.add(new GuiButton(ButtonIds.RESET.id, getButtonX(), getButtonY(), "Reset"));
+        break;
+      case "BANK":
+        buttonList.add(new GuiButton(ButtonIds.RESET.id, getButtonX(), getButtonY(), "Reset"));
+        break;
     }
 
     buttonList.add(new GuiButton(ButtonIds.BACK.id, 10, height - 25, "Back"));
@@ -73,7 +77,7 @@ public class ModuleSettingsGui extends GuiScreen {
   protected void actionPerformed(GuiButton Button) {
     if (Button.id == ButtonIds.IS_ACTIVE.id) {
       module.setActive(!module.isActive());
-      Button.displayString = "Module: " + getOnOff(module.isActive());
+      Button.displayString = "Module: " + SettingsGui.getOnOff(module.isActive());
     } else if (Button.id == ButtonIds.SCALE_SLIDER.id) {
       module.setScale((float) scaleSlider.getValue() / 10);
     } else if (Button.id == ButtonIds.ENTRIES_SLIDER.id) {
@@ -85,13 +89,13 @@ public class ModuleSettingsGui extends GuiScreen {
     } else if (Button.id == ButtonIds.COLLECTION_CHECK.id) {
       BazaarNotifier.config.collectionCheckDisabled ^= true;
       Button.displayString =
-          "Collection Check: " + getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
+          "Collection Check: " + SettingsGui.getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
 
       if (!BazaarNotifier.config.collectionCheckDisabled) {
         new Thread(() -> {
           CraftingCalculator.getUnlockedRecipes();
           Button.displayString =
-              "Collection Check: " + getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
+              "Collection Check: " + SettingsGui.getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
           if (BazaarNotifier.config.collectionCheckDisabled) {
             Minecraft.getMinecraft().thePlayer
                 .addChatMessage(new ChatComponentText(BazaarNotifier.prefix +
@@ -111,15 +115,15 @@ public class ModuleSettingsGui extends GuiScreen {
       BazaarNotifier.config
           .setShowInstantSellProfit(!BazaarNotifier.config.isShowInstantSellProfit());
       Button.displayString =
-          "Instant Sell Profit: " + getOnOff(BazaarNotifier.config.isShowInstantSellProfit());
+          "Instant Sell Profit: " + SettingsGui.getOnOff(BazaarNotifier.config.isShowInstantSellProfit());
     } else if (Button.id == ButtonIds.SELL_OFFER_PROFIT.id) {
       BazaarNotifier.config.setShowSellOfferProfit(!BazaarNotifier.config.isShowSellOfferProfit());
       Button.displayString =
-          "Sell Offer Profit: " + getOnOff(BazaarNotifier.config.isShowSellOfferProfit());
+          "Sell Offer Profit: " + SettingsGui.getOnOff(BazaarNotifier.config.isShowSellOfferProfit());
     } else if (Button.id == ButtonIds.PROFIT_PER_MILLION.id) {
       BazaarNotifier.config.setShowProfitPerMil(!BazaarNotifier.config.isShowProfitPerMil());
       Button.displayString =
-          "Profit Per Million: " + getOnOff(BazaarNotifier.config.isShowProfitPerMil());
+          "Profit Per Million: " + SettingsGui.getOnOff(BazaarNotifier.config.isShowProfitPerMil());
     } else if (Button.id == ButtonIds.MATERIAL_BUYING_OPTION.id) {
       BazaarNotifier.config.useBuyOrders ^= true;
       Button.displayString = "Materials: " + (BazaarNotifier.config.useBuyOrders ?
@@ -130,7 +134,7 @@ public class ModuleSettingsGui extends GuiScreen {
     } else if (Button.id == ButtonIds.USE_ENCHANTMENTS.id) {
       BazaarNotifier.config.suggestionShowEnchantments ^= true;
       Button.displayString =
-          "Show Enchantments: " + getOnOff(BazaarNotifier.config.suggestionShowEnchantments);
+          "Show Enchantments: " + SettingsGui.getOnOff(BazaarNotifier.config.suggestionShowEnchantments);
     } else if (Button.id == ButtonIds.BACK.id) {
       BazaarNotifier.guiToOpen = "settings";
     }
@@ -141,7 +145,7 @@ public class ModuleSettingsGui extends GuiScreen {
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     this.drawDefaultBackground();
     super.drawScreen(mouseX, mouseY, partialTicks);
-    //action Performed is only called on the first tick when picking up the slider
+    // Action Performed is only called on the first tick when picking up the slider
     if (scaleSlider.getValue() != module.getScale()) {
       module.setScale((float) scaleSlider.getValue() / 10);
     }
@@ -156,39 +160,15 @@ public class ModuleSettingsGui extends GuiScreen {
     }
   }
 
-  @Override
-  public boolean doesGuiPauseGame() {
-    return false;
-  }
-
-  String getOnOff(boolean b) {
-    return b ? "ON" : "OFF";
-  }
-
   public int getButtonX() {
-    int id = buttonList.size();
-    if (id % 2 == 0) {
-      //left side
-      return width / 2 - 205;
-    } else {
-      //right side
-      return width / 2 + 5;
-    }
+    return SettingsGui.getButtonX(buttonList.size(), width);
   }
 
   public int getButtonY() {
-    int id = buttonList.size();
-    if (id % 2 == 0) {
-      //left side
-      return (int) Math.round(height / Math.E - 50 + 25 * id / 2f);
-    } else {
-      //right side
-      return (int) Math.round(height / Math.E - 50 + 25 * (id - 1) / 2f);
-    }
+    return SettingsGui.getButtonY(buttonList.size(), height);
   }
 
-
-  enum ButtonIds {
+  private enum ButtonIds {
     IS_ACTIVE(0),
     SCALE_SLIDER(1),
     ENTRIES_SLIDER(2),
@@ -209,6 +189,4 @@ public class ModuleSettingsGui extends GuiScreen {
       this.id = i;
     }
   }
-
-
 }

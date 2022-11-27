@@ -177,37 +177,6 @@ public class Utils {
   }
 
 
-  public static void chatNotification(Order order, String notification) {
-    if (!BazaarNotifier.config.showChatMessages) {
-      return;
-    }
-    EnumChatFormatting messageColor =
-        (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
-            : order.type.equals(Order.OrderType.BUY) ? EnumChatFormatting.DARK_PURPLE
-                : EnumChatFormatting.BLUE);
-    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-        messageColor + order.type.longName
-            + EnumChatFormatting.GRAY + " for "
-            + messageColor + BazaarNotifier.dfNoDecimal
-            .format(order.startAmount)
-            + EnumChatFormatting.GRAY + "x " + messageColor
-            + order.product
-            + EnumChatFormatting.YELLOW
-            + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + messageColor + BazaarNotifier.df.format(order.pricePerUnit)
-            + EnumChatFormatting.GRAY + ")"
-    ));
-  }
-
-
-  public static void drawCenteredString(String text, int x, int y, int color, float moduleScale) {
-    x = (int) (x / moduleScale + 200 / 4);
-    y = (int) (y / moduleScale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6));
-    GL11.glScalef(moduleScale, moduleScale, 1);
-    Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
-    GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
-  }
-
   public static void updateResources() throws IOException {
     Gson gson = new Gson();
     String result;

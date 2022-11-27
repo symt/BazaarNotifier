@@ -28,10 +28,10 @@ public class SettingsGui extends GuiScreen {
       buttonId++;
     }
     buttonList.add(new GuiButton(buttonId, getButtonX(buttonId), getButtonY(buttonId),
-        "Mod: " + getOnOff(BazaarNotifier.activeBazaar)));
+        "Mod: " + SettingsGui.getOnOff(BazaarNotifier.activeBazaar)));
     buttonId++;
     buttonList.add(new GuiButton(buttonId, getButtonX(buttonId), getButtonY(buttonId),
-        "Chat Messages: " + getOnOff(BazaarNotifier.config.showChatMessages)));
+        "Chat Messages: " + SettingsGui.getOnOff(BazaarNotifier.config.showChatMessages)));
     buttonId++;
     apiKey = new GuiTextField(buttonId, fontRendererObj, getButtonX(buttonId), getButtonY(buttonId),
         200, 20);
@@ -71,7 +71,7 @@ public class SettingsGui extends GuiScreen {
   @Override
   protected void keyTyped(char typedChar, int keyCode) throws IOException {
     super.keyTyped(typedChar, keyCode);
-    if (apiKey.isFocused()) {
+    if (apiKey != null && apiKey.isFocused()) {
       if (!textCleared && (apiKey.getText().equalsIgnoreCase("Api key set")
           || apiKey.getText().equals("Api key missing"))) {
         apiKey.setText("");
@@ -105,30 +105,38 @@ public class SettingsGui extends GuiScreen {
     } catch (IOException e) {
       e.printStackTrace();
     } catch (NullPointerException | IllegalArgumentException ignored) {
-      //this only happens if the GUI is closed during initialising
+      // this only happens if the GUI is closed during initialising
     }
   }
 
-  String getOnOff(boolean b) {
+  public int getButtonX(int id) {
+    return SettingsGui.getButtonX(id, width);
+  }
+
+  public int getButtonY(int id) {
+    return SettingsGui.getButtonY(id, height);
+  }
+
+  public static String getOnOff(boolean b) {
     return b ? "ON" : "OFF";
   }
 
-  public int getButtonX(int id) {
+  public static int getButtonX(int id, int width) {
     if (id % 2 == 0) {
-      //left side
+      // left side
       return width / 2 - 205;
     } else {
-      //right side
+      // right side
       return width / 2 + 5;
     }
   }
 
-  public int getButtonY(int id) {
+  public static int getButtonY(int id, int height) {
     if (id % 2 == 0) {
-      //left side
+      // left side
       return (int) Math.round(height / Math.E - 50 + 25 * id / 2f);
     } else {
-      //right side
+      // right side
       return (int) Math.round(height / Math.E - 50 + 25 * (id - 1) / 2f);
     }
   }
