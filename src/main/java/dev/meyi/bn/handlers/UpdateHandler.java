@@ -53,7 +53,7 @@ public class UpdateHandler {
             try {
               buildGradle = IOUtils.toString(new BufferedReader(new InputStreamReader(
                   HttpClientBuilder.create().build().execute(new HttpGet(
-                      "https://raw.githubusercontent.com/symt/BazaarNotifier/beta/build.gradle"))
+                      "https://raw.githubusercontent.com/symt/BazaarNotifier/beta/build.gradle.kts"))
                       .getEntity().getContent())));
             } catch (IOException e) {
               Minecraft.getMinecraft().thePlayer.addChatMessage(
