@@ -14,6 +14,7 @@ import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.ModuleList;
+import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
 import java.io.File;
@@ -38,7 +39,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.5.0-beta14";
+  public static final String VERSION = "1.5.0-beta15";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -156,6 +157,7 @@ public class BazaarNotifier {
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
+    ReflectionHelper.setup();
     ScheduledEvents.create();
 
     Runtime.getRuntime()

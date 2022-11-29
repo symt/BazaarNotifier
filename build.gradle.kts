@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.meyi.bazaarnotifier"
-version = "1.5.0-beta14"
+version = "1.5.0-beta15"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
@@ -43,6 +43,18 @@ val resourcesFile = "src/main/resources/resources.json"
 val resourcesURL = "https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json"
 
 tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    inputs.property("version", project.version)
+    inputs.property("mcversion", "1.8.9")
+    from(sourceSets["main"].resources.srcDirs) {
+        include("mcmod.info")
+        expand("version" to project.version, "mcversion" to "1.8.9")
+    }
+    from(sourceSets["main"].resources.srcDirs) {
+        exclude("mcmod.info")
+    }
+
     dependsOn("retrieveResources")
     finalizedBy("destroyResources")
     outputs.upToDateWhen { false }

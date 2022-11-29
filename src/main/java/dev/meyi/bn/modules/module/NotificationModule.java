@@ -5,12 +5,16 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
 import java.awt.Color;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -154,7 +158,8 @@ public class NotificationModule extends Module {
 
     if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar
         && BazaarNotifier.activeBazaar) {
-      IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
+      IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) Minecraft.getMinecraft().currentScreen);
+      if (chest == null) return;
       String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
 
       if (chestName.contains("bazaar orders")) {
@@ -172,9 +177,10 @@ public class NotificationModule extends Module {
               || Item.itemRegistry.getIDForObject(item.getItem()) == 262) {
             continue;
           }
-          Order.OrderType type = StringUtils.stripControlCodes(item.getDisplayName()).split(" ")[0]
+          String itemDisplayName = StringUtils.stripControlCodes(item.getDisplayName());
+          Order.OrderType type = itemDisplayName.split(" ")[0]
               .equalsIgnoreCase("sell") ? Order.OrderType.SELL : Order.OrderType.BUY;
-          String product = StringUtils.stripControlCodes(item.getDisplayName())
+          String product = itemDisplayName
               .replaceAll("SELL ", "").replaceAll("BUY ", "");
           NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
               .getTagList("Lore", 8);
@@ -182,8 +188,9 @@ public class NotificationModule extends Module {
           for (int k = 0; k < lorePreFilter.tagCount(); k++) {
             lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(k)));
           }
-          int amount = Integer.parseInt(
-              lore.get(2).toLowerCase().split("amount: ")[1].replace(".", "").replaceAll("x", ""));
+
+          int amount = Integer.parseInt(lore.get(2).toLowerCase().split("amount: ")[1].replaceAll("[x,.]", ""));
+
           String ppu = lore.get(3).equals("") ? lore.get(4) : lore.get(5);
           ppu = ppu.toLowerCase().replace("price per unit: ", "").replace(" coins", "")
               .replaceAll(",", "");

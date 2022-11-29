@@ -6,11 +6,13 @@ import dev.meyi.bn.gui.SettingsGui;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
+import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
@@ -22,6 +24,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import org.lwjgl.opengl.GL11;
 
+@SuppressWarnings("unused")
 public class EventHandler {
 
   static Order verify = null;
@@ -35,13 +38,12 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
-    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!") || message
-        .startsWith("[Bazaar] Buy Order Setup!") || message
-        .startsWith("[Bazaar] Sell Offer Setup!")) {
-      if (productVerify[0] != null && productVerify[1] != null && productVerify[0]
-          .equals(BazaarNotifier.bazaarConv.inverse()
-              .get(message.split("x ", 2)[1].split(" for ")[0])) && productVerify[1]
-          .equals(message.split("! ")[1].split(" for ")[0])) {
+    if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")
+        || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith(
+        "[Bazaar] Sell Offer Setup!")) {
+      if (productVerify[0] != null && productVerify[1] != null && productVerify[0].equals(
+          BazaarNotifier.bazaarConv.inverse().get(message.split("x ", 2)[1].split(" for ")[0]))
+          && productVerify[1].equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
         BankCalculator.getBazaarProfit();
         verify = null;
@@ -49,8 +51,8 @@ public class EventHandler {
       }
     } else if (message.startsWith("[Bazaar] Your ") && message.endsWith(" was filled!")) {
       String item = message.split("x ", 2)[1].split(" was ")[0];
-      int amount = Integer
-          .parseInt(message.split(" for ")[1].split("x ", 2)[0].replaceAll(",", ""));
+      int amount = Integer.parseInt(
+          message.split(" for ")[1].split("x ", 2)[0].replaceAll(",", ""));
       int orderToRemove = 0;
       boolean found = false;
       double edgePrice;
@@ -58,9 +60,8 @@ public class EventHandler {
         edgePrice = Double.MIN_VALUE;
         for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
           Order order = BazaarNotifier.orders.get(i);
-          if (order.product.equalsIgnoreCase(item)
-              && order.startAmount == amount && order.type.equals(Order.OrderType.BUY)
-              && order.pricePerUnit > edgePrice) {
+          if (order.product.equalsIgnoreCase(item) && order.startAmount == amount
+              && order.type.equals(Order.OrderType.BUY) && order.pricePerUnit > edgePrice) {
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
             found = true;
@@ -71,9 +72,8 @@ public class EventHandler {
         edgePrice = Double.MAX_VALUE;
         for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
           Order order = BazaarNotifier.orders.get(i);
-          if (order.product.equalsIgnoreCase(item)
-              && order.startAmount == amount && order.type.equals(Order.OrderType.SELL)
-              && order.pricePerUnit < edgePrice) {
+          if (order.product.equalsIgnoreCase(item) && order.startAmount == amount
+              && order.type.equals(Order.OrderType.SELL) && order.pricePerUnit < edgePrice) {
 
             edgePrice = order.pricePerUnit;
             orderToRemove = i;
@@ -91,14 +91,14 @@ public class EventHandler {
       int refundAmount = 0;
       String itemRefunded = "";
       if (message.endsWith("Buy Order!")) {
-        refund = Double
-            .parseDouble(message.split("Refunded ")[1].split(" coins")[0].replaceAll(",", ""));
+        refund = Double.parseDouble(
+            message.split("Refunded ")[1].split(" coins")[0].replaceAll(",", ""));
         if (refund >= 10000) {
           refund = Math.round(refund);
         }
       } else if (message.endsWith("Sell Offer!")) {
-        refundAmount = Integer
-            .parseInt(message.split("Refunded ")[1].split("x ", 2)[0].replaceAll(",", ""));
+        refundAmount = Integer.parseInt(
+            message.split("Refunded ")[1].split("x ", 2)[0].replaceAll(",", ""));
         itemRefunded = message.split("x ", 2)[1].split(" from")[0];
 
       }
@@ -130,8 +130,7 @@ public class EventHandler {
       try {
         if (Utils.validateApiKey(apiKey)) {
           Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Your api key has been set."));
+              BazaarNotifier.prefix + EnumChatFormatting.RED + "Your api key has been set."));
           BazaarNotifier.config.api = apiKey;
           BazaarNotifier.validApiKey = true;
           BazaarNotifier.activeBazaar = true;
@@ -155,21 +154,26 @@ public class EventHandler {
 
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
-    if (e.gui instanceof GuiChest && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled)
-        && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() && (StringUtils
-        .stripControlCodes(
-            ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .startsWith("Bazaar") || StringUtils.stripControlCodes(
-        ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .equalsIgnoreCase("How much do you want to pay?") || StringUtils.stripControlCodes(
-        ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .matches("Confirm (Buy|Sell) (Order|Offer)")) || StringUtils.stripControlCodes(
-        ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-        .contains("Bazaar")) || BazaarNotifier.forceRender)) {
-      if (!BazaarNotifier.inBazaar) {
-        BazaarNotifier.inBazaar = true;
-        if (!BankCalculator.orderWait) {
-          BankCalculator.purseLast = BankCalculator.getPurse();
+    if (e.gui instanceof GuiChest && (BazaarNotifier.validApiKey
+        || BazaarNotifier.apiKeyDisabled)) {
+      IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
+      if (chest == null) {
+        return;
+      }
+      if ((chest.hasCustomName() && (
+          StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+              .startsWith("Bazaar") || StringUtils.stripControlCodes(
+                  chest.getDisplayName().getUnformattedText())
+              .equalsIgnoreCase("How much do you want to pay?") || StringUtils.stripControlCodes(
+                  chest.getDisplayName().getUnformattedText())
+              .matches("Confirm (Buy|Sell) (Order|Offer)")) || StringUtils.stripControlCodes(
+          chest.getDisplayName().getUnformattedText()).contains("Bazaar"))
+          || BazaarNotifier.forceRender) {
+        if (!BazaarNotifier.inBazaar) {
+          BazaarNotifier.inBazaar = true;
+          if (!BankCalculator.orderWait) {
+            BankCalculator.purseLast = BankCalculator.getPurse();
+          }
         }
       }
     } else if (e.gui instanceof GuiEditSign) {
@@ -209,17 +213,15 @@ public class EventHandler {
 
     }
 
-    if (e.gui instanceof GuiChest && ((((GuiChest) e.gui).lowerChestInventory.hasCustomName() &&
-        StringUtils.stripControlCodes(
-            ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-            .contains("Bank"))) &&
-        !StringUtils.stripControlCodes(
-            ((GuiChest) e.gui).lowerChestInventory.getDisplayName().getUnformattedText())
-            .contains("Bank Account Upgrades")) {
-      BazaarNotifier.inBank = true;
+    if (e.gui instanceof GuiChest) {
+      IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
+      BazaarNotifier.inBank =
+          chest != null && chest.hasCustomName() && StringUtils.stripControlCodes(
+              chest.getDisplayName().getUnformattedText()).contains("Bank")
+              && !StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+              .contains("Bank Account Upgrades");
     }
   }
-
 
   @SubscribeEvent
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
