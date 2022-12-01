@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.meyi.bazaarnotifier"
-version = "1.5.0-beta15"
+version = "1.5.0"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
