@@ -1,32 +1,39 @@
 package dev.meyi.bn.modules;
 
-import java.awt.Color;
+import dev.meyi.bn.config.ModuleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import org.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
 public abstract class Module {
 
-  int lastMouseX, lastMouseY;
-  int x, y;
-  int boundsX, boundsY;
-  int padding = 3;
-  int shift = 0;
 
-  boolean moving = false;
-  boolean needsToMove = false;
+  protected int x;
+  protected int y;
+  protected float scale;
+  protected int boundsX, boundsY;
+  protected int shift = 0;
+  protected boolean moving = false;
+  protected boolean active = true;
+  protected boolean needsToMove = false;
+  protected int mouseWheelShift = 0;
+  protected int padding = 3;
+  private int lastMouseX, lastMouseY;
 
   public Module() {
-    reset();
+    this.x = 0;
+    this.y = 0;
+    this.scale = 1;
   }
 
-  public Module(JSONObject module) {
-    x = module.getInt("x");
-    y = module.getInt("y");
+  public Module(ModuleConfig module) {
+    this.x = module.x;
+    this.y = module.y;
+    this.scale = module.scale;
+    this.active = module.active;
   }
 
   protected abstract void draw();
@@ -62,18 +69,41 @@ public abstract class Module {
         && getMouseCoordinateY() <= boundsY);
   }
 
-  public JSONObject generateModuleConfig() {
-    JSONObject config = new JSONObject();
-    config.put("x", x).put("y", y).put("name", name());
-    return config;
+  public ModuleConfig generateModuleConfig() {
+    return new ModuleConfig(name(), x, y, scale, active);
   }
 
-  private int getMouseCoordinateX() {
+  protected int getMouseCoordinateX() {
     return Mouse.getX() / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
   }
 
-  private int getMouseCoordinateY() {
+  protected int getMouseCoordinateY() {
     return (Display.getHeight() - Mouse.getY()) / new ScaledResolution(Minecraft.getMinecraft())
         .getScaleFactor();
+  }
+
+  public String getReadableName() {
+    String name = StringUtils.lowerCase(name());
+    return StringUtils.capitalize(name) + " Module";
+  }
+
+  public String getName() {
+    return name();
+  }
+
+  public float getScale() {
+    return scale;
+  }
+
+  public void setScale(float scale) {
+    this.scale = scale;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
   }
 }

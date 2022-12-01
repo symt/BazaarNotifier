@@ -1,119 +1,140 @@
 package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.Order;
+import dev.meyi.bn.modules.calc.CraftingCalculator;
+import dev.meyi.bn.modules.calc.SuggestionCalculator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.client.Minecraft;
-import org.json.JSONObject;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 
 public class ScheduledEvents {
 
   public static ScheduledEvents instance;
 
-  public boolean inOutdatedRequest = false;
+  private final Map<String, ScheduledExecutorService> executors = new HashMap<>();
 
   private ScheduledEvents() {
-    outdatedNotification();
-    suggestionLoop();
+    executors.put("bazaar", getScheduler("bazaar"));
+    executors.put("notification", getScheduler("notification"));
+    executors.put("crafting", getScheduler("crafting"));
+    executors.put("suggestion", getScheduler("suggestion"));
+    executors.put("collection", getScheduler("collection"));
+    executors.put("purse", getScheduler("purse"));
+
+    shutdownWatcher();
   }
 
   public static void create() {
+    CraftingCalculator.getUnlockedRecipes();
     if (instance == null) {
-      new ScheduledEvents();
+      instance = new ScheduledEvents();
     }
   }
 
-  public void suggestionLoop() {
-    Executors.newScheduledThreadPool(1)
-        .scheduleAtFixedRate(Suggester::basic, 5, 5, TimeUnit.SECONDS);
+  private ScheduledExecutorService getScheduler(String key) {
+    switch (key) {
+      case "bazaar":
+        return getBazaarData();
+      case "notification":
+        return notificationLoop();
+      case "crafting":
+        return craftingLoop();
+      case "suggestion":
+        return suggestionLoop();
+      case "collection":
+        return collectionLoop();
+    }
+    return null;
   }
 
-  public void outdatedNotification() {
+  private void shutdownWatcher() {
     Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-      if (!inOutdatedRequest) {
-        inOutdatedRequest = true;
-        try {
-          if (BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled)) {
-            BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
-            if (BazaarNotifier.orders.length() > 0) {
-              for (int i = 0; i < BazaarNotifier.orders.length(); i++) {
-                JSONObject currentOrder = BazaarNotifier.orders.getJSONObject(i);
-                String key = BazaarNotifier.bazaarConversionsReversed
-                    .getString(currentOrder.getString("product"));
-                double price = currentOrder.getDouble("pricePerUnit");
-                if (currentOrder.getString("type").equals("buy")) {
-                  double diff =
-                      BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
-                          .getJSONObject(0)
-                          .getDouble("pricePerUnit") - price;
-                  if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
-                      .getJSONObject(0).getInt("orders") != 1 && diff == 0
-                      && !currentOrder.getBoolean("matchedOrder")) {
-                    currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
-                        .put("goodOrder", false)
-                        .put("currentNotification", "MATCHED");
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Buy Order", "MATCHED"));
-                  } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Buy Order", "OUTDATED"));
-                    currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
-                        .put("goodOrder", false)
-                        .put("currentNotification", "OUTDATED");
-                  } else if (diff == 0 &&
-                      BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("sell_summary")
-                          .getJSONObject(0).getInt("orders") == 1) {
-                    if (currentOrder.getBoolean("outdatedOrder") || currentOrder
-                        .getBoolean("matchedOrder")) {
-                      Minecraft.getMinecraft().thePlayer.addChatMessage(
-                          Utils.chatNotification(key, price, i, "Buy Order", "REVIVED"));
-                    }
-                    currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
-                        .put("goodOrder", true);
-                  }
-                } else {
-                  double diff = price - BazaarNotifier.bazaarDataRaw.getJSONObject(key)
-                      .getJSONArray("buy_summary")
-                      .getJSONObject(0)
-                      .getDouble("pricePerUnit");
-                  if (BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
-                      .getJSONObject(0).getInt("orders") != 1 && diff == 0 && !currentOrder
-                      .getBoolean("matchedOrder")) {
-                    currentOrder.put("matchedOrder", true).put("outdatedOrder", false)
-                        .put("goodOrder", false)
-                        .put("currentNotification", "MATCHED");
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Sell Offer", "MATCHED"));
-                  } else if (diff > 0 && !currentOrder.getBoolean("outdatedOrder")) {
-                    currentOrder.put("outdatedOrder", true).put("matchedOrder", false)
-                        .put("goodOrder", false)
-                        .put("currentNotification", "OUTDATED");
-                    Minecraft.getMinecraft().thePlayer
-                        .addChatMessage(
-                            Utils.chatNotification(key, price, i, "Sell Offer", "OUTDATED"));
-                  } else if (diff == 0
-                      && BazaarNotifier.bazaarDataRaw.getJSONObject(key).getJSONArray("buy_summary")
-                      .getJSONObject(0).getInt("orders") == 1) {
-                    if (currentOrder.getBoolean("outdatedOrder") || currentOrder
-                        .getBoolean("matchedOrder")) {
-                      Minecraft.getMinecraft().thePlayer.addChatMessage(
-                          Utils.chatNotification(key, price, i, "Sell Offer", "REVIVED"));
-                    }
-                    currentOrder.put("outdatedOrder", false).put("matchedOrder", false)
-                        .put("goodOrder", true);
-                  }
-                }
-              }
-            }
+      for (Entry<String, ScheduledExecutorService> entry : executors.entrySet()) {
+        if (entry.getValue().isShutdown()) {
+          if (Minecraft.getMinecraft() != null && Minecraft.getMinecraft().thePlayer != null) {
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+                BazaarNotifier.prefix + EnumChatFormatting.RED + "Something has caused the " + entry
+                    .getKey()
+                    + " scheduler to crash. Please report this to the discord server (/bn discord)"));
+
           }
-        } catch (Exception e) {
-          e.printStackTrace();
+          executors.put(entry.getKey(), getScheduler(entry.getKey()));
         }
-        inOutdatedRequest = false;
+      }
+    }, 1, 1, TimeUnit.MINUTES);
+  }
+
+  public ScheduledExecutorService craftingLoop() {
+    ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
+    ex.scheduleAtFixedRate(() -> {
+      try {
+        CraftingCalculator.getBestEnchantRecipes();
+      } catch (Exception t) {
+        t.printStackTrace();
+      }
+    }, 5, 5, TimeUnit.SECONDS);
+    return ex;
+  }
+
+  public ScheduledExecutorService getBazaarData() {
+    ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
+    ex.scheduleAtFixedRate(() -> {
+      if (BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey
+          || BazaarNotifier.apiKeyDisabled)) {
+        try {
+          BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
+        } catch (Exception t) {
+          t.printStackTrace();
+        }
       }
     }, 0, 2, TimeUnit.SECONDS);
+    return ex;
+  }
+
+  public ScheduledExecutorService suggestionLoop() {
+    ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
+    ex.scheduleAtFixedRate(() -> {
+      try {
+        SuggestionCalculator.basic();
+      } catch (Exception t) {
+        t.printStackTrace();
+      }
+    }, 5, 5, TimeUnit.SECONDS);
+    return ex;
+  }
+
+  public ScheduledExecutorService collectionLoop() {
+    ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
+    ex.scheduleAtFixedRate(() -> {
+      try {
+        CraftingCalculator.getUnlockedRecipes();
+      } catch (Exception t) {
+        t.printStackTrace();
+      }
+    }, 5, 5, TimeUnit.MINUTES);
+    return ex;
+  }
+
+
+  public ScheduledExecutorService notificationLoop() {
+    ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
+    ex.scheduleAtFixedRate(() -> {
+      try {
+        for (Order order : BazaarNotifier.orders) {
+          order.updateStatus();
+        }
+      } catch (Exception t) {
+        t.printStackTrace();
+      }
+    }, 0, 2, TimeUnit.SECONDS);
+
+    return ex;
   }
 }

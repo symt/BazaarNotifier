@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.27.2",
     "discord.js": "^13.7.0",
     "dotenv": "^8.2.0"
   }

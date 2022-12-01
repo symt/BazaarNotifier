@@ -20,7 +20,13 @@ build
 # other
 eclipse
 run
+.vscode
 
 .env
 node_modules
 .DS_STORE
+
+# resources file (downloaded from github on build)
+src/main/resources/resources.json
+
+sync
