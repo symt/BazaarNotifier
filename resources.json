@@ -795,7 +795,16 @@
   		"DIVER_FRAGMENT": "Emperor's Skull",
   		"WINTER_WATER_ORB": "Winter Water Orb",
 		"RITUAL_RESIDUE": "Ritual Residue",
-  		"MITE_GEL": "Mite Gel"
+  		"MITE_GEL": "Mite Gel",
+		"SALT_CUBE": "Salt Cube",
+		"ENCHANTMENT_EXPERIENCE_5": "Experience V",
+		"RUSTY_ANCHOR": "Rusty Anchor",
+		"GLACIAL_FRAGMENT": "Glacial Fragment",
+		"ENCHANTMENT_PROSPERITY_1": "Prosperity I",
+		"ENCHANTMENT_PROSPERITY_3": "Prosperity III",
+		"ENCHANTMENT_PROSPERITY_2": "Prosperity II",
+		"ENCHANTMENT_PROSPERITY_5": "Prosperity V",
+		"ENCHANTMENT_PROSPERITY_4": "Prosperity IV"
 	},
 	"enchantCraftingList": {
 		"normal": {},
