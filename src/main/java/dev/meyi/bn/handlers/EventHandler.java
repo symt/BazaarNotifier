@@ -38,6 +38,10 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
+    if (message.startsWith("[Bazaar] Claimed") || message.startsWith("[Bazaar] Bought") || message.startsWith("[Bazaar] Sold")) {
+      BankCalculator.evaluate(message);
+    }
+
     if (message.startsWith("Buy Order Setup!") || message.startsWith("Sell Offer Setup!")
         || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith(
         "[Bazaar] Sell Offer Setup!")) {
@@ -45,7 +49,6 @@ public class EventHandler {
           BazaarNotifier.bazaarConv.inverse().get(message.split("x ", 2)[1].split(" for ")[0]))
           && productVerify[1].equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
-        BankCalculator.getBazaarProfit();
         verify = null;
         productVerify = new String[2];
       }
@@ -120,11 +123,7 @@ public class EventHandler {
         }
       }
     } else if (message.startsWith("Bazaar! Claimed ") || message.startsWith("[Bazaar] Claimed")) {
-      ChestTickHandler.lastScreenDisplayName = ""; // Force update on next tick
-      // ChestTickHandler.updateBazaarOrders(
-      //    ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory);
-    } else if (message.startsWith("Welcome to Hypixel SkyBlock!")) {
-      BankCalculator.getPurse();
+      ChestTickHandler.lastScreenDisplayName = "";
     } else if (message.startsWith("Your new API key is")) {
       String apiKey = message.split("key is ")[1];
       try {
@@ -157,10 +156,8 @@ public class EventHandler {
     if (e.gui instanceof GuiChest && (BazaarNotifier.validApiKey
         || BazaarNotifier.apiKeyDisabled)) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
-      if (chest == null) {
-        return;
-      }
-      if ((chest.hasCustomName() && (
+
+      if (chest != null && ((chest.hasCustomName() && (
           StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
               .startsWith("Bazaar") || StringUtils.stripControlCodes(
                   chest.getDisplayName().getUnformattedText())
@@ -168,66 +165,17 @@ public class EventHandler {
                   chest.getDisplayName().getUnformattedText())
               .matches("Confirm (Buy|Sell) (Order|Offer)")) || StringUtils.stripControlCodes(
           chest.getDisplayName().getUnformattedText()).contains("Bazaar"))
-          || BazaarNotifier.forceRender) {
-        if (!BazaarNotifier.inBazaar) {
-          BazaarNotifier.inBazaar = true;
-          if (!BankCalculator.orderWait) {
-            BankCalculator.purseLast = BankCalculator.getPurse();
-          }
-        }
+          || BazaarNotifier.forceRender)) {
+        BazaarNotifier.inBazaar = true;
       }
-    } else if (e.gui instanceof GuiEditSign) {
+    } else if (e.gui == null || e.gui instanceof GuiEditSign) {
       BazaarNotifier.inBazaar = false;
-    }
-
-    if (e.gui == null && BazaarNotifier.inBazaar) {
-      BazaarNotifier.inBazaar = false;
-      Thread t = new Thread(() -> {
-        BankCalculator.orderWait = true;
-        try {
-          Thread.sleep(1000);
-          BankCalculator.getBazaarProfit();
-        } catch (InterruptedException ex) {
-          ex.printStackTrace();
-        }
-        BankCalculator.orderWait = false;
-      });
-      t.start();
-    }
-
-    if (e.gui == null && BazaarNotifier.inBank) {
-      BazaarNotifier.inBank = false;
-    }
-
-    if (e.gui == null && BankCalculator.isOnDangerousPage) {
-      BankCalculator.isOnDangerousPage = false;
-      Thread t = new Thread(() -> {
-        try {
-          Thread.sleep(1000);
-          BankCalculator.bank += (BankCalculator.purseInBank - BankCalculator.getPurse());
-        } catch (InterruptedException ex) {
-          ex.printStackTrace();
-        }
-      });
-      t.start();
-
-    }
-
-    if (e.gui instanceof GuiChest) {
-      IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
-      BazaarNotifier.inBank =
-          chest != null && chest.hasCustomName() && StringUtils.stripControlCodes(
-              chest.getDisplayName().getUnformattedText()).contains("Bank")
-              && !StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
-              .contains("Bank Account Upgrades");
     }
   }
 
   @SubscribeEvent
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
     BazaarNotifier.inBazaar = false;
-    BazaarNotifier.inBank = false;
-    BankCalculator.isOnDangerousPage = false;
   }
 
   @SubscribeEvent

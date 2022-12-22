@@ -162,23 +162,6 @@ public class ChestTickHandler {
                 chest.getDisplayName().getUnformattedText());
           }
         }
-      } else if (BazaarNotifier.inBank
-          && Minecraft.getMinecraft().currentScreen instanceof GuiChest) {
-        IInventory chest = ReflectionHelper.getLowerChestInventory(
-            (GuiChest) Minecraft.getMinecraft().currentScreen);
-        if (chest == null) {
-          return;
-        }
-        String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
-        if (chestName.contains("personal bank account") && !chestName.contains("upgrade")) {
-          BankCalculator.extractBankFromItemDescription(chest, false);
-        } else if (chestName.contains("co-op bank account") && !chestName.contains("upgrade")) {
-          BankCalculator.extractBankFromItemDescription(chest, true);
-        } else if (chestName.equals("bank deposit") || chestName.equals("bank withdrawal")) {
-          BankCalculator.isOnDangerousPage = true;
-          BankCalculator.purseInBank = BankCalculator.getPurse();
-        }
-
       } else if (!BazaarNotifier.inBazaar) { // if you aren't in the bazaar, this should be clear
         ChestTickHandler.lastScreenDisplayName = "";
       }
