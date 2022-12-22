@@ -35,7 +35,7 @@ public class BankModule extends Module {
     items.add(header);
 
     LinkedHashMap<String, Color> message2 = new LinkedHashMap<>();
-    message2.put("Bazaar profit: ", Color.CYAN);
+    message2.put("Bazaar Profit: ", Color.CYAN);
     message2.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.MAGENTA);
     items.add(message2);
 
