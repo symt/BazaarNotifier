@@ -6,8 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,15 +22,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
@@ -41,7 +38,7 @@ public class Utils {
 
   public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
-    HttpClient client = HttpClientBuilder.create().build();
+    CloseableHttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
     if (!BazaarNotifier.apiKeyDisabled) {
       apiBit = "?key=" + BazaarNotifier.config.api;
@@ -50,9 +47,12 @@ public class Utils {
         "https://api.hypixel.net/skyblock/bazaar" + apiBit);
     HttpResponse response = client.execute(request);
 
+
     String result = IOUtils.toString(new BufferedReader
         (new InputStreamReader(
             response.getEntity().getContent())));
+
+    client.close();
 
     if (isJSONValid(result)) {
       return gson.fromJson(result, BazaarResponse.class);
@@ -67,7 +67,7 @@ public class Utils {
     if (!BazaarNotifier.config.api.isEmpty() && (BazaarNotifier.validApiKey
         || (BazaarNotifier.validApiKey = validateApiKey()))) {
 
-      HttpClient client = HttpClientBuilder.create().build();
+      CloseableHttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
         HttpGet request = new HttpGet(
             "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft()
@@ -89,9 +89,11 @@ public class Utils {
               + playerUUID);
       HttpResponse response = client.execute(request);
 
-      String _results = IOUtils
-          .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-      JsonObject results = gson.fromJson(_results, JsonObject.class);
+      JsonReader jsonReader = new JsonReader(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+      jsonReader.setLenient(true);
+      JsonObject results = gson.fromJson(jsonReader, JsonObject.class);
+
+      client.close();
       int profileIndex = 0;
       if (!results.get("success").getAsBoolean() || !results.has("profiles")) {
         return null;
@@ -151,9 +153,9 @@ public class Utils {
     if (uuidMatcher.matcher(key).find()) {
       try {
         if (gson.fromJson(IOUtils.toString(new BufferedReader
-            (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
-                "https://api.hypixel.net/key?key=" + key)).getEntity()
-                .getContent()))), JsonObject.class).getAsJsonObject().get("success")
+                (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
+                        "https://api.hypixel.net/key?key=" + key)).getEntity()
+                    .getContent()))), JsonObject.class).getAsJsonObject().get("success")
             .getAsBoolean()) {
           return true;
         } else {
@@ -179,22 +181,25 @@ public class Utils {
 
   public static void updateResources() throws IOException {
     Gson gson = new Gson();
-    String result;
     HttpGet request;
     HttpResponse response;
-    HttpClient client = HttpClientBuilder.create().build();
+    CloseableHttpClient client = HttpClientBuilder.create().build();
     request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
-    result = IOUtils
-        .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+
+    JsonReader jsonReader = new JsonReader(
+        new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+    jsonReader.setLenient(true);
     try {
-      BazaarNotifier.resources = gson.fromJson(result, JsonObject.class).getAsJsonObject();
+      BazaarNotifier.resources = gson.fromJson(jsonReader, JsonObject.class);
       BazaarNotifier.bazaarConv = jsonToBimap(
           BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
       BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
           .getAsJsonObject("enchantCraftingList");
     } catch (JsonSyntaxException e) {
       e.printStackTrace();
+    } finally {
+      client.close();
     }
   }
 

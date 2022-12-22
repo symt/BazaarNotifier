@@ -66,18 +66,20 @@ public class RenderUtils {
         (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
             : order.type.equals(Order.OrderType.BUY) ? EnumChatFormatting.DARK_PURPLE
                 : EnumChatFormatting.BLUE);
-    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-        messageColor + order.type.longName
-            + EnumChatFormatting.GRAY + " for "
-            + messageColor + BazaarNotifier.dfNoDecimal
-            .format(order.startAmount)
-            + EnumChatFormatting.GRAY + "x " + messageColor
-            + order.product
-            + EnumChatFormatting.YELLOW
-            + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + messageColor + BazaarNotifier.df.format(order.pricePerUnit)
-            + EnumChatFormatting.GRAY + ")"
-    ));
+    if (Minecraft.getMinecraft().thePlayer != null) {
+      Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+          messageColor + order.type.longName
+              + EnumChatFormatting.GRAY + " for "
+              + messageColor + BazaarNotifier.dfNoDecimal
+              .format(order.startAmount)
+              + EnumChatFormatting.GRAY + "x " + messageColor
+              + order.product
+              + EnumChatFormatting.YELLOW
+              + " " + notification + " " + EnumChatFormatting.GRAY + "("
+              + messageColor + BazaarNotifier.df.format(order.pricePerUnit)
+              + EnumChatFormatting.GRAY + ")"
+      ));
+    }
   }
 
   public static void drawCenteredString(String text, int x, int y, int color, float moduleScale) {
