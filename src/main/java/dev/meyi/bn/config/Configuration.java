@@ -22,6 +22,8 @@ public class Configuration {
   public boolean showChatMessages;
   public boolean useBuyOrders;
   public boolean suggestionShowEnchantments;
+  public boolean bankRawDifference;
+
   public String api = "";
   public String version;
   public ModuleConfig[] modules;
@@ -35,7 +37,7 @@ public class Configuration {
   public Configuration(boolean collectionCheck, int craftingSortingOption,
       int craftingListLength, boolean suggestionShowEnchantments,
       boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
-      int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders, double bazaarProfit,
+      int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders, double bazaarProfit, boolean bankRawDifference,
       ModuleConfig[] modules) {
     this.collectionCheck = collectionCheck;
     this.craftingSortingOption = craftingSortingOption;
@@ -46,6 +48,7 @@ public class Configuration {
     this.showProfitPerMil = showProfitPerMil;
     this.suggestionListLength = suggestionListLength;
     this.bazaarProfit = bazaarProfit;
+    this.bankRawDifference = bankRawDifference;
     this.api =
         apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
     this.version = BazaarNotifier.VERSION;
@@ -82,7 +85,7 @@ public class Configuration {
         Defaults.SUGGESTION_SHOW_ENCHANTMENTS,
         Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
         Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
-        Defaults.USE_BUY_ORDERS, 0, c);
+        Defaults.USE_BUY_ORDERS, 0, Defaults.BANK_RAW_DIFFERENCE, c);
   }
 
   public boolean isShowSellOfferProfit() {

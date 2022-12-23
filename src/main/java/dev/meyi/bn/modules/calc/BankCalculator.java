@@ -25,13 +25,18 @@ public class BankCalculator {
   private static final Pattern instantBuy = Pattern.compile(
       "\\[Bazaar] Bought (.*)x (.*) for (.*) coins!");
   private static double calculatedProfit = 0;
+  private static double rawDifference = 0;
   private static boolean startup = true;
 
   public static double getBazaarProfit() {
     return calculatedProfit;
   }
+  public static double getRawDifference() {
+    return rawDifference;
+  }
 
   public static void calculateBazaarProfit() {
+
     for (int i = orderHistory.size() - 1; i >= 0; i--) {
       Exchange sell = orderHistory.get(i);
       if (sell.getAmount() != 0 && sell.getType() == OrderType.SELL) {
@@ -163,6 +168,7 @@ public class BankCalculator {
         orderHistory.add(e);
       }
 
+      rawDifference += (((e.getType() == OrderType.BUY) ? -1.0 : 0.99) * e.getPricePerUnit() * (double)e.getAmount());
       // Regardless of type, because reverse flipping is possible
       //  aka selling an item you already own and buying back cheaper
       calculateBazaarProfit();
@@ -177,6 +183,7 @@ public class BankCalculator {
       calculatedProfit = 0;
     }
     orderHistory.clear();
+    rawDifference = 0;
   }
 
 }

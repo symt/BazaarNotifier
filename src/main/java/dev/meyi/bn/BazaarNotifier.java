@@ -42,7 +42,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.6.1";
+  public static final String VERSION = "1.6.2-beta1";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -100,8 +100,11 @@ public class BazaarNotifier {
     try {
       if (configFile.isFile()) {
         try {
-          configString = new JsonReader(new StringReader(new String(Files.readAllBytes(Paths.get(configFile.getPath())))));
+          byte[] bytes = Files.readAllBytes(Paths.get(configFile.getPath()));
+          if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Config File");
+          configString = new JsonReader(new StringReader(new String(bytes)));
           configString.setLenient(true);
+
           config = gson.fromJson(configString, Configuration.class);
           config.version = BazaarNotifier.VERSION;
         } catch (JsonSyntaxException | MalformedJsonException e) {
@@ -115,8 +118,10 @@ public class BazaarNotifier {
     try {
       if (resourcesFile.isFile()) {
         try {
+          byte[] bytes = Files.readAllBytes(Paths.get(resourcesFile.getPath()));
+          if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Resources File");
           JsonReader resourcesReader = new JsonReader(new StringReader(new String(
-              Files.readAllBytes(Paths.get(resourcesFile.getPath())))));
+              bytes)));
           resourcesReader.setLenient(true);
           resources = gson.fromJson(resourcesReader, JsonObject.class);
         } catch (JsonSyntaxException | ClassCastException e) {

@@ -66,6 +66,8 @@ public class ModuleSettingsGui extends GuiScreen {
 
         break;
       case "BANK":
+        buttonList.add(new GuiButton(ButtonIds.BANK_RAW_DIFFERENCE.id, getButtonX(), getButtonY(), "Raw Difference: " +
+            SettingsGui.getOnOff(BazaarNotifier.config.bankRawDifference)));
         buttonList.add(new GuiButton(ButtonIds.RESET.id, getButtonX(), getButtonY(), "Reset"));
         break;
     }
@@ -116,11 +118,13 @@ public class ModuleSettingsGui extends GuiScreen {
       BazaarNotifier.config
           .setShowInstantSellProfit(!BazaarNotifier.config.isShowInstantSellProfit());
       Button.displayString =
-          "Instant Sell Profit: " + SettingsGui.getOnOff(BazaarNotifier.config.isShowInstantSellProfit());
+          "Instant Sell Profit: " + SettingsGui.getOnOff(
+              BazaarNotifier.config.isShowInstantSellProfit());
     } else if (Button.id == ButtonIds.SELL_OFFER_PROFIT.id) {
       BazaarNotifier.config.setShowSellOfferProfit(!BazaarNotifier.config.isShowSellOfferProfit());
       Button.displayString =
-          "Sell Offer Profit: " + SettingsGui.getOnOff(BazaarNotifier.config.isShowSellOfferProfit());
+          "Sell Offer Profit: " + SettingsGui.getOnOff(
+              BazaarNotifier.config.isShowSellOfferProfit());
     } else if (Button.id == ButtonIds.PROFIT_PER_MILLION.id) {
       BazaarNotifier.config.setShowProfitPerMil(!BazaarNotifier.config.isShowProfitPerMil());
       Button.displayString =
@@ -135,7 +139,13 @@ public class ModuleSettingsGui extends GuiScreen {
     } else if (Button.id == ButtonIds.USE_ENCHANTMENTS.id) {
       BazaarNotifier.config.suggestionShowEnchantments ^= true;
       Button.displayString =
-          "Show Enchantments: " + SettingsGui.getOnOff(BazaarNotifier.config.suggestionShowEnchantments);
+          "Show Enchantments: " + SettingsGui.getOnOff(
+              BazaarNotifier.config.suggestionShowEnchantments);
+    } else if (Button.id == ButtonIds.BANK_RAW_DIFFERENCE.id) {
+      BazaarNotifier.config.bankRawDifference ^= true;
+      Button.displayString =
+          "Raw Difference: " + SettingsGui.getOnOff(
+              BazaarNotifier.config.bankRawDifference);
     } else if (Button.id == ButtonIds.BACK.id) {
       BazaarNotifier.guiToOpen = "settings";
     }
@@ -181,6 +191,7 @@ public class ModuleSettingsGui extends GuiScreen {
     MATERIAL_BUYING_OPTION(8),
     RESET(9),
     USE_ENCHANTMENTS(10),
+    BANK_RAW_DIFFERENCE(11),
 
     BACK(100);
 

@@ -39,7 +39,15 @@ public class BankModule extends Module {
     message2.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.MAGENTA);
     items.add(message2);
 
-    int lines = 2;
+
+    if (BazaarNotifier.config.bankRawDifference) {
+      LinkedHashMap<String, Color> message3 = new LinkedHashMap<>();
+      message3.put("Bazaar Difference: ", Color.CYAN);
+      message3.put(BazaarNotifier.df.format(BankCalculator.getRawDifference()), Color.MAGENTA);
+      items.add(message3);
+    }
+
+    int lines = 3;
     int longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
     boundsX = x + longestXString;
     boundsY = (int) (
