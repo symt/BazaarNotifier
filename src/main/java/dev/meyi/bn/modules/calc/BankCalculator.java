@@ -163,9 +163,9 @@ public class BankCalculator {
         orderHistory.add(e);
       }
 
-      if (type == OrderType.SELL) {
-        calculateBazaarProfit();
-      }
+      // Regardless of type, because reverse flipping is possible
+      //  aka selling an item you already own and buying back cheaper
+      calculateBazaarProfit();
     }
   }
 
