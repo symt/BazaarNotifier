@@ -43,7 +43,7 @@ public class ModuleSettingsGui extends GuiScreen {
             100, BazaarNotifier.config.craftingListLength, false, true));
         buttonList.add(new GuiButton(ButtonIds.COLLECTION_CHECK.id, getButtonX(),
             getButtonY(), "Collection Check: " +
-            SettingsGui.getOnOff(!BazaarNotifier.config.collectionCheckDisabled)));
+            SettingsGui.getOnOff(BazaarNotifier.config.collectionCheck)));
         if (!BazaarNotifier.validApiKey) {
           buttonList.get(3).enabled = false;
         }
@@ -87,16 +87,17 @@ public class ModuleSettingsGui extends GuiScreen {
         BazaarNotifier.config.craftingListLength = (int) Math.round(lengthSlider.getValue());
       }
     } else if (Button.id == ButtonIds.COLLECTION_CHECK.id) {
-      BazaarNotifier.config.collectionCheckDisabled ^= true;
+      BazaarNotifier.config.collectionCheck ^= true;
       Button.displayString =
-          "Collection Check: " + SettingsGui.getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
+          "Collection Check: " + SettingsGui.getOnOff(BazaarNotifier.config.collectionCheck);
 
-      if (!BazaarNotifier.config.collectionCheckDisabled) {
+      if (BazaarNotifier.config.collectionCheck) {
         new Thread(() -> {
           CraftingCalculator.getUnlockedRecipes();
           Button.displayString =
-              "Collection Check: " + SettingsGui.getOnOff(!BazaarNotifier.config.collectionCheckDisabled);
-          if (BazaarNotifier.config.collectionCheckDisabled) {
+              "Collection Check: " + SettingsGui.getOnOff(
+                  BazaarNotifier.config.collectionCheck);
+          if (!BazaarNotifier.config.collectionCheck) {
             Minecraft.getMinecraft().thePlayer
                 .addChatMessage(new ChatComponentText(BazaarNotifier.prefix +
                     EnumChatFormatting.RED

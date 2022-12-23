@@ -2,10 +2,8 @@ package dev.meyi.bn.handlers;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
-import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,7 +25,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 public class ChestTickHandler {
 
   public static String lastScreenDisplayName = "";
-  private static long date = System.currentTimeMillis();
 
   // /blockdata x y z {CustomName:"___"} << For Custom Chest Name Testing
 
@@ -179,21 +176,33 @@ public class ChestTickHandler {
 
       String product = StringUtils.stripControlCodes(
           chest.getStackInSlot(13).getTagCompound().getCompoundTag("display").getTagList("Lore", 8)
-              .getStringTagAt(4)).split("x ")[1];
+              .getStringTagAt(4)).split("x ", 2)[1];
+
+      String productName;
 
       if (!BazaarNotifier.bazaarConv.containsValue(product)) {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.RED
-                + "The bazaar item you just put an order for doesn't exist. Please report this in the discord server"));
-        if (System.currentTimeMillis() > date + (60 * 60 * 1000)) {
-          try {
-            Utils.updateResources();
-          } catch (IOException ignored) {
-          }
+        String[] possibleConversion = Utils.getItemIdFromName(product);
+        productName = possibleConversion[1];
+
+        if (!possibleConversion[0].equals(product) && !productName.isEmpty()) {
+          BazaarNotifier.bazaarConv.put(productName, product);
+          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+              BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "A possible conversion was found. Please report this to the discord server:"
+                  + EnumChatFormatting.GRAY + " \""
+                  + productName + "\" - \"" + product + "\" \"" + possibleConversion[0] + "\"."));
+        } else {
+          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
+              BazaarNotifier.prefix + EnumChatFormatting.RED
+                  + "No item conversion was found for that item. Please report this to the discord server: "
+                  + EnumChatFormatting.GRAY + "\""
+                  + product + "\"."));
         }
-        date = System.currentTimeMillis();
       } else {
-        String productName = BazaarNotifier.bazaarConv.inverse().get(product);
+        productName = BazaarNotifier.bazaarConv.inverse().get(product);
+      }
+
+      if (BazaarNotifier.bazaarConv.containsKey(productName)) {
         String productWithAmount = StringUtils.stripControlCodes(
             chest.getStackInSlot(13).getTagCompound().getCompoundTag("display")
                 .getTagList("Lore", 8).getStringTagAt(4)).split(": ")[1];

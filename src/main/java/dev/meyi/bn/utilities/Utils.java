@@ -47,7 +47,6 @@ public class Utils {
         "https://api.hypixel.net/skyblock/bazaar" + apiBit);
     HttpResponse response = client.execute(request);
 
-
     String result = IOUtils.toString(new BufferedReader
         (new InputStreamReader(
             response.getEntity().getContent())));
@@ -64,8 +63,9 @@ public class Utils {
 
   public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
-    if (!BazaarNotifier.config.api.isEmpty() && (BazaarNotifier.validApiKey
-        || (BazaarNotifier.validApiKey = validateApiKey()))) {
+    if (BazaarNotifier.config.collectionCheck && !BazaarNotifier.config.api.isEmpty() && (
+        BazaarNotifier.validApiKey
+            || (BazaarNotifier.validApiKey = validateApiKey()))) {
 
       CloseableHttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
@@ -89,13 +89,21 @@ public class Utils {
               + playerUUID);
       HttpResponse response = client.execute(request);
 
-      JsonReader jsonReader = new JsonReader(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+      JsonReader jsonReader = new JsonReader(
+          new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
       jsonReader.setLenient(true);
-      JsonObject results = gson.fromJson(jsonReader, JsonObject.class);
+
+      JsonObject results = null;
+
+      try {
+        results = gson.fromJson(jsonReader, JsonObject.class);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
 
       client.close();
       int profileIndex = 0;
-      if (!results.get("success").getAsBoolean() || !results.has("profiles")) {
+      if (results == null || !results.get("success").getAsBoolean() || !results.has("profiles")) {
         return null;
       }
 
@@ -132,7 +140,7 @@ public class Utils {
       }
       return unlockedCollections;
     } else {
-      BazaarNotifier.config.collectionCheckDisabled = true;
+      BazaarNotifier.config.collectionCheck = false;
 
       return null;
     }
@@ -141,9 +149,9 @@ public class Utils {
   public static boolean isJSONValid(String jsonInString) {
     Gson gson = new Gson();
     try {
-      gson.fromJson(jsonInString, Object.class);
+      gson.fromJson(jsonInString, JsonObject.class);
       return true;
-    } catch (com.google.gson.JsonSyntaxException ex) {
+    } catch (Exception ex) {
       return false;
     }
   }
@@ -159,13 +167,15 @@ public class Utils {
             .getAsBoolean()) {
           return true;
         } else {
-          BazaarNotifier.config.collectionCheckDisabled = true;
+          BazaarNotifier.config.collectionCheck = false;
           return false;
         }
       } catch (JsonSyntaxException e) {
+        BazaarNotifier.config.collectionCheck = false;
         return false;
       }
     }
+    BazaarNotifier.config.collectionCheck = false;
     return false;
   }
 
@@ -173,7 +183,7 @@ public class Utils {
     if (validateApiKey(BazaarNotifier.config.api)) {
       return true;
     } else {
-      BazaarNotifier.config.collectionCheckDisabled = true;
+      BazaarNotifier.config.collectionCheck = false;
       return false;
     }
   }
