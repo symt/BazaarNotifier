@@ -33,7 +33,7 @@ public class CraftingCalculator {
           .getAsJsonObject(itemName)
           .get("collection").getAsString();
 
-      if (!BazaarNotifier.config.collectionCheckDisabled && !(unlockedRecipes.contains(collection)
+      if (BazaarNotifier.config.collectionCheck && !(unlockedRecipes.contains(collection)
           || collection.equals("NONE"))) {
         continue;
       }
@@ -170,10 +170,10 @@ public class CraftingCalculator {
 
         // Honestly, if this is empty, we should just assume something went wrong and disable the collection check.
         if (unlockedRecipes.size() == 0) {
-          BazaarNotifier.config.collectionCheckDisabled = true;
+          BazaarNotifier.config.collectionCheck = false;
         }
       } else {
-        BazaarNotifier.config.collectionCheckDisabled = true;
+        BazaarNotifier.config.collectionCheck = false;
       }
     } catch (IOException e) {
       e.printStackTrace();

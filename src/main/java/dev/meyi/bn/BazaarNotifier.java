@@ -16,6 +16,7 @@ import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.ModuleList;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
@@ -41,7 +42,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.6.0";
+  public static final String VERSION = "1.6.1";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -152,6 +153,8 @@ public class BazaarNotifier {
       enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
       bazaarConv = Utils.jsonToBimap(bazaarConversions);
     }
+
+    BankCalculator.reset();
   }
 
 

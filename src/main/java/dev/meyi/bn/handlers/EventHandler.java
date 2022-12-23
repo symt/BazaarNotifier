@@ -133,8 +133,6 @@ public class EventHandler {
           BazaarNotifier.config.api = apiKey;
           BazaarNotifier.validApiKey = true;
           BazaarNotifier.activeBazaar = true;
-          CraftingCalculator.getUnlockedRecipes();
-          BazaarNotifier.config.collectionCheckDisabled = false;
         } else {
           Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
               BazaarNotifier.prefix + EnumChatFormatting.RED

@@ -60,8 +60,8 @@ public class Exchange {
   }
 
   public boolean canCraft() {
-    return BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(productId)
-        && type == OrderType.SELL;
+    return type == OrderType.SELL && BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+        .has(productId);
   }
 
   @Override
