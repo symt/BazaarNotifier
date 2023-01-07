@@ -196,7 +196,7 @@ public class NotificationModule extends Module {
           ppu = ppu.toLowerCase().replace("price per unit: ", "").replace(" coins", "")
               .replaceAll(",", "");
 
-          if (!ppu.contains("expired!")) {
+          if (!ppu.contains("expired!") && !ppu.contains("expires in")) {
 
             double pricePerUnit = Double.parseDouble(ppu);
 
