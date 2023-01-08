@@ -1,5 +1,6 @@
 package dev.meyi.bn.modules.calc;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.module.CraftingModule;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +33,7 @@ public class CraftingCalculator {
           .getAsJsonObject(itemName)
           .get("collection").getAsString();
 
-      if (!BazaarNotifier.config.collectionCheckDisabled && !(unlockedRecipes.contains(collection)
+      if (BazaarNotifier.config.collectionCheck && !(unlockedRecipes.contains(collection)
           || collection.equals("NONE"))) {
         continue;
       }
@@ -150,6 +152,16 @@ public class CraftingCalculator {
 
   }
 
+  public static Map<String, Integer> getMaterialsMap(String productId) {
+    JsonArray materialsArray = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
+        .getAsJsonObject(productId).getAsJsonArray("material");
+    Map<String, Integer> materials = new HashMap<>();
+    for (int i = 0; i < materialsArray.size(); i += 2) {
+      materials.put(materialsArray.get(i).getAsString(), materialsArray.get(i+1).getAsInt());
+    }
+    return materials;
+  }
+
   public static void getUnlockedRecipes() {
     try {
       List<String> s = Utils.unlockedRecipes();
@@ -158,10 +170,10 @@ public class CraftingCalculator {
 
         // Honestly, if this is empty, we should just assume something went wrong and disable the collection check.
         if (unlockedRecipes.size() == 0) {
-          BazaarNotifier.config.collectionCheckDisabled = true;
+          BazaarNotifier.config.collectionCheck = false;
         }
       } else {
-        BazaarNotifier.config.collectionCheckDisabled = true;
+        BazaarNotifier.config.collectionCheck = false;
       }
     } catch (IOException e) {
       e.printStackTrace();

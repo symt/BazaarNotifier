@@ -3,6 +3,7 @@ package dev.meyi.bn.config;
 import com.google.gson.Gson;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.Defaults;
 import java.io.File;
 import java.io.IOException;
@@ -14,27 +15,31 @@ public class Configuration {
 
   private static final int MODULE_LENGTH = 4;
 
-  public boolean collectionCheckDisabled;
+  public boolean collectionCheck;
   public int craftingSortingOption;
   public int craftingListLength;
   public int suggestionListLength;
   public boolean showChatMessages;
   public boolean useBuyOrders;
   public boolean suggestionShowEnchantments;
+  public boolean bankRawDifference;
+
   public String api = "";
   public String version;
   public ModuleConfig[] modules;
+
+  public double bazaarProfit = 0;
 
   private boolean showInstantSellProfit;
   private boolean showSellOfferProfit;
   private boolean showProfitPerMil;
 
-  public Configuration(boolean collectionCheckDisabled, int craftingSortingOption,
+  public Configuration(boolean collectionCheck, int craftingSortingOption,
       int craftingListLength, boolean suggestionShowEnchantments,
       boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
-      int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders,
+      int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders, double bazaarProfit, boolean bankRawDifference,
       ModuleConfig[] modules) {
-    this.collectionCheckDisabled = collectionCheckDisabled;
+    this.collectionCheck = collectionCheck;
     this.craftingSortingOption = craftingSortingOption;
     this.craftingListLength = craftingListLength;
     this.suggestionShowEnchantments = suggestionShowEnchantments;
@@ -42,6 +47,8 @@ public class Configuration {
     this.showSellOfferProfit = showSellOfferProfit;
     this.showProfitPerMil = showProfitPerMil;
     this.suggestionListLength = suggestionListLength;
+    this.bazaarProfit = bazaarProfit;
+    this.bankRawDifference = bankRawDifference;
     this.api =
         apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
     this.version = BazaarNotifier.VERSION;
@@ -54,6 +61,7 @@ public class Configuration {
   public static void saveConfig(File file, Configuration config) {
     Gson gson = new Gson();
     BazaarNotifier.config.modules = BazaarNotifier.modules.generateConfig();
+    BazaarNotifier.config.bazaarProfit = BankCalculator.getBazaarProfit();
     try {
       if (!file.isFile()) {
         //noinspection ResultOfMethodCallIgnored
@@ -72,12 +80,12 @@ public class Configuration {
     for (ModuleName moduleName : ModuleName.values()) {
       c[i++] = ModuleConfig.generateDefaultConfig(moduleName.name());
     }
-    return new Configuration(Defaults.COLLECTION_CHECKING_DISABLED,
+    return new Configuration(Defaults.COLLECTION_CHECKING,
         Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
         Defaults.SUGGESTION_SHOW_ENCHANTMENTS,
         Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
         Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
-        Defaults.USE_BUY_ORDERS, c);
+        Defaults.USE_BUY_ORDERS, 0, Defaults.BANK_RAW_DIFFERENCE, c);
   }
 
   public boolean isShowSellOfferProfit() {

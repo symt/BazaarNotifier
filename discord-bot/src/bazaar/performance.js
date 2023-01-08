@@ -1,13 +1,15 @@
 // Version 2.0
 
 module.exports = bazaarData => {
-    bazaarData.forEach(product => {
-        let diff = product.sellOrderPrice * 0.99 - product.buyOrderPrice;
-        product.profitFlowPerMinute = ((product.sellCount + product.buyCount) === 0) ? 0 : (product.sellCount * product.buyCount)/(10080 * (product.sellCount + product.buyCount)) * diff;
-    });
+  bazaarData.forEach(product => {
+    let diff = product.sellOrderPrice * 0.99 - product.buyOrderPrice;
+    product.profitFlowPerMinute = ((product.sellCount + product.buyCount) === 0)
+        ? 0 : (product.sellCount * product.buyCount) / (10080
+        * (product.sellCount + product.buyCount)) * diff;
+  });
 
-    bazaarData.sort((a, b) => b.profitFlowPerMinute - a.profitFlowPerMinute);
-    return bazaarData;
+  bazaarData.sort((a, b) => b.profitFlowPerMinute - a.profitFlowPerMinute);
+  return bazaarData;
 }
 
 /*

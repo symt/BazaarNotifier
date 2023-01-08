@@ -5,9 +5,9 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
-import dev.meyi.bn.utilities.ColorUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Utils;
+import dev.meyi.bn.utilities.ReflectionHelper;
+import dev.meyi.bn.utilities.RenderUtils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -94,10 +94,10 @@ public class NotificationModule extends Module {
         items.add(message);
       }
 
-      longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
+      longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + longestXString;
     } else {
-      Utils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
+      RenderUtils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
       float X = x + 200 * scale;
       boundsX = (int) X;
     }
@@ -155,7 +155,11 @@ public class NotificationModule extends Module {
 
     if (Minecraft.getMinecraft().currentScreen instanceof GuiChest && BazaarNotifier.inBazaar
         && BazaarNotifier.activeBazaar) {
-      IInventory chest = ((GuiChest) Minecraft.getMinecraft().currentScreen).lowerChestInventory;
+      IInventory chest = ReflectionHelper.getLowerChestInventory(
+          (GuiChest) Minecraft.getMinecraft().currentScreen);
+      if (chest == null) {
+        return;
+      }
       String chestName = chest.getDisplayName().getUnformattedText().toLowerCase();
 
       if (chestName.contains("bazaar orders")) {
@@ -173,9 +177,10 @@ public class NotificationModule extends Module {
               || Item.itemRegistry.getIDForObject(item.getItem()) == 262) {
             continue;
           }
-          Order.OrderType type = StringUtils.stripControlCodes(item.getDisplayName()).split(" ")[0]
+          String itemDisplayName = StringUtils.stripControlCodes(item.getDisplayName());
+          Order.OrderType type = itemDisplayName.split(" ")[0]
               .equalsIgnoreCase("sell") ? Order.OrderType.SELL : Order.OrderType.BUY;
-          String product = StringUtils.stripControlCodes(item.getDisplayName())
+          String product = itemDisplayName
               .replaceAll("SELL ", "").replaceAll("BUY ", "");
           NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
               .getTagList("Lore", 8);
@@ -183,18 +188,24 @@ public class NotificationModule extends Module {
           for (int k = 0; k < lorePreFilter.tagCount(); k++) {
             lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(k)));
           }
+
           int amount = Integer.parseInt(
-              lore.get(2).toLowerCase().split("amount: ")[1].replace(".", "").replaceAll("x", ""));
+              lore.get(2).toLowerCase().split("amount: ")[1].replaceAll("[x,.]", ""));
+
           String ppu = lore.get(3).equals("") ? lore.get(4) : lore.get(5);
           ppu = ppu.toLowerCase().replace("price per unit: ", "").replace(" coins", "")
               .replaceAll(",", "");
-          double pricePerUnit = Double.parseDouble(ppu);
 
-          Order o = new Order(product, type, pricePerUnit, amount);
+          if (!ppu.contains("expired!") && !ppu.contains("expires in")) {
 
-          for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
-            if (o.matches(BazaarNotifier.orders.get(hoveredText))) {
-              drawOnSlot(chest.getSizeInventory(), j, 0xff00ff00);
+            double pricePerUnit = Double.parseDouble(ppu);
+
+            Order o = new Order(product, type, pricePerUnit, amount);
+
+            for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
+              if (o.matches(BazaarNotifier.orders.get(hoveredText))) {
+                drawOnSlot(chest.getSizeInventory(), j, 0xff00ff00);
+              }
             }
           }
         }

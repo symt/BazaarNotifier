@@ -1,173 +1,189 @@
 package dev.meyi.bn.modules.calc;
 
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.Order;
-import java.util.Collection;
+import dev.meyi.bn.json.Exchange;
+import dev.meyi.bn.json.Order.OrderType;
+import dev.meyi.bn.utilities.Utils;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.scoreboard.Score;
-import net.minecraft.scoreboard.ScoreObjective;
-import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.util.StringUtils;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class BankCalculator {
 
-  public static double purseLast = 0;
-  public static boolean orderWait = false;
-  public static double purseInBank = 0; //fix for personal bank
-  public static boolean isOnDangerousPage = false; //a page that can instantly close the bank gui without opening it again
-  public static double bank = 0;
-  private static double bazaarProfit2 = 0;
-  private static double purseBackup = 0;
-  private static boolean personalBankInitialised = false;
-  private static boolean coopBankInitialised = false;
-  private static boolean purseInitialised = false;
-  private static double moneyOnStartup = 0;
+  private static final List<Exchange> orderHistory = new ArrayList<>();
+  private static final Pattern sellOffer = Pattern.compile(
+      "\\[Bazaar] Claimed .* coins from selling (.*)x (.*) at (.*) each!");
+  private static final Pattern buyOrder = Pattern.compile(
+      "\\[Bazaar] Claimed (.*)x (.*) worth .* coins bought for (.*) each!");
+  private static final Pattern instantSell = Pattern.compile(
+      "\\[Bazaar] Sold (.*)x (.*) for (.*) coins!");
+  private static final Pattern instantBuy = Pattern.compile(
+      "\\[Bazaar] Bought (.*)x (.*) for (.*) coins!");
+  private static double calculatedProfit = 0;
+  private static double rawDifference = 0;
+  private static boolean startup = true;
 
   public static double getBazaarProfit() {
-    bazaarProfit2 += getPurse() - purseLast;
-    purseLast = getPurse();
-    return bazaarProfit2;
+    return calculatedProfit;
+  }
+  public static double getRawDifference() {
+    return rawDifference;
   }
 
-  public static double calculateProfit() {
-    return getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank
-        - moneyOnStartup;
-  }
+  public static void calculateBazaarProfit() {
 
-
-  public static double moneyStoredInSellOffers() {
-    if (BazaarNotifier.orders.size() != 0) {
-      double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
-        if (BazaarNotifier.orders.get(i).type.equals(Order.OrderType.SELL)) {
-          orderWorth += BazaarNotifier.orders.get(i).orderValue;
-        }
-      }
-      return orderWorth;
-    }
-    return 0;
-  }
-
-  public static double moneyStoredInBuyOrders() {
-    if (BazaarNotifier.orders.size() != 0) {
-      double orderWorth = 0;
-      for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
-        if (BazaarNotifier.orders.get(i).type.equals(Order.OrderType.BUY)) {
-          orderWorth += BazaarNotifier.orders.get(i).orderValue;
-        }
-      }
-      return orderWorth;
-    }
-    return 0;
-  }
-
-  public static double getPurse() {
-    double ps = getPurseFromSidebar();
-    if (ps == -1) {
-      return purseBackup;
-    } else {
-      if (!purseInitialised) {
-        moneyOnStartup += ps;
-        purseInitialised = true;
-      }
-      return ps;
-    }
-  }
-
-  private static double getPurseFromSidebar() {
-    if (Minecraft.getMinecraft().theWorld == null) {
-      return -1;
-    }
-    Scoreboard scoreboard = Minecraft.getMinecraft().theWorld.getScoreboard();
-    if (scoreboard == null) {
-      return -1;
-    }
-
-    ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
-
-    if (objective == null) {
-      return -1;
-    }
-
-    Collection<Score> scores = scoreboard.getSortedScores(objective);
-    List<Score> list = scores.stream()
-        .filter(input -> input != null && input.getPlayerName() != null && !input.getPlayerName()
-            .startsWith("#")).collect(Collectors.toList());
-
-    if (list.size() > 15) {
-      scores = Lists.newArrayList(Iterables.skip(list, scores.size() - 15));
-    } else {
-      scores = list;
-    }
-
-    for (Score score : scores) {
-      ScorePlayerTeam team = scoreboard.getPlayersTeam(score.getPlayerName());
-      if (ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()).contains("Purse")) {
-        if (ScorePlayerTeam.formatPlayerName(team, score.getPlayerName())
-            .contains(")")) {// coins get added to your purse
-          String purse = StringUtils
-              .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()));
-          int i = purse.indexOf("(");
-          String s = purse.substring(i + 1, purse.length() - 1);
-          purse = purse.replace(s, "").replaceAll("[^0-9 .]", "");
-          purseBackup = Float.parseFloat(purse);
-          return purseBackup;
-        } else {
-          String purse = StringUtils
-              .stripControlCodes(ScorePlayerTeam.formatPlayerName(team, score.getPlayerName()))
-              .replaceAll("[^0-9 +.]", "");
-          purseBackup = Float.parseFloat(purse);
-          return purseBackup;
-        }
-      }
-    }
-
-    return -1;
-  }
-
-  public static void extractBankFromItemDescription(IInventory chest, boolean isCoop) {
-    // TODO: Test co-op check
-    if (chest != null) {
-      if (chest.getStackInSlot(11) != null) {
-        if (chest.getStackInSlot(11).getDisplayName().toLowerCase().contains("deposit coins")) {
-          if (!isCoop) {
-            if (!personalBankInitialised) {
-              double p = Double.parseDouble(StringUtils.stripControlCodes(
-                  chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                      .getTagList("Lore", 8)
-                      .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
-              bank += p;
-              moneyOnStartup += p;
-              personalBankInitialised = true;
+    for (int i = orderHistory.size() - 1; i >= 0; i--) {
+      Exchange sell = orderHistory.get(i);
+      if (sell.getAmount() != 0 && sell.getType() == OrderType.SELL) {
+        for (int j = orderHistory.size() - 1; j >= 0; j--) {
+          Exchange buy = orderHistory.get(j);
+          if (buy.getAmount() != 0 && sell.matchesOrder(buy)) {
+            if (buy.getAmount() >= sell.getAmount()) {
+              calculatedProfit +=
+                  sell.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
+              buy.removeAmount(sell.getAmount());
+              sell.removeAmount(sell.getAmount());
+            } else {
+              calculatedProfit +=
+                  buy.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
+              sell.removeAmount(buy.getAmount());
+              buy.removeAmount(buy.getAmount());
             }
-          } else {
-            if (!coopBankInitialised) {
-              double p = Double.parseDouble(StringUtils.stripControlCodes(
-                  chest.getStackInSlot(11).getTagCompound().getCompoundTag("display")
-                      .getTagList("Lore", 8)
-                      .getStringTagAt(0)).split("balance: ")[1].replaceAll(",", ""));
-              bank += p;
-              moneyOnStartup += p;
-              coopBankInitialised = true;
+
+            if (sell.getAmount() == 0) {
+              break;
             }
           }
         }
       }
     }
+
+    orderHistory.removeIf(v -> v.getAmount() == 0);
+
+    craftingLoop:
+    for (int i = orderHistory.size() - 1; i >= 0; i--) {
+      if (orderHistory.get(i).getAmount() != 0 && orderHistory.get(i).canCraft()) {
+        Map<String, Integer> craftingResources = orderHistory.get(i).getCraftingResources();
+        Map<String, List<Exchange>> availableResources = new HashMap<>();
+        craftingResources.keySet().forEach(key -> availableResources.put(key, new ArrayList<>()));
+        for (Exchange exchange : orderHistory) {
+          if (exchange.getType() == OrderType.BUY && craftingResources.containsKey(
+              exchange.getProductId())) {
+            availableResources.get(exchange.getProductId()).add(exchange);
+          }
+        }
+
+        int maxCrafting = orderHistory.get(i).getAmount();
+
+        for (Entry<String, List<Exchange>> entry : availableResources.entrySet()) {
+          int amountAvailable = 0;
+          for (Exchange e : entry.getValue()) {
+            amountAvailable += e.getAmount();
+          }
+
+          int craftCost = craftingResources.get(entry.getKey());
+
+          if (amountAvailable < craftCost) {
+            break craftingLoop;
+          } else {
+            maxCrafting = Math.min(maxCrafting, amountAvailable / craftCost);
+          }
+        }
+
+        double buyValue = 0;
+
+        if (maxCrafting > 0) {
+          for (String key : availableResources.keySet()) {
+            int valueToRemove = maxCrafting * craftingResources.get(key);
+            for (Exchange e : availableResources.get(key)) {
+              if (e.getAmount() >= valueToRemove) {
+                buyValue += valueToRemove * e.getPricePerUnit();
+                e.removeAmount(valueToRemove);
+                valueToRemove = 0;
+              } else {
+                buyValue += e.getAmount() * e.getPricePerUnit();
+                valueToRemove -= e.getAmount();
+                e.removeAmount(e.getAmount());
+              }
+            }
+          }
+        }
+        orderHistory.get(i).removeAmount(maxCrafting);
+        calculatedProfit +=
+            ((double) maxCrafting * orderHistory.get(i).getPricePerUnit()) * .99 - buyValue;
+      }
+    }
+
+    orderHistory.removeIf(v -> v.getAmount() == 0);
   }
 
-  public static void reset() {
-    moneyOnStartup = getPurse() + moneyStoredInBuyOrders() + moneyStoredInSellOffers() + bank;
-    bazaarProfit2 = 0;
+  public static void evaluate(String message) {
+    String productId;
+    double pricePerUnit;
+    int amount;
+    OrderType type;
+
+    Matcher m;
+
+    if ((m = sellOffer.matcher(message)).find()) {
+      type = OrderType.SELL;
+      amount = Integer.parseInt(m.group(1).replaceAll("[,.]", ""));
+      pricePerUnit = Double.parseDouble(m.group(3).replaceAll(",", ""));
+    } else if ((m = instantSell.matcher(message)).find()) {
+      type = OrderType.SELL;
+      amount = Integer.parseInt(m.group(1).replaceAll("[,.]", ""));
+      double coins = Double.parseDouble(m.group(3).replaceAll(",", ""));
+      pricePerUnit = coins / (double) amount;
+    } else if ((m = buyOrder.matcher(message)).find()) {
+      type = OrderType.BUY;
+      amount = Integer.parseInt(m.group(1).replaceAll("[,.]", ""));
+      pricePerUnit = Double.parseDouble(m.group(3).replaceAll(",", ""));
+    } else if ((m = instantBuy.matcher(message)).find()) {
+      type = OrderType.BUY;
+      amount = Integer.parseInt(m.group(1).replaceAll("[,.]", ""));
+      double coins = Double.parseDouble(m.group(3).replaceAll(",", ""));
+      pricePerUnit = coins / (double) amount;
+    } else {
+      return;
+    }
+
+    if (BazaarNotifier.bazaarConv.containsValue(m.group(2))) {
+      productId = BazaarNotifier.bazaarConv.inverse().get(m.group(2));
+    } else {
+      productId = Utils.getItemIdFromName(m.group(2))[1];
+    }
+
+    if (!productId.isEmpty()) {
+      Exchange e = new Exchange(type, productId, pricePerUnit, amount);
+
+      int index;
+      if ((index = orderHistory.indexOf(e)) != -1) {
+        orderHistory.get(index).addAmount(amount);
+      } else {
+        orderHistory.add(e);
+      }
+
+      rawDifference += (((e.getType() == OrderType.BUY) ? -1.0 : 0.99) * e.getPricePerUnit() * (double)e.getAmount());
+      // Regardless of type, because reverse flipping is possible
+      //  aka selling an item you already own and buying back cheaper
+      calculateBazaarProfit();
+    }
   }
 
+  public static synchronized void reset() {
+    if (startup) {
+      startup = false;
+      calculatedProfit = BazaarNotifier.config.bazaarProfit;
+    } else {
+      calculatedProfit = 0;
+    }
+    orderHistory.clear();
+    rawDifference = 0;
+  }
 
 }

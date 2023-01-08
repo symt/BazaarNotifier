@@ -5,9 +5,8 @@ import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
-import dev.meyi.bn.utilities.ColorUtils;
+import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
-import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -166,11 +165,11 @@ public class CraftingModule extends Module {
           items.add(message);
         }
       }
-      this.longestXString = ColorUtils.drawColorfulParagraph(items, x, y, scale);
+      this.longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
       boundsX = x + this.longestXString;
       renderMaterials(checkHoveredText(), list);
     } else {
-      Utils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA, scale);
+      RenderUtils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA, scale);
       float X = x + 200 * scale;
       boundsX = (int) X;
     }
@@ -277,13 +276,13 @@ public class CraftingModule extends Module {
           text.put(_material.toString(), Color.LIGHT_GRAY);
         }
         material.add(text);
-        int longestXString = ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
+        int longestXString = RenderUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
             getMouseCoordinateY() - (int) (8 * scale), scale);
         Gui.drawRect(getMouseCoordinateX() - padding,
             getMouseCoordinateY() - (int) (8 * scale) - (int) (padding * scale),
             (int) (getMouseCoordinateX() + longestXString + padding * scale),
             (int) (getMouseCoordinateY() + padding * scale), 0xFF404040);
-        ColorUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
+        RenderUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
             getMouseCoordinateY() - (int) (8 * scale), scale);
       }
     }

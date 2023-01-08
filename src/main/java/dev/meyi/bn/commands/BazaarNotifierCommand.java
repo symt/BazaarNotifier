@@ -59,8 +59,6 @@ public class BazaarNotifierCommand extends CommandBase {
               BazaarNotifier.config.api = args[1];
               BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
-              CraftingCalculator.getUnlockedRecipes();
-              BazaarNotifier.config.collectionCheckDisabled = false;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED

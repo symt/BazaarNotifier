@@ -6,8 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,15 +22,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.lwjgl.opengl.GL11;
 
 public class Utils {
 
@@ -41,7 +38,7 @@ public class Utils {
 
   public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
-    HttpClient client = HttpClientBuilder.create().build();
+    CloseableHttpClient client = HttpClientBuilder.create().build();
     String apiBit = "";
     if (!BazaarNotifier.apiKeyDisabled) {
       apiBit = "?key=" + BazaarNotifier.config.api;
@@ -54,6 +51,8 @@ public class Utils {
         (new InputStreamReader(
             response.getEntity().getContent())));
 
+    client.close();
+
     if (isJSONValid(result)) {
       return gson.fromJson(result, BazaarResponse.class);
     } else {
@@ -64,10 +63,11 @@ public class Utils {
 
   public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
-    if (!BazaarNotifier.config.api.isEmpty() && (BazaarNotifier.validApiKey
-        || (BazaarNotifier.validApiKey = validateApiKey()))) {
+    if (BazaarNotifier.config.collectionCheck && !BazaarNotifier.config.api.isEmpty() && (
+        BazaarNotifier.validApiKey
+            || (BazaarNotifier.validApiKey = validateApiKey()))) {
 
-      HttpClient client = HttpClientBuilder.create().build();
+      CloseableHttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {
         HttpGet request = new HttpGet(
             "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft()
@@ -89,11 +89,21 @@ public class Utils {
               + playerUUID);
       HttpResponse response = client.execute(request);
 
-      String _results = IOUtils
-          .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-      JsonObject results = gson.fromJson(_results, JsonObject.class);
+      JsonReader jsonReader = new JsonReader(
+          new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+      jsonReader.setLenient(true);
+
+      JsonObject results = null;
+
+      try {
+        results = gson.fromJson(jsonReader, JsonObject.class);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      client.close();
       int profileIndex = 0;
-      if (!results.get("success").getAsBoolean() || !results.has("profiles")) {
+      if (results == null || !results.get("success").getAsBoolean() || !results.has("profiles")) {
         return null;
       }
 
@@ -130,7 +140,7 @@ public class Utils {
       }
       return unlockedCollections;
     } else {
-      BazaarNotifier.config.collectionCheckDisabled = true;
+      BazaarNotifier.config.collectionCheck = false;
 
       return null;
     }
@@ -139,9 +149,9 @@ public class Utils {
   public static boolean isJSONValid(String jsonInString) {
     Gson gson = new Gson();
     try {
-      gson.fromJson(jsonInString, Object.class);
+      gson.fromJson(jsonInString, JsonObject.class);
       return true;
-    } catch (com.google.gson.JsonSyntaxException ex) {
+    } catch (Exception ex) {
       return false;
     }
   }
@@ -151,19 +161,21 @@ public class Utils {
     if (uuidMatcher.matcher(key).find()) {
       try {
         if (gson.fromJson(IOUtils.toString(new BufferedReader
-            (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
-                "https://api.hypixel.net/key?key=" + key)).getEntity()
-                .getContent()))), JsonObject.class).getAsJsonObject().get("success")
+                (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
+                        "https://api.hypixel.net/key?key=" + key)).getEntity()
+                    .getContent()))), JsonObject.class).getAsJsonObject().get("success")
             .getAsBoolean()) {
           return true;
         } else {
-          BazaarNotifier.config.collectionCheckDisabled = true;
+          BazaarNotifier.config.collectionCheck = false;
           return false;
         }
       } catch (JsonSyntaxException e) {
+        BazaarNotifier.config.collectionCheck = false;
         return false;
       }
     }
+    BazaarNotifier.config.collectionCheck = false;
     return false;
   }
 
@@ -171,61 +183,33 @@ public class Utils {
     if (validateApiKey(BazaarNotifier.config.api)) {
       return true;
     } else {
-      BazaarNotifier.config.collectionCheckDisabled = true;
+      BazaarNotifier.config.collectionCheck = false;
       return false;
     }
   }
 
 
-  public static void chatNotification(Order order, String notification) {
-    if (!BazaarNotifier.config.showChatMessages) {
-      return;
-    }
-    EnumChatFormatting messageColor =
-        (notification.equalsIgnoreCase("REVIVED") ? EnumChatFormatting.GREEN
-            : order.type.equals(Order.OrderType.BUY) ? EnumChatFormatting.DARK_PURPLE
-                : EnumChatFormatting.BLUE);
-    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-        messageColor + order.type.longName
-            + EnumChatFormatting.GRAY + " for "
-            + messageColor + BazaarNotifier.dfNoDecimal
-            .format(order.startAmount)
-            + EnumChatFormatting.GRAY + "x " + messageColor
-            + order.product
-            + EnumChatFormatting.YELLOW
-            + " " + notification + " " + EnumChatFormatting.GRAY + "("
-            + messageColor + BazaarNotifier.df.format(order.pricePerUnit)
-            + EnumChatFormatting.GRAY + ")"
-    ));
-  }
-
-
-  public static void drawCenteredString(String text, int x, int y, int color, float moduleScale) {
-    x = (int) (x / moduleScale + 200 / 4);
-    y = (int) (y / moduleScale + (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 6));
-    GL11.glScalef(moduleScale, moduleScale, 1);
-    Minecraft.getMinecraft().fontRendererObj.drawString(text, x, y, color);
-    GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
-  }
-
   public static void updateResources() throws IOException {
     Gson gson = new Gson();
-    String result;
     HttpGet request;
     HttpResponse response;
-    HttpClient client = HttpClientBuilder.create().build();
+    CloseableHttpClient client = HttpClientBuilder.create().build();
     request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
-    result = IOUtils
-        .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+
+    JsonReader jsonReader = new JsonReader(
+        new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+    jsonReader.setLenient(true);
     try {
-      BazaarNotifier.resources = gson.fromJson(result, JsonObject.class).getAsJsonObject();
+      BazaarNotifier.resources = gson.fromJson(jsonReader, JsonObject.class);
       BazaarNotifier.bazaarConv = jsonToBimap(
           BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
       BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
           .getAsJsonObject("enchantCraftingList");
     } catch (JsonSyntaxException e) {
       e.printStackTrace();
+    } finally {
+      client.close();
     }
   }
 

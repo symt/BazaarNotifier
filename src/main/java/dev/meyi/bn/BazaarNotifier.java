@@ -5,6 +5,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.MalformedJsonException;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.ChestTickHandler;
@@ -14,12 +16,14 @@ import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.ModuleList;
+import dev.meyi.bn.modules.calc.BankCalculator;
+import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,7 +42,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.5.0-beta13";
+  public static final String VERSION = "1.6.2-beta2";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -54,7 +58,6 @@ public class BazaarNotifier {
 
   public static boolean activeBazaar = true;
   public static boolean inBazaar = false;
-  public static boolean inBank = false;
   public static boolean forceRender = false;
   public static boolean validApiKey = false;
   public static boolean apiKeyDisabled = true;
@@ -92,15 +95,19 @@ public class BazaarNotifier {
     bnDir.mkdirs();
     configFile = new File(bnDir, "config.json");
     resourcesFile = new File(bnDir, "resources.json");
-    String configString = null;
+    JsonReader configString = null;
     Gson gson = new Gson();
     try {
       if (configFile.isFile()) {
         try {
-          configString = new String(Files.readAllBytes(Paths.get(configFile.getPath())));
+          byte[] bytes = Files.readAllBytes(Paths.get(configFile.getPath()));
+          if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Config File");
+          configString = new JsonReader(new StringReader(new String(bytes)));
+          configString.setLenient(true);
+
           config = gson.fromJson(configString, Configuration.class);
           config.version = BazaarNotifier.VERSION;
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | MalformedJsonException e) {
           e.printStackTrace();
           config = Configuration.createDefaultConfig();
         }
@@ -111,18 +118,23 @@ public class BazaarNotifier {
     try {
       if (resourcesFile.isFile()) {
         try {
-          String resourcesString = new String(
-              Files.readAllBytes(Paths.get(resourcesFile.getPath())));
-          resources = gson.fromJson(resourcesString, JsonObject.class);
+          byte[] bytes = Files.readAllBytes(Paths.get(resourcesFile.getPath()));
+          if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Resources File");
+          JsonReader resourcesReader = new JsonReader(new StringReader(new String(
+              bytes)));
+          resourcesReader.setLenient(true);
+          resources = gson.fromJson(resourcesReader, JsonObject.class);
         } catch (JsonSyntaxException | ClassCastException e) {
           e.printStackTrace();
-          Reader reader = new InputStreamReader(Objects.requireNonNull(
-              BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
+          JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(
+              BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8));
+          reader.setLenient(true);
           resources = gson.fromJson(reader, JsonObject.class);
         }
       } else {
-        Reader reader = new InputStreamReader(Objects.requireNonNull(
-            BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8);
+        JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(
+            BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8));
+        reader.setLenient(true);
         resources = gson.fromJson(reader, JsonObject.class);
       }
     } catch (IOException e) {
@@ -146,6 +158,8 @@ public class BazaarNotifier {
       enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
       bazaarConv = Utils.jsonToBimap(bazaarConversions);
     }
+
+    BankCalculator.reset();
   }
 
 
@@ -156,6 +170,7 @@ public class BazaarNotifier {
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
+    ReflectionHelper.setup();
     ScheduledEvents.create();
 
     Runtime.getRuntime()
