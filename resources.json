@@ -804,7 +804,18 @@
 		"ENCHANTMENT_PROSPERITY_3": "Prosperity III",
 		"ENCHANTMENT_PROSPERITY_2": "Prosperity II",
 		"ENCHANTMENT_PROSPERITY_5": "Prosperity V",
-		"ENCHANTMENT_PROSPERITY_4": "Prosperity IV"
+		"ENCHANTMENT_PROSPERITY_4": "Prosperity IV",
+		"CROPIE": "Cropie",
+		"COMPOST": "Compost",
+		"ENCHANTED_COMPOST": "Compost Bundle",
+		"FERMENTO": "Fermento",
+		"CONDENSED_FERMENTO": "Condensed Fermento",
+		"SQUASH": "Squash",
+		"ENCHANTMENT_SUNDER_1": "Sunder I",
+		"ENCHANTMENT_SUNDER_4": "Sunder IV",
+		"ENCHANTMENT_SUNDER_5": "Sunder V",
+		"ENCHANTMENT_SUNDER_2": "Sunder II",
+		"ENCHANTMENT_SUNDER_3": "Sunder III"
 	},
 	"enchantCraftingList": {
 		"normal": {},
@@ -2175,6 +2186,20 @@
 					160
 				],
 				"collection": "LOG:3_6"
+			},
+			"ENCHANTED_COMPOST": {
+				"material": [
+					"COMPOST",
+					160
+				],
+				"collection": "None"
+			},
+			"CONDENSED_FERMENTO": {
+				"material": [
+					"FERMENTO",
+					9
+				],
+				"collection": "None"
 			}
 		}
 	}
