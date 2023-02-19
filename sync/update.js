@@ -6,6 +6,24 @@ const axios = require("axios").default
 
 const toTitleCase = (str) => str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 
+function jsonToAscii( jsonText) {
+    var s = "";
+    
+    for( var i = 0; i < jsonText.length; ++i) {
+        var c = jsonText[ i];
+        if( c >= '\x7F') {
+            c = c.charCodeAt(0).toString(16).toUpperCase();
+            switch( c.length) {
+              case 2: c = "\\u00" + c; break;
+              case 3: c = "\\u0" + c; break;
+              default: c = "\\u" + c; break;
+            }
+        }
+        s += c;
+    }
+    return s;
+}
+
 const convertItemName = (item) => {
     let filtered = item;
     let romanConversion = "";
@@ -14,7 +32,7 @@ const convertItemName = (item) => {
         let enchantNumber = parseInt(item.split("_").pop());
 
         // Since it only goes 1-10, might as well hard code the list
-        romanConversion = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][enchantNumber];
+        romanConversion = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"][enchantNumber];
         
         filtered = filtered.split("_").slice(0, -1).join("_");
 
@@ -60,13 +78,28 @@ const run = async () => {
     let newItems = {}
     
     let currentItemList = Object.keys(bazaarData)
+    let flaggedItem = {};
 
     for (let item of currentItemList) {
         if (!Object.keys(resources.bazaarConversions).includes(item)) {
             newItems[item] = convertItemName(item)
-        }
+        } else {
+	    flaggedItem[item] = true;
+	}
     }
 
+    for (let item of Object.keys(newItems)) {
+	flaggedItem[item] = true;
+	resources.bazaarConversions[item] = newItems[item];
+    }
+
+    for (let item of Object.keys(resources.bazaarConversions)) {
+        if (!(item in flaggedItem)) {
+		console.log(item);
+        }
+    }
+    
+    require('fs').writeFile("../resources.json", jsonToAscii(JSON.stringify(resources, null, '\t')), () => {});
     console.log(JSON.stringify(newItems, null, 2))
 }
 run();
