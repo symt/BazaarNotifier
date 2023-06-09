@@ -9,6 +9,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarResponse;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -63,9 +64,7 @@ public class Utils {
 
   public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
-    if (BazaarNotifier.config.collectionCheck && !BazaarNotifier.config.api.isEmpty() && (
-        BazaarNotifier.validApiKey
-            || (BazaarNotifier.validApiKey = validateApiKey()))) {
+    if (BazaarNotifier.config.collectionCheck && !BazaarNotifier.config.api.isEmpty()) {
 
       CloseableHttpClient client = HttpClientBuilder.create().build();
       if (playerUUID.equals("")) {

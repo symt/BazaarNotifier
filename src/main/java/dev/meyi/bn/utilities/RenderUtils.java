@@ -3,6 +3,7 @@ package dev.meyi.bn.utilities;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -25,7 +26,7 @@ public class RenderUtils {
    * @return length of the entire text
    */
   public static int drawMulticoloredString(FontRenderer renderer, int x, int y,
-      LinkedHashMap<String, Color> message, boolean dropShadow, float moduleScale) {
+      HashMap<String, Color> message, boolean dropShadow, float moduleScale) {
 
     int renderLength = 0;
     for (Entry<String, Color> substring : message.entrySet()) {
@@ -40,17 +41,33 @@ public class RenderUtils {
     return renderLength;
   }
 
-  public static int drawColorfulParagraph(List<LinkedHashMap<String, Color>> items, int x, int y,
-      float moduleScale) {
+  public static int drawColorfulParagraph(List<LinkedHashMap <String, Color>> items, int x, int y,
+                                          float moduleScale) {
     float longestXString = 0;
     for (int i = 0; i < items.size(); i++) {
       float fontHeight =
-          (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i * moduleScale;
+              (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i * moduleScale;
       int length = RenderUtils
           .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
               x, y
                   + (int) fontHeight,
               items.get(i), false, moduleScale);
+      if (length > longestXString) {
+        longestXString = length;
+      }
+    }
+    return (int) longestXString;
+  }
+  public static int getStringLength(List<LinkedHashMap <String, Color>> items) {
+    FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+    float longestXString = 0;
+    for (HashMap<String, Color> item : items) {
+      StringBuilder builder = new StringBuilder("");
+      for (Entry<String, Color> entry : item.entrySet()) {
+        builder.append(entry.getKey());
+      }
+
+      int length = fontRenderer.getStringWidth(builder.toString());
       if (length > longestXString) {
         longestXString = length;
       }

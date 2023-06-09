@@ -39,7 +39,7 @@ public class CraftingCalculator {
       }
       list.add(getEnchantCraft(itemName));
     }
-    int i = BazaarNotifier.config.useBuyOrders ? 0 : 3;
+    int i = BazaarNotifier.config.craftingModule.useBuyOrders ? 0 : 3;
 
     list.sort((o1, o2) -> {
       ArrayList<Double> list1 = new ArrayList<>();
@@ -51,8 +51,8 @@ public class CraftingCalculator {
       list2.add(Double.valueOf(o2[i + 1]));
       list2.add(Double.valueOf(o2[i + 2]));
 
-      return list1.get(BazaarNotifier.config.craftingSortingOption).compareTo(list2.get(
-          BazaarNotifier.config.craftingSortingOption));
+      return list1.get(BazaarNotifier.config.craftingModule.craftingSortingOption).compareTo(list2.get(
+          BazaarNotifier.config.craftingModule.craftingSortingOption));
     });
     Collections.reverse(list);
     CraftingModule.list = list;
@@ -60,8 +60,8 @@ public class CraftingCalculator {
 
 
   public static void toggleCrafting() {
-    BazaarNotifier.config.craftingSortingOption =
-        (BazaarNotifier.config.craftingSortingOption + 1) % 3;
+    BazaarNotifier.config.craftingModule.craftingSortingOption =
+        (BazaarNotifier.config.craftingModule.craftingSortingOption + 1) % 3;
   }
 
   public static String[] getEnchantCraft(String itemName) {
@@ -130,18 +130,16 @@ public class CraftingCalculator {
 
         double profitInstaSell = itemSellPrice - materialCost;
         double profitSellOffer = itemBuyPrice - materialCost;
-        double CountPerMil = 1000000 / materialCost;
-        double profitPerMil = CountPerMil * profitInstaSell;
+        double profitPercentage = (itemSellPrice / materialCost -1) * 100;
         double profitInstaSell2 = itemSellPrice - materialCost2;
         double profitSellOffer2 = itemBuyPrice - materialCost2;
-        double CountPerMil2 = 1000000 / materialCost2;
-        double profitPerMil2 = CountPerMil2 * profitInstaSell2;
+        double profitPercentage2 = (itemSellPrice / materialCost2 - 1) * 100 ;
         values[0] = String.valueOf(profitInstaSell);
         values[1] = String.valueOf(profitSellOffer);
-        values[2] = String.valueOf(profitPerMil);
+        values[2] = String.valueOf(profitPercentage);
         values[3] = String.valueOf(profitInstaSell2);
         values[4] = String.valueOf(profitSellOffer2);
-        values[5] = String.valueOf(profitPerMil2);
+        values[5] = String.valueOf(profitPercentage2);
       } else {
         Arrays.fill(values, "0");
       }

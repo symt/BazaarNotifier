@@ -178,7 +178,7 @@ public class BankCalculator {
   public static synchronized void reset() {
     if (startup) {
       startup = false;
-      calculatedProfit = BazaarNotifier.config.bazaarProfit;
+      calculatedProfit = BazaarNotifier.config.bankModule.bazaarProfit;
     } else {
       calculatedProfit = 0;
     }

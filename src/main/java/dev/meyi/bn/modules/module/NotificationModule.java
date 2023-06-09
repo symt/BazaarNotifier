@@ -1,7 +1,7 @@
 package dev.meyi.bn.modules.module;
 
+import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
@@ -26,17 +26,31 @@ import org.lwjgl.opengl.GL11;
 
 public class NotificationModule extends Module {
 
-  public static final ModuleName type = ModuleName.NOTIFICATION;
-  int longestXString = 0;
+  public transient static final ModuleName type = ModuleName.NOTIFICATION;
+  transient float longestXString = 1;
 
   public NotificationModule() {
     super();
   }
 
-  public NotificationModule(ModuleConfig module) {
-    super(module);
+  @Override
+  protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
+    draw();
   }
 
+  @Override
+  protected float getWidth(float scale, boolean example) {
+    if(example) {
+      return 200*scale;
+    }else {
+      return longestXString;
+    }
+  }
+
+  @Override
+  protected float getHeight(float scale, boolean example) {
+    return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * 10 + 20)*scale  - 2;
+  }
   //source dsm
   public static void drawOnSlot(int chestSize, int slot, int color) {
     chestSize += 36;
@@ -58,10 +72,11 @@ public class NotificationModule extends Module {
   }
 
   @Override
-  protected void draw() {
+  public void draw() {
+    GL11.glTranslated(0, 0, 1);
     // add extra space after "Buy" so it lines up with sell
-
-    List<LinkedHashMap<String, Color>> items = new ArrayList<>();
+    drawBounds();
+    List<LinkedHashMap <String, Color>> items = new ArrayList<>();
 
     if (BazaarNotifier.orders.size() != 0) {
 
@@ -69,7 +84,7 @@ public class NotificationModule extends Module {
 
       for (int i = shift; i < size; i++) {
         Order currentOrder = BazaarNotifier.orders.get(i);
-        LinkedHashMap<String, Color> message = new LinkedHashMap<>();
+        LinkedHashMap <String, Color> message = new LinkedHashMap <>();
 
         Color typeSpecificColor =
             currentOrder.orderStatus == Order.OrderStatus.BEST
@@ -80,43 +95,38 @@ public class NotificationModule extends Module {
 
         String notification = currentOrder.orderStatus.name();
         message.put(WordUtils.capitalizeFully(currentOrder.type.name()), typeSpecificColor);
-        message.put(" - ", new Color(0xAAAAAA));
-        message.put(notification + " ", new Color(0xFFFF55));
-        message.put("(", new Color(0xAAAAAA));
+        message.put(" - ", BazaarNotifier.config.infoColor.toJavaColor());
+        message.put(notification + " ", BazaarNotifier.config.infoColor.toJavaColor());
+        message.put("(", BazaarNotifier.config.infoColor.toJavaColor());
         message.put(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount),
             typeSpecificColor);
-        message.put("x ", new Color(0xAAAAAA));
+        message.put("x ", BazaarNotifier.config.infoColor.toJavaColor());
         message.put(currentOrder.product, typeSpecificColor);
-        message.put(", ", new Color(0xAAAAAA));
+        message.put(", ", BazaarNotifier.config.infoColor.toJavaColor());
         message.put(BazaarNotifier.df.format(currentOrder.pricePerUnit),
             typeSpecificColor);
-        message.put(")", new Color(0xAAAAAA));
+        message.put(")", BazaarNotifier.config.infoColor.toJavaColor());
         items.add(message);
       }
 
-      longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
-      boundsX = x + longestXString;
+      longestXString = RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
     } else {
-      RenderUtils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
-      float X = x + 200 * scale;
-      boundsX = (int) X;
+      RenderUtils.drawCenteredString("No orders found", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
+      longestXString = 200*scale;
     }
-    float Y =
-        y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * 10 + 20 * scale - 2;
-    boundsY = (int) Y;
     highlightOrder(checkHoveredText());
+    GL11.glTranslated(0, 0, -1);
   }
 
   @Override
   protected void reset() {
-    x = Defaults.NOTIFICATION_MODULE_X;
-    y = Defaults.NOTIFICATION_MODULE_Y;
-    scale = 1;
-    active = true;
+    position.setPosition(Defaults.NOTIFICATION_MODULE_X, Defaults.NOTIFICATION_MODULE_Y);
+    setScale(1, false);
+    enabled = true;
   }
 
   @Override
-  protected String name() {
+  public String name() {
     return ModuleName.NOTIFICATION.name();
   }
 
@@ -131,13 +141,13 @@ public class NotificationModule extends Module {
   }
 
   protected int checkHoveredText() {
-    float _y = y;
+    float _y = position.getY();
     float y2 = _y + (10 * 11 * scale);
     int mouseYFormatted = getMouseCoordinateY();
     int mouseXFormatted = getMouseCoordinateX();
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
     if (this.longestXString != 0) {
-      if (mouseXFormatted >= x && mouseXFormatted <= x + longestXString
+      if (mouseXFormatted >= position.getX() && mouseXFormatted <= position.getX() + longestXString
           && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
         return Math.round(relativeYMouse + shift);
       } else {

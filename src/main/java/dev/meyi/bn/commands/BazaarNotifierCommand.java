@@ -57,26 +57,22 @@ public class BazaarNotifierCommand extends CommandBase {
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key has been set."));
               BazaarNotifier.config.api = args[1];
-              BazaarNotifier.validApiKey = true;
               BazaarNotifier.activeBazaar = true;
             } else {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
-              BazaarNotifier.validApiKey = false;
             }
           } catch (IOException e) {
             player.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.RED
                     + "An error occurred when trying to set your api key. Please re-run the command to try again."));
-            BazaarNotifier.validApiKey = false;
             e.printStackTrace();
           }
         } else {
           player.addChatMessage(new ChatComponentText(
               BazaarNotifier.prefix + EnumChatFormatting.RED
                   + "Run /bn api (key) to set your api key. Do /api if you need to get your api key."));
-          BazaarNotifier.validApiKey = false;
         }
       } else if (args.length > 0 && args[0].equalsIgnoreCase("reset")) {
         if (args.length == 1 || args[1].equalsIgnoreCase("all")) {

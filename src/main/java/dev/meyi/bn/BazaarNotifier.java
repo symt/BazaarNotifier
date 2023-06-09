@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.MalformedJsonException;
 import dev.meyi.bn.commands.BazaarNotifierCommand;
 import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.handlers.ChestTickHandler;
@@ -16,7 +15,6 @@ import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.ModuleList;
-import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
@@ -35,6 +33,7 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 
@@ -59,7 +58,6 @@ public class BazaarNotifier {
   public static boolean activeBazaar = true;
   public static boolean inBazaar = false;
   public static boolean forceRender = false;
-  public static boolean validApiKey = false;
   public static boolean apiKeyDisabled = true;
 
 
@@ -75,13 +73,12 @@ public class BazaarNotifier {
   public static JsonObject enchantCraftingList;
   public static BiMap<String, String> bazaarConv = HashBiMap.create();
 
-  public static File configFile;
   public static File resourcesFile;
 
   public static void resetMod() {
     modules.resetAll();
     orders = new ArrayList<>();
-    config = Configuration.createDefaultConfig();
+    config = new Configuration();
   }
 
   public static void resetScale() {
@@ -90,31 +87,13 @@ public class BazaarNotifier {
 
   @Mod.EventHandler
   public void preInit(FMLPreInitializationEvent event) {
+    ReflectionHelper.setup();
     File bnDir = new File(event.getModConfigurationDirectory(), "BazaarNotifier");
     //noinspection ResultOfMethodCallIgnored
     bnDir.mkdirs();
-    configFile = new File(bnDir, "config.json");
     resourcesFile = new File(bnDir, "resources.json");
-    JsonReader configString = null;
     Gson gson = new Gson();
-    try {
-      if (configFile.isFile()) {
-        try {
-          byte[] bytes = Files.readAllBytes(Paths.get(configFile.getPath()));
-          if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Config File");
-          configString = new JsonReader(new StringReader(new String(bytes)));
-          configString.setLenient(true);
 
-          config = gson.fromJson(configString, Configuration.class);
-          config.version = BazaarNotifier.VERSION;
-        } catch (JsonSyntaxException | MalformedJsonException e) {
-          e.printStackTrace();
-          config = Configuration.createDefaultConfig();
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
     try {
       if (resourcesFile.isFile()) {
         try {
@@ -141,14 +120,6 @@ public class BazaarNotifier {
       e.printStackTrace();
     }
 
-    if (configString != null) {
-      modules = new ModuleList(config);
-    } else {
-      config = Configuration.createDefaultConfig();
-      modules = new ModuleList();
-      modules.resetAll();
-    }
-
     try {
       Utils.updateResources();
     } catch (IOException e) {
@@ -159,7 +130,7 @@ public class BazaarNotifier {
       bazaarConv = Utils.jsonToBimap(bazaarConversions);
     }
 
-    BankCalculator.reset();
+   // BankCalculator.reset();
   }
 
 
@@ -170,16 +141,25 @@ public class BazaarNotifier {
     MinecraftForge.EVENT_BUS.register(new MouseHandler());
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
-    ReflectionHelper.setup();
-    ScheduledEvents.create();
+
+
+
+    config = new Configuration();
+
 
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
                 () -> {
-                  Configuration.saveConfig(configFile, config);
                   Utils.saveResources(resourcesFile, resources);
+                  //config.save();
                 }));
 
   }
+  @Mod.EventHandler
+  public void done(FMLLoadCompleteEvent e){
+    ScheduledEvents.create();
+    modules = new ModuleList();
+  }
+
 }
