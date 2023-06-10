@@ -5,12 +5,12 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.RenderUtils;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -27,7 +27,6 @@ import org.lwjgl.opengl.GL11;
 public class NotificationModule extends Module {
 
   public transient static final ModuleName type = ModuleName.NOTIFICATION;
-  transient float longestXString = 1;
 
   public NotificationModule() {
     super();
@@ -40,10 +39,10 @@ public class NotificationModule extends Module {
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    if(example) {
+    if(!"".equals(longestString)) {
+      return RenderUtils.getStringWidth(longestString)*scale;
+    }else{
       return 200*scale;
-    }else {
-      return longestXString;
     }
   }
 
@@ -76,7 +75,7 @@ public class NotificationModule extends Module {
     GL11.glTranslated(0, 0, 1);
     // add extra space after "Buy" so it lines up with sell
     drawBounds();
-    List<LinkedHashMap <String, Color>> items = new ArrayList<>();
+    ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
 
     if (BazaarNotifier.orders.size() != 0) {
 
@@ -84,7 +83,7 @@ public class NotificationModule extends Module {
 
       for (int i = shift; i < size; i++) {
         Order currentOrder = BazaarNotifier.orders.get(i);
-        LinkedHashMap <String, Color> message = new LinkedHashMap <>();
+        ArrayList<ColoredText> message = new ArrayList<>();
 
         Color typeSpecificColor =
             currentOrder.orderStatus == Order.OrderStatus.BEST
@@ -94,25 +93,25 @@ public class NotificationModule extends Module {
                     : new Color(0x55FFFF);
 
         String notification = currentOrder.orderStatus.name();
-        message.put(WordUtils.capitalizeFully(currentOrder.type.name()), typeSpecificColor);
-        message.put(" - ", BazaarNotifier.config.infoColor.toJavaColor());
-        message.put(notification + " ", BazaarNotifier.config.infoColor.toJavaColor());
-        message.put("(", BazaarNotifier.config.infoColor.toJavaColor());
-        message.put(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount),
-            typeSpecificColor);
-        message.put("x ", BazaarNotifier.config.infoColor.toJavaColor());
-        message.put(currentOrder.product, typeSpecificColor);
-        message.put(", ", BazaarNotifier.config.infoColor.toJavaColor());
-        message.put(BazaarNotifier.df.format(currentOrder.pricePerUnit),
-            typeSpecificColor);
-        message.put(")", BazaarNotifier.config.infoColor.toJavaColor());
+        message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()), typeSpecificColor));
+        message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(notification + " ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText("(", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount),
+            typeSpecificColor));
+        message.add(new ColoredText("x ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(currentOrder.product, typeSpecificColor));
+        message.add(new ColoredText(", ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(BazaarNotifier.df.format(currentOrder.pricePerUnit),
+            typeSpecificColor));
+        message.add(new ColoredText(")", BazaarNotifier.config.infoColor.toJavaColor()));
         items.add(message);
       }
-
-      longestXString = RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
+      longestString = RenderUtils.getLongestString(items);
+      RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
     } else {
+      longestString = "";
       RenderUtils.drawCenteredString("No orders found", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
-      longestXString = 200*scale;
     }
     highlightOrder(checkHoveredText());
     GL11.glTranslated(0, 0, -1);
@@ -146,9 +145,8 @@ public class NotificationModule extends Module {
     int mouseYFormatted = getMouseCoordinateY();
     int mouseXFormatted = getMouseCoordinateX();
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
-    if (this.longestXString != 0) {
-      if (mouseXFormatted >= position.getX() && mouseXFormatted <= position.getX() + longestXString
-          && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
+    if (this.getWidth(scale, false) != 0) {
+      if (inMovementBox() && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
         return Math.round(relativeYMouse + shift);
       } else {
         return -1;

@@ -21,6 +21,8 @@ public abstract class Module extends Hud{
   protected int padding = 3;
   private int lastMouseX, lastMouseY;
 
+  protected transient String longestString = "";
+
 
 
   @Switch(name="Show Modules Outside of Bazaar",

@@ -7,11 +7,11 @@ import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,6 @@ public class SuggestionModule extends Module{
 
   public transient static final ModuleName type = ModuleName.SUGGESTION;
   public transient static List<String[]> list = new LinkedList<>();
-  transient float longestXString = 1;
 
   @Switch(name= "Use Profit per Hour", category = "Suggestion Module")
   public boolean useProfitPerHour = false;
@@ -52,19 +51,13 @@ public class SuggestionModule extends Module{
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    if(example){
-      return 200 * scale;
-    }else{
-      return longestXString;
-    }
-
-
+    return RenderUtils.getStringWidth(longestString)*scale;
   }
 
   @Override
   protected float getHeight(float scale, boolean example) {
     if(BazaarNotifier.config == null){
-      return 100f;
+      return 100f*scale;
     }
     return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT
             * BazaarNotifier.config.suggestionModule.suggestionListLength
@@ -76,21 +69,19 @@ public class SuggestionModule extends Module{
     GL11.glTranslated(0, 0, 1);
     drawBounds();
     if (list.size() != 0) {
-      List<LinkedHashMap<String, Color>> items = new ArrayList<>();
-
+      ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
       for (int i = shift; i < BazaarNotifier.config.suggestionModule.suggestionListLength + shift; i++) {
-        LinkedHashMap <String, Color> message = new LinkedHashMap <>();
-        message.put((i + 1) + ". ", BazaarNotifier.config.numberColor.toJavaColor());
-        message.put(list.get(i)[0], BazaarNotifier.config.itemColor.toJavaColor());
-        message.put(" - ", BazaarNotifier.config.infoColor.toJavaColor());
-        message.put("EP: ", Color.RED);
-        message.put("" + BazaarNotifier.df.format(Double.parseDouble(list.get(i)[1]) *
-                (useProfitPerHour?60:1)), Color.ORANGE);
+        ArrayList<ColoredText> message = new ArrayList<>();
+        message.add(new ColoredText((i + 1) + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
+        message.add(new ColoredText(list.get(i)[0], BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText("EP: ", Color.RED));
+        message.add(new ColoredText("" + BazaarNotifier.df.format(Double.parseDouble(list.get(i)[1]) *
+                (useProfitPerHour?60:1)), Color.ORANGE));
         items.add(message);
       }
-
-      longestXString = RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
-
+      longestString = RenderUtils.getLongestString(items);
+      RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
     } else {
       RenderUtils.drawCenteredString("Waiting for bazaar data", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
       //Todo add height and width

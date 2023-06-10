@@ -7,12 +7,11 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
+import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
@@ -27,7 +26,6 @@ public class BankModule extends Module {
 
   public transient static final ModuleName type = ModuleName.BANK;
   transient int  lines = 2;
-  transient float longestXString = 1;
 
   @JsonName("bankRawDifference")
   @Switch(name = "Raw Difference",
@@ -43,11 +41,7 @@ public class BankModule extends Module {
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    if(example) {
-      return 150*scale;
-    }else {
-      return longestXString;
-    }
+    return RenderUtils.getStringWidth(longestString)*scale;
   }
 
   @Override
@@ -60,27 +54,29 @@ public class BankModule extends Module {
   public void draw() {
     GL11.glTranslated(0, 0, 1);
     drawBounds();
-    List<LinkedHashMap <String, Color>> items = new ArrayList<>();
+    ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
 
-    LinkedHashMap <String, Color> header = new LinkedHashMap <>();
-    header.put("Bank Module (Experimental)", BazaarNotifier.config.infoColor.toJavaColor());
+    ArrayList <ColoredText> header = new ArrayList<>();
+    header.add(new ColoredText("Bank Module (Experimental)", BazaarNotifier.config.infoColor.toJavaColor()));
     items.add(header);
 
-    LinkedHashMap <String, Color> message2 = new LinkedHashMap <>();
-    message2.put("Bazaar Profit: ", BazaarNotifier.config.itemColor.toJavaColor());
-    message2.put(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.ORANGE);
-    items.add(message2);
+    ArrayList <ColoredText> bazaarProfitMessage = new ArrayList<>();
+    bazaarProfitMessage.add(new ColoredText("Bazaar Profit: ", BazaarNotifier.config.itemColor.toJavaColor()));
+    bazaarProfitMessage.add(new ColoredText(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.ORANGE));
+    items.add(bazaarProfitMessage);
 
 
     if (BazaarNotifier.config.bankModule.bankRawDifference) {
-      LinkedHashMap <String, Color> message3 = new LinkedHashMap <>();
-      message3.put("Bazaar Difference: ", BazaarNotifier.config.itemColor.toJavaColor());
-      message3.put(BazaarNotifier.df.format(BankCalculator.getRawDifference()), Color.ORANGE);
-      items.add(message3);
+      ArrayList<ColoredText> bazaarDifferenceMessage = new ArrayList<>();
+      bazaarDifferenceMessage.add(new ColoredText("Bazaar Difference: ", BazaarNotifier.config.itemColor.toJavaColor()));
+      bazaarDifferenceMessage.add(new ColoredText(BazaarNotifier.df.format(BankCalculator.getRawDifference()), Color.ORANGE));
+      items.add(bazaarDifferenceMessage);
     }
 
     lines = BazaarNotifier.config.bankModule.bankRawDifference?3:2;
-    longestXString = RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
+
+    longestString = RenderUtils.getLongestString(items);
+    RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
     GL11.glTranslated(0, 0, -1);
   }
 

@@ -27,7 +27,10 @@ public class Configuration extends Config {
   public Configuration() {
     super(new Mod("BazaarNotifier", ModType.SKYBLOCK,"/icon.png", new JsonMigrator("./config/BazaarNotifier/config.json")), "bazaarnotifier.json");
     initialize();
-    addDependency("collectionCheck", "Requires ApiKey", () ->  !"".equals(api));
+    addDependency("collectionCheck", "Requires ApiKey", () -> {
+      if ("".equals(api)) collectionCheck = false;
+      return !"".equals(api);
+    });
   }
 
 
