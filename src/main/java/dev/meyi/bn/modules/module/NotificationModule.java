@@ -85,26 +85,22 @@ public class NotificationModule extends Module {
         Order currentOrder = BazaarNotifier.orders.get(i);
         ArrayList<ColoredText> message = new ArrayList<>();
 
-        Color typeSpecificColor =
-            currentOrder.orderStatus == Order.OrderStatus.BEST
+        Color statusSpecificColor = currentOrder.orderStatus == Order.OrderStatus.BEST
                 || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
-                ? new Color(0x55FF55)
-                : currentOrder.type.equals(Order.OrderType.BUY) ? new Color(0xFF55FF)
-                    : new Color(0x55FFFF);
+                ? Color.GREEN : currentOrder.orderStatus == Order.OrderStatus.MATCHED? 
+                Color.YELLOW : Color.RED;
+        Color typeSpecificColor = currentOrder.type == Order.OrderType.BUY?Color.MAGENTA:Color.CYAN;
 
-        String notification = currentOrder.orderStatus.name();
-        message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()), typeSpecificColor));
+        message.add(new ColoredText(i+1 + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
+        message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()),typeSpecificColor));
         message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
-        message.add(new ColoredText(notification + " ", BazaarNotifier.config.infoColor.toJavaColor()));
-        message.add(new ColoredText("(", BazaarNotifier.config.infoColor.toJavaColor()));
-        message.add(new ColoredText(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount),
-            typeSpecificColor));
-        message.add(new ColoredText("x ", BazaarNotifier.config.infoColor.toJavaColor()));
-        message.add(new ColoredText(currentOrder.product, typeSpecificColor));
-        message.add(new ColoredText(", ", BazaarNotifier.config.infoColor.toJavaColor()));
-        message.add(new ColoredText(BazaarNotifier.df.format(currentOrder.pricePerUnit),
-            typeSpecificColor));
-        message.add(new ColoredText(")", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount)+ "x ",
+                BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(new ColoredText(currentOrder.product , BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(currentOrder.orderStatus.name() + " ", statusSpecificColor));
+
+
         items.add(message);
       }
       longestString = RenderUtils.getLongestString(items);

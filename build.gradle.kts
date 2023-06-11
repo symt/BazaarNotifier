@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "dev.meyi.bazaarnotifier"
-version = "1.6.2-beta2"
+version = "1.6.2-beta3"
 val mod_id = "bazaarnotifier"
 
 java {
@@ -40,9 +40,7 @@ val shade: Configuration by configurations.creating {
 repositories {
     mavenCentral()
     maven("https://repo.spongepowered.org/maven/")
-    maven{
-      url = uri("https://repo.polyfrost.cc/releases")
-    }
+    maven("https://repo.polyfrost.cc/releases")
 }
 
 dependencies {
@@ -57,6 +55,24 @@ dependencies {
 
 val resourcesFile = "src/main/resources/resources.json"
 val resourcesURL = "https://raw.githubusercontent.com/symt/BazaarNotifier/resources/resources.json"
+
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    inputs.property("version", project.version)
+    inputs.property("mcversion", "1.8.9")
+    from(sourceSets["main"].resources.srcDirs) {
+        include("mcmod.info")
+        expand("version" to project.version, "mcversion" to "1.8.9")
+    }
+    from(sourceSets["main"].resources.srcDirs) {
+        exclude("mcmod.info")
+    }
+
+    dependsOn("retrieveResources")
+    finalizedBy("destroyResources")
+    outputs.upToDateWhen { false }
+}
 
 task<DefaultTask>("destroyResources") {
     doLast {

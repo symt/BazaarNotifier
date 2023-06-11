@@ -125,12 +125,6 @@ public class EventHandler {
     if (e.gui instanceof GuiChest && (!"".equals(BazaarNotifier.config.api)
         || BazaarNotifier.apiKeyDisabled)) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
-      System.out.println(chest);
-      if (chest != null) {
-        System.out.println(chest.hasCustomName());
-        System.out.println(StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
-                .startsWith("Bazaar"));
-      }
       if (chest != null && ((chest.hasCustomName() && (
                   StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
               .startsWith("Bazaar") || StringUtils.stripControlCodes(

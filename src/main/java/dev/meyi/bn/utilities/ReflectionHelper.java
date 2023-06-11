@@ -14,10 +14,8 @@ public class ReflectionHelper {
       try{
         lowerChestInventory = GuiChest.class.getDeclaredField("lowerChestInventory");
         lowerChestInventory.setAccessible(true);
-        System.out.println(lowerChestInventory);
       }catch (NoSuchFieldException ignored){
         lowerChestInventory = null;
-        System.out.println("Set to null");
         e.printStackTrace();
       }
     }
@@ -28,9 +26,7 @@ public class ReflectionHelper {
       if (lowerChestInventory != null) {
         return (IInventory)lowerChestInventory.get(g);
       }
-      System.out.println("null");
     } catch (IllegalAccessException ignored) {
-      System.out.println("Illegal access");
     }
     return null;
   }

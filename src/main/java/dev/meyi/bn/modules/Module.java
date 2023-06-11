@@ -39,12 +39,16 @@ public abstract class Module extends Hud{
   protected boolean shouldShow() {
     if (showInGuis && Platform.getGuiPlatform().getCurrentScreen() != null &&
             (Platform.getGuiPlatform().getCurrentScreen() instanceof OneConfigGui))  return false;
-    if(BazaarNotifier.inBazaar) return true;
-    if(showInChat && Platform.getGuiPlatform().isInChat()) return true;
-    if(showInDebug && Platform.getGuiPlatform().isInDebug()) return true;
-    if(showInGuis && Platform.getGuiPlatform() != null && Minecraft.getMinecraft().currentScreen != null &&
-            !Platform.getGuiPlatform().isInDebug() && !Platform.getGuiPlatform().isInChat()) return true;
-    return showEverywhere;
+    if(enabled) {
+      if (BazaarNotifier.inBazaar) return true;
+      if (showInChat && Platform.getGuiPlatform().isInChat()) return true;
+      if (showInDebug && Platform.getGuiPlatform().isInDebug()) return true;
+      if (showInGuis && Platform.getGuiPlatform() != null && Minecraft.getMinecraft().currentScreen != null &&
+              !Platform.getGuiPlatform().isInDebug() && !Platform.getGuiPlatform().isInChat()) return true;
+      return showEverywhere;
+    }else {
+      return false;
+    }
   }
 
   public abstract void draw();

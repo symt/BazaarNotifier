@@ -61,7 +61,7 @@ public class BankModule extends Module {
 
     ArrayList <ColoredText> bazaarProfitMessage = new ArrayList<>();
     bazaarProfitMessage.add(new ColoredText("Bazaar Profit: ", BazaarNotifier.config.itemColor.toJavaColor()));
-    bazaarProfitMessage.add(new ColoredText(BazaarNotifier.df.format(BankCalculator.getBazaarProfit()), Color.ORANGE));
+    bazaarProfitMessage.add(new ColoredText(BazaarNotifier.df.format(bazaarProfit), Color.ORANGE));
     items.add(bazaarProfitMessage);
 
 
