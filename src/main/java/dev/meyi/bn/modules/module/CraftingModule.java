@@ -63,9 +63,9 @@ public class CraftingModule extends Module {
           description = "Shows the sell offer profit tab"
   )
   public boolean showSellOfferProfit = Defaults.SELL_OFFER_PROFIT;
-  @Checkbox(name = "Show 1m instant Profit",
+  @Checkbox(name = "Show Profit Percentage",
           category = "Crafting Module",
-          description = "Shows the 1m instant profit tab"
+          description = "Shows the profit percentage tab"
   )
   public boolean showProfitPerMil = Defaults.PROFIT_PER_MIL;
 
