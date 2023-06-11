@@ -1,6 +1,7 @@
 package dev.meyi.bn.modules.module;
 
 import cc.polyfrost.oneconfig.config.annotations.Switch;
+import cc.polyfrost.oneconfig.config.annotations.Text;
 import cc.polyfrost.oneconfig.config.migration.JsonName;
 import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
@@ -18,6 +19,13 @@ import org.lwjgl.opengl.GL11;
 
 public class BankModule extends Module {
 
+  @SuppressWarnings("unused")
+  @Text(name = "Bank Module",
+          description = "A module that tracks your bazaar profit" ,
+          category = "Bank Module"
+  )
+  private boolean _ignore;
+
   @JsonName("bazaarProfit")
   public double bazaarProfit = 0;
   public BankModule() {
@@ -30,7 +38,7 @@ public class BankModule extends Module {
   @JsonName("bankRawDifference")
   @Switch(name = "Raw Difference",
           category = "Bank Module",
-          description = "No clue"//Todo
+          description = "Show profit including current orders"
   )
   public boolean bankRawDifference = Defaults.BANK_RAW_DIFFERENCE;
 

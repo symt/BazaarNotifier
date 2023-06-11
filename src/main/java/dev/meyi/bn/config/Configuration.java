@@ -81,11 +81,22 @@ public class Configuration extends Config {
   public boolean collectionCheck = Defaults.COLLECTION_CHECKING;
 
 
-  @cc.polyfrost.oneconfig.config.annotations.Color(name = "Info Color", allowAlpha = false)
+  @cc.polyfrost.oneconfig.config.annotations.Color(
+          name = "Info Color",
+          allowAlpha = false,
+          description = "The color for all information and less significant elements"
+  )
   public OneColor infoColor = new OneColor(Color.GRAY);
-  @cc.polyfrost.oneconfig.config.annotations.Color(name = "Item Color", allowAlpha = false)
+  @cc.polyfrost.oneconfig.config.annotations.Color(name = "Item Color",
+          allowAlpha = false,
+          description = "The color the items will be in"
+  )
   public OneColor itemColor = new OneColor(Color.CYAN);
-  @cc.polyfrost.oneconfig.config.annotations.Color(name = "Number Color", allowAlpha = false)
+  @cc.polyfrost.oneconfig.config.annotations.Color(
+          name = "Number Color",
+          allowAlpha = false,
+          description = "The color the numbers will be in"
+  )
   public OneColor numberColor = new OneColor(Color.MAGENTA);
 
   @SuppressWarnings("unused")
