@@ -122,8 +122,7 @@ public class EventHandler {
 
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
-    if (e.gui instanceof GuiChest && (!"".equals(BazaarNotifier.config.api)
-        || BazaarNotifier.apiKeyDisabled)) {
+    if (e.gui instanceof GuiChest && (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled)) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
       if (chest != null && ((chest.hasCustomName() && (
                   StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())

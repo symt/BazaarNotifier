@@ -129,7 +129,7 @@ public class UpdateHandler {
             }
           }
 
-          if ("".equals(BazaarNotifier.config.api) && !BazaarNotifier.apiKeyDisabled) {
+          if (BazaarNotifier.config.api.isEmpty() && !BazaarNotifier.apiKeyDisabled) {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
                 BazaarNotifier.prefix + EnumChatFormatting.RED
                     + "The mod doesn't have access to a valid api key yet. Please run /bn api (key) to set your key"));

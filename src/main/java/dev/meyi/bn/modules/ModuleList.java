@@ -84,9 +84,10 @@ public class ModuleList extends ArrayList<Module> {
       }
     }
   }
-  public void drawAll(){
+  public void drawAllGui(){
     for (Module m:this) {
-      if(m.shouldShow()){
+      if(m.shouldShowGui()){
+        m.position.updateSizePosition(m.getModuleWidth(),m.getModuleHeight());
         m.draw();
       }
     }

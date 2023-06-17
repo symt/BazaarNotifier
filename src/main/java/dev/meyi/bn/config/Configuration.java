@@ -29,7 +29,7 @@ public class Configuration extends Config {
     initialize();
     addDependency("collectionCheck", "Requires ApiKey", () -> {
       if ("".equals(api)) collectionCheck = false;
-      return !"".equals(api);
+      return !api.isEmpty();
     });
   }
 

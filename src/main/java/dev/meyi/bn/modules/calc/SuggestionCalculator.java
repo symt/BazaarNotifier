@@ -15,7 +15,7 @@ public class SuggestionCalculator {
 
   public static void basic() {
     try {
-      if (!"".equals(BazaarNotifier.config.api) || BazaarNotifier.apiKeyDisabled) {
+      if (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled) {
         List<String[]> list = new LinkedList<>();
         for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products
             .entrySet()) {

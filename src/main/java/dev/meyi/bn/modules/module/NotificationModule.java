@@ -39,11 +39,12 @@ public class NotificationModule extends Module {
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    if(!"".equals(longestString)) {
-      return RenderUtils.getStringWidth(longestString)*scale;
-    }else{
-      return 200*scale;
+    if (longestString != null) {
+      if (longestString.isEmpty()) {
+        return RenderUtils.getStringWidth(longestString) * scale;
+      }
     }
+    return 200*scale;
   }
 
   @Override
@@ -89,7 +90,7 @@ public class NotificationModule extends Module {
                 || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
                 ? Color.GREEN : currentOrder.orderStatus == Order.OrderStatus.MATCHED? 
                 Color.YELLOW : Color.RED;
-        Color typeSpecificColor = currentOrder.type == Order.OrderType.BUY?Color.MAGENTA:Color.CYAN;
+        Color typeSpecificColor = currentOrder.type == Order.OrderType.BUY?new Color( 90, 0, 250):Color.CYAN;
 
         message.add(new ColoredText(i+1 + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
         message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()),typeSpecificColor));

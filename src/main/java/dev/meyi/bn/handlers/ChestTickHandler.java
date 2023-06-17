@@ -225,6 +225,6 @@ public class ChestTickHandler {
   }
   @SubscribeEvent
   public void renderInChest(GuiScreenEvent.BackgroundDrawnEvent e){
-    BazaarNotifier.modules.drawAll();
+    BazaarNotifier.modules.drawAllGui();
   }
 }

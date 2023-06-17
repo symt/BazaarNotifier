@@ -37,20 +37,24 @@ public abstract class Module extends Hud{
 
   @Override
   protected boolean shouldShow() {
+    if(BazaarNotifier.inBazaar || Platform.getGuiPlatform().getCurrentScreen() != null){
+      //Drawing at this case is handled by the ChestTickHandler to keep it above the gray gui background;
+      return false;
+    }
     if (showInGuis && Platform.getGuiPlatform().getCurrentScreen() != null &&
             (Platform.getGuiPlatform().getCurrentScreen() instanceof OneConfigGui))  return false;
     if(enabled) {
-      if (BazaarNotifier.inBazaar) return true;
       if (showInChat && Platform.getGuiPlatform().isInChat()) return true;
       if (showInDebug && Platform.getGuiPlatform().isInDebug()) return true;
-      if (showInGuis && Platform.getGuiPlatform() != null && Minecraft.getMinecraft().currentScreen != null &&
-              !Platform.getGuiPlatform().isInDebug() && !Platform.getGuiPlatform().isInChat()) return true;
       return showEverywhere;
     }else {
       return false;
     }
   }
 
+  public boolean shouldShowGui(){
+    return (BazaarNotifier.inBazaar || showInGuis) && enabled &&BazaarNotifier.config.enabled;
+  }
   public abstract void draw();
 
   protected abstract void reset();
@@ -100,7 +104,14 @@ public abstract class Module extends Hud{
   }
 
   public void setActive(boolean active) {
-    System.out.println("Set to disabled" + active);
     enabled = active;
+  }
+
+  public float getModuleWidth(){
+    return this.getWidth(scale, false);
+  }
+
+  public float getModuleHeight(){
+    return this.getHeight(scale, false);
   }
 }
