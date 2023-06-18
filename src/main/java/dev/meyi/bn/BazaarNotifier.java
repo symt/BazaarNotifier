@@ -79,7 +79,6 @@ public class BazaarNotifier {
   public static void resetMod() {
     modules.resetAll();
     orders = new ArrayList<>();
-    config = new Configuration();
   }
 
   public static void resetScale() {
