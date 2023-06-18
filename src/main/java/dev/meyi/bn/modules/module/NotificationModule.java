@@ -40,7 +40,7 @@ public class NotificationModule extends Module {
   @Override
   protected float getWidth(float scale, boolean example) {
     if (longestString != null) {
-      if (longestString.isEmpty()) {
+      if (!longestString.isEmpty()) {
         return RenderUtils.getStringWidth(longestString) * scale;
       }
     }
