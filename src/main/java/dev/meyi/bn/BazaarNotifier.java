@@ -14,8 +14,8 @@ import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.resp.BazaarResponse;
+import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleList;
-import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.ScheduledEvents;
 import dev.meyi.bn.utilities.Utils;
@@ -158,6 +158,14 @@ public class BazaarNotifier {
   public void done(FMLLoadCompleteEvent e){
     ScheduledEvents.create();
     modules = new ModuleList();
+    if (BazaarNotifier.config.firstLoad){
+      for(Module m : modules){
+        m.setActive(true);
+        m.showInChat = false;
+        m.showInGuis = false;
+      }
+      BazaarNotifier.config.firstLoad = false;
+    }
   }
 
 }

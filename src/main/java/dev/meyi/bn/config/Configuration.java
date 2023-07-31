@@ -33,7 +33,7 @@ public class Configuration extends Config {
     });
   }
 
-
+  public boolean firstLoad = true;
 
   @JsonName("version")
   public String version = BazaarNotifier.VERSION;
