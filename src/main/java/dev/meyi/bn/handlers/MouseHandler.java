@@ -17,11 +17,15 @@ public class MouseHandler {
   public void mouseActionCheck(TickEvent e) {
     if (e.phase == TickEvent.Phase.START) {
       if (BazaarNotifier.inBazaar) {
-        BazaarNotifier.modules.movementCheck();
+        if(BazaarNotifier.config.legacyMovement) {
+          BazaarNotifier.modules.movementCheck();
+        }
         if (tick >= 8 && !inPageFlip) { // 2.5 times per second
           inPageFlip = true;
           BazaarNotifier.modules.pageFlipCheck();
-          BazaarNotifier.modules.rescaleCheck();
+          if (BazaarNotifier.config.legacyMovement) {
+            BazaarNotifier.modules.rescaleCheck();
+          }
           BazaarNotifier.modules.shiftSettingCheck();
           mouseWheel();
 

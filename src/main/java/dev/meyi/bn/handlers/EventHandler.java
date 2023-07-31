@@ -5,24 +5,17 @@ import dev.meyi.bn.gui.ModuleSettingsGui;
 import dev.meyi.bn.gui.SettingsGui;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
-import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.ReflectionHelper;
-import dev.meyi.bn.utilities.Utils;
-import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
-import org.lwjgl.opengl.GL11;
 
 @SuppressWarnings("unused")
 public class EventHandler {
@@ -124,39 +117,15 @@ public class EventHandler {
       }
     } else if (message.startsWith("Bazaar! Claimed ") || message.startsWith("[Bazaar] Claimed")) {
       ChestTickHandler.lastScreenDisplayName = "";
-    } else if (message.startsWith("Your new API key is")) {
-      String apiKey = message.split("key is ")[1];
-      try {
-        if (Utils.validateApiKey(apiKey)) {
-          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED + "Your api key has been set."));
-          BazaarNotifier.config.api = apiKey;
-          BazaarNotifier.validApiKey = true;
-          BazaarNotifier.activeBazaar = true;
-        } else {
-          Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-              BazaarNotifier.prefix + EnumChatFormatting.RED
-                  + "Your api key is invalid. Please run /api new to get a fresh api key & use that in /bn api (key)"));
-          BazaarNotifier.validApiKey = false;
-        }
-      } catch (IOException r) {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.RED
-                + "An error occurred when trying to set your api key. Please re-run the command to try again."));
-        BazaarNotifier.validApiKey = false;
-        r.printStackTrace();
-      }
     }
   }
 
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
-    if (e.gui instanceof GuiChest && (BazaarNotifier.validApiKey
-        || BazaarNotifier.apiKeyDisabled)) {
+    if (e.gui instanceof GuiChest && (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled)) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
-
       if (chest != null && ((chest.hasCustomName() && (
-          StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+                  StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
               .startsWith("Bazaar") || StringUtils.stripControlCodes(
                   chest.getDisplayName().getUnformattedText())
               .equalsIgnoreCase("How much do you want to pay?") || StringUtils.stripControlCodes(
@@ -174,16 +143,6 @@ public class EventHandler {
   @SubscribeEvent
   public void disconnectEvent(ClientDisconnectionFromServerEvent e) {
     BazaarNotifier.inBazaar = false;
-  }
-
-  @SubscribeEvent
-  public void renderBazaarEvent(BackgroundDrawnEvent e) {
-    if (BazaarNotifier.inBazaar && BazaarNotifier.activeBazaar) {
-      GL11.glTranslated(0, 0, 1);
-      BazaarNotifier.modules.drawAllOutlines();
-      BazaarNotifier.modules.drawAllModules();
-      GL11.glTranslated(0, 0, -1);
-    }
   }
 
   @SubscribeEvent

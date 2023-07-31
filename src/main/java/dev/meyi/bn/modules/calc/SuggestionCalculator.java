@@ -15,14 +15,14 @@ public class SuggestionCalculator {
 
   public static void basic() {
     try {
-      if (BazaarNotifier.validApiKey || BazaarNotifier.apiKeyDisabled) {
+      if (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled) {
         List<String[]> list = new LinkedList<>();
         for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products
             .entrySet()) {
           String key = entry.getKey();
           BazaarItem product = BazaarNotifier.bazaarDataRaw.products.get(key);
 
-          if (!BazaarNotifier.config.suggestionShowEnchantments && key.startsWith("ENCHANTMENT")) {
+          if (!BazaarNotifier.config.suggestionModule.suggestionShowEnchantments && key.startsWith("ENCHANTMENT")) {
             continue;
           }
 

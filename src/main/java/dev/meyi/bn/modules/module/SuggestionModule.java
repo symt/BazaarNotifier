@@ -1,71 +1,104 @@
 package dev.meyi.bn.modules.module;
 
+import cc.polyfrost.oneconfig.config.annotations.Slider;
+import cc.polyfrost.oneconfig.config.annotations.Switch;
+import cc.polyfrost.oneconfig.config.migration.JsonName;
+import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.opengl.GL11;
 
-public class SuggestionModule extends Module {
+public class SuggestionModule extends Module{
 
-  public static final ModuleName type = ModuleName.SUGGESTION;
-  public static List<String[]> list = new LinkedList<>();
+  public transient static final ModuleName type = ModuleName.SUGGESTION;
+  public transient static List<String[]> list = new LinkedList<>();
+
+  @Switch(name= "Use Profit per Hour", category = "Suggestion Module")
+  public boolean useProfitPerHour = false;
+
+  @JsonName("suggestionListLength")
+  @Slider(name = "Suggestion List Entries",
+          category = "Suggestion Module",
+          description = "The amount of entries in the Suggestion Module list",
+          min = 1,max = 25,step = 1
+  )
+  public int suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
+
+  @JsonName("suggestionShowEnchantments")
+  @Switch(name = "Show Enchantments",
+          category = "Suggestion Module",
+          description = "If the mod should recommend enchantments"
+  )
+  public boolean suggestionShowEnchantments = Defaults.SUGGESTION_SHOW_ENCHANTMENTS;
 
   public SuggestionModule() {
     super();
   }
 
-  public SuggestionModule(ModuleConfig module) {
-    super(module);
+  @Override
+  protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
+    draw();
   }
 
   @Override
-  protected void draw() {
-    if (list.size() != 0) {
-      List<LinkedHashMap<String, Color>> items = new ArrayList<>();
+  protected float getWidth(float scale, boolean example) {
+    return RenderUtils.getStringWidth(longestString)*scale;
+  }
 
-      for (int i = shift; i < BazaarNotifier.config.suggestionListLength + shift; i++) {
-        LinkedHashMap<String, Color> message = new LinkedHashMap<>();
-        message.put((i + 1) + ". ", Color.MAGENTA);
-        message.put(list.get(i)[0], Color.CYAN);
-        message.put(" - ", Color.GRAY);
-        message.put("EP: ", Color.RED);
-        message.put("" + BazaarNotifier.df.format(Double.valueOf(list.get(i)[1])), Color.ORANGE);
+  @Override
+  protected float getHeight(float scale, boolean example) {
+    if(BazaarNotifier.config == null){
+      return 100f*scale;
+    }
+    return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT
+            * BazaarNotifier.config.suggestionModule.suggestionListLength
+            + BazaarNotifier.config.suggestionModule.suggestionListLength * 2)*scale - 2;
+  }
+
+  @Override
+  public void draw() {
+    GL11.glTranslated(0, 0, 1);
+    drawBounds();
+    if (list.size() != 0) {
+      ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
+      for (int i = shift; i < BazaarNotifier.config.suggestionModule.suggestionListLength + shift; i++) {
+        ArrayList<ColoredText> message = new ArrayList<>();
+        message.add(new ColoredText((i + 1) + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
+        message.add(new ColoredText(list.get(i)[0], BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText("EP: ", Color.RED));
+        message.add(new ColoredText("" + BazaarNotifier.df.format(Double.parseDouble(list.get(i)[1]) *
+                (useProfitPerHour?60:1)), Color.ORANGE));
         items.add(message);
       }
-
-      int longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
-
-      boundsX = x + longestXString;
-
+      longestString = RenderUtils.getLongestString(items);
+      RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
     } else {
-      RenderUtils.drawCenteredString("Waiting for bazaar data", x, y, 0xAAAAAA, scale);
-      boundsX = x + 200;
+      RenderUtils.drawCenteredString("Waiting for bazaar data", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
+      //Todo add height and width
     }
-    float Y = y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale
-        * BazaarNotifier.config.suggestionListLength
-        + BazaarNotifier.config.suggestionListLength * 2 * scale - 2;
-    boundsY = (int) Y;
+    GL11.glTranslated(0, 0, -1);
   }
 
   @Override
   protected void reset() {
-    x = Defaults.SUGGESTION_MODULE_X;
-    y = Defaults.SUGGESTION_MODULE_Y;
+    position.setPosition(Defaults.SUGGESTION_MODULE_X,Defaults.SUGGESTION_MODULE_Y);
     scale = 1;
-    active = true;
-    BazaarNotifier.config.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
+    enabled = true;
+    BazaarNotifier.config.suggestionModule.suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
   }
 
   @Override
-  protected String name() {
+  public String name() {
     return ModuleName.SUGGESTION.name();
   }
 
@@ -76,14 +109,8 @@ public class SuggestionModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return list.size() - BazaarNotifier.config.suggestionListLength;
+    return list.size() - BazaarNotifier.config.suggestionModule.suggestionListLength;
   }
-
-  @Override
-  public ModuleConfig generateModuleConfig() {
-    return super.generateModuleConfig();
-  }
-
 
 }
 

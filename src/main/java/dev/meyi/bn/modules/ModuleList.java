@@ -1,14 +1,7 @@
 package dev.meyi.bn.modules;
 
-
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
-import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.handlers.MouseHandler;
-import dev.meyi.bn.modules.module.BankModule;
-import dev.meyi.bn.modules.module.CraftingModule;
-import dev.meyi.bn.modules.module.NotificationModule;
-import dev.meyi.bn.modules.module.SuggestionModule;
 import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -18,75 +11,17 @@ public class ModuleList extends ArrayList<Module> {
   Module movingModule = null;
 
   public ModuleList() {
-    this(BazaarNotifier.config);
-  }
-
-  public ModuleList(Configuration config) {
-
-    ModuleConfig[] modules = config.modules;
-
-    for (ModuleConfig module : modules) {
-      switch (ModuleName.valueOf(module.name)) {
-        case SUGGESTION:
-          add(new SuggestionModule(module));
-          break;
-        case BANK:
-          add(new BankModule(module));
-          break;
-        case NOTIFICATION:
-          add(new NotificationModule(module));
-          break;
-        case CRAFTING:
-          add(new CraftingModule(module));
-          break;
-        default:
-          throw new IllegalStateException(
-              "Unexpected value: " + ModuleName.valueOf(module.name));
-      }
-    }
-  }
-
-  public boolean toggleModule(ModuleName type) {
-    if (type == ModuleName.SUGGESTION) {
-      BazaarNotifier.config.showChatMessages ^= true;
-    }
-
-    for (Module m : this) {
-      try {
-        if (m.getClass().getField("type").get(null) == type) {
-          m.active ^= true;
-
-          return m.active;
-        }
-      } catch (NoSuchFieldException | IllegalAccessException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return false;
-  }
-
-  public void drawAllModules() {
-    for (Module m : this) {
-      if (m.active) {
-        m.draw();
-      }
-    }
-  }
-
-  public void drawAllOutlines() {
-    for (Module m : this) {
-      if (m.active) {
-        m.drawBounds();
-      }
-    }
+     add(BazaarNotifier.config.suggestionModule);
+     add(BazaarNotifier.config.bankModule);
+     add(BazaarNotifier.config.notificationModule);
+     add(BazaarNotifier.config.craftingModule);
   }
 
   public void rescaleCheck() {
     for (Module m : this) {
       if (m.inMovementBox() && Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
-        float newScale = m.scale + (float) MouseHandler.mouseWheelMovement / 20;
-        m.scale = Math.max(newScale, 0.1f);
+        float newScale = m.getScale() + (float) MouseHandler.mouseWheelMovement / 20;
+        m.setScale(Math.max(newScale, 0.1f),false);
       }
     }
   }
@@ -149,6 +84,14 @@ public class ModuleList extends ArrayList<Module> {
       }
     }
   }
+  public void drawAllGui(){
+    for (Module m:this) {
+      if(m.shouldShowGui()){
+        m.position.updateSizePosition(m.getModuleWidth(),m.getModuleHeight());
+        m.draw();
+      }
+    }
+  }
 
 
   public void resetAll() {
@@ -159,16 +102,9 @@ public class ModuleList extends ArrayList<Module> {
 
   public void resetScale() {
     for (Module m : this) {
-      m.scale = 1;
+      m.setScale(1, false);
     }
   }
 
-  public ModuleConfig[] generateConfig() {
-    ModuleConfig[] config = new ModuleConfig[BazaarNotifier.modules.size()];
-    for (int i = 0; i < BazaarNotifier.modules.size(); i++) {
-      config[i] = this.get(i).generateModuleConfig();
-    }
-    return config;
-  }
 
 }

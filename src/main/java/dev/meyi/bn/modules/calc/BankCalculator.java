@@ -24,19 +24,12 @@ public class BankCalculator {
       "\\[Bazaar] Sold (.*)x (.*) for (.*) coins!");
   private static final Pattern instantBuy = Pattern.compile(
       "\\[Bazaar] Bought (.*)x (.*) for (.*) coins!");
-  private static double calculatedProfit = 0;
   private static double rawDifference = 0;
-  private static boolean startup = true;
-
-  public static double getBazaarProfit() {
-    return calculatedProfit;
-  }
   public static double getRawDifference() {
     return rawDifference;
   }
 
   public static void calculateBazaarProfit() {
-
     for (int i = orderHistory.size() - 1; i >= 0; i--) {
       Exchange sell = orderHistory.get(i);
       if (sell.getAmount() != 0 && sell.getType() == OrderType.SELL) {
@@ -44,12 +37,12 @@ public class BankCalculator {
           Exchange buy = orderHistory.get(j);
           if (buy.getAmount() != 0 && sell.matchesOrder(buy)) {
             if (buy.getAmount() >= sell.getAmount()) {
-              calculatedProfit +=
+              BazaarNotifier.config.bankModule.bazaarProfit +=
                   sell.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
               buy.removeAmount(sell.getAmount());
               sell.removeAmount(sell.getAmount());
             } else {
-              calculatedProfit +=
+              BazaarNotifier.config.bankModule.bazaarProfit  +=
                   buy.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
               sell.removeAmount(buy.getAmount());
               buy.removeAmount(buy.getAmount());
@@ -114,7 +107,7 @@ public class BankCalculator {
           }
         }
         orderHistory.get(i).removeAmount(maxCrafting);
-        calculatedProfit +=
+        BazaarNotifier.config.bankModule.bazaarProfit  +=
             ((double) maxCrafting * orderHistory.get(i).getPricePerUnit()) * .99 - buyValue;
       }
     }
@@ -176,12 +169,7 @@ public class BankCalculator {
   }
 
   public static synchronized void reset() {
-    if (startup) {
-      startup = false;
-      calculatedProfit = BazaarNotifier.config.bazaarProfit;
-    } else {
-      calculatedProfit = 0;
-    }
+    BazaarNotifier.config.bankModule.bazaarProfit = 0;
     orderHistory.clear();
     rawDifference = 0;
   }

@@ -1,16 +1,16 @@
 package dev.meyi.bn.modules.module;
 
+import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.ModuleConfig;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
+import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.RenderUtils;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -26,17 +26,31 @@ import org.lwjgl.opengl.GL11;
 
 public class NotificationModule extends Module {
 
-  public static final ModuleName type = ModuleName.NOTIFICATION;
-  int longestXString = 0;
+  public transient static final ModuleName type = ModuleName.NOTIFICATION;
 
   public NotificationModule() {
     super();
   }
 
-  public NotificationModule(ModuleConfig module) {
-    super(module);
+  @Override
+  protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
+    draw();
   }
 
+  @Override
+  protected float getWidth(float scale, boolean example) {
+    if (longestString != null) {
+      if (!longestString.isEmpty()) {
+        return RenderUtils.getStringWidth(longestString) * scale;
+      }
+    }
+    return 200*scale;
+  }
+
+  @Override
+  protected float getHeight(float scale, boolean example) {
+    return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * 10 + 20)*scale  - 2;
+  }
   //source dsm
   public static void drawOnSlot(int chestSize, int slot, int color) {
     chestSize += 36;
@@ -58,10 +72,11 @@ public class NotificationModule extends Module {
   }
 
   @Override
-  protected void draw() {
+  public void draw() {
+    GL11.glTranslated(0, 0, 1);
     // add extra space after "Buy" so it lines up with sell
-
-    List<LinkedHashMap<String, Color>> items = new ArrayList<>();
+    drawBounds();
+    ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
 
     if (BazaarNotifier.orders.size() != 0) {
 
@@ -69,54 +84,45 @@ public class NotificationModule extends Module {
 
       for (int i = shift; i < size; i++) {
         Order currentOrder = BazaarNotifier.orders.get(i);
-        LinkedHashMap<String, Color> message = new LinkedHashMap<>();
+        ArrayList<ColoredText> message = new ArrayList<>();
 
-        Color typeSpecificColor =
-            currentOrder.orderStatus == Order.OrderStatus.BEST
+        Color statusSpecificColor = currentOrder.orderStatus == Order.OrderStatus.BEST
                 || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
-                ? new Color(0x55FF55)
-                : currentOrder.type.equals(Order.OrderType.BUY) ? new Color(0xFF55FF)
-                    : new Color(0x55FFFF);
+                ? Color.GREEN : currentOrder.orderStatus == Order.OrderStatus.MATCHED? 
+                Color.YELLOW : Color.RED;
+        Color typeSpecificColor = currentOrder.type == Order.OrderType.BUY?new Color( 90, 0, 250):Color.CYAN;
 
-        String notification = currentOrder.orderStatus.name();
-        message.put(WordUtils.capitalizeFully(currentOrder.type.name()), typeSpecificColor);
-        message.put(" - ", new Color(0xAAAAAA));
-        message.put(notification + " ", new Color(0xFFFF55));
-        message.put("(", new Color(0xAAAAAA));
-        message.put(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount),
-            typeSpecificColor);
-        message.put("x ", new Color(0xAAAAAA));
-        message.put(currentOrder.product, typeSpecificColor);
-        message.put(", ", new Color(0xAAAAAA));
-        message.put(BazaarNotifier.df.format(currentOrder.pricePerUnit),
-            typeSpecificColor);
-        message.put(")", new Color(0xAAAAAA));
+        message.add(new ColoredText(i+1 + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
+        message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()),typeSpecificColor));
+        message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount)+ "x ",
+                BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(new ColoredText(currentOrder.product , BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+        message.add(new ColoredText(currentOrder.orderStatus.name() + " ", statusSpecificColor));
+
+
         items.add(message);
       }
-
-      longestXString = RenderUtils.drawColorfulParagraph(items, x, y, scale);
-      boundsX = x + longestXString;
+      longestString = RenderUtils.getLongestString(items);
+      RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
     } else {
-      RenderUtils.drawCenteredString("No orders found", x, y, 0xAAAAAA, scale);
-      float X = x + 200 * scale;
-      boundsX = (int) X;
+      longestString = "";
+      RenderUtils.drawCenteredString("No orders found", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
     }
-    float Y =
-        y + Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * scale * 10 + 20 * scale - 2;
-    boundsY = (int) Y;
     highlightOrder(checkHoveredText());
+    GL11.glTranslated(0, 0, -1);
   }
 
   @Override
   protected void reset() {
-    x = Defaults.NOTIFICATION_MODULE_X;
-    y = Defaults.NOTIFICATION_MODULE_Y;
-    scale = 1;
-    active = true;
+    position.setPosition(Defaults.NOTIFICATION_MODULE_X, Defaults.NOTIFICATION_MODULE_Y);
+    setScale(1, false);
+    enabled = true;
   }
 
   @Override
-  protected String name() {
+  public String name() {
     return ModuleName.NOTIFICATION.name();
   }
 
@@ -131,14 +137,13 @@ public class NotificationModule extends Module {
   }
 
   protected int checkHoveredText() {
-    float _y = y;
+    float _y = position.getY();
     float y2 = _y + (10 * 11 * scale);
     int mouseYFormatted = getMouseCoordinateY();
     int mouseXFormatted = getMouseCoordinateX();
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
-    if (this.longestXString != 0) {
-      if (mouseXFormatted >= x && mouseXFormatted <= x + longestXString
-          && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
+    if (this.getWidth(scale, false) != 0) {
+      if (inMovementBox() && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
         return Math.round(relativeYMouse + shift);
       } else {
         return -1;
