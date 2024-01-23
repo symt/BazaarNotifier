@@ -37,6 +37,15 @@ public class ChestTickHandler {
     }
     items[items.length - 1] = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
 
+    Pattern p = Pattern.compile("(?:\\[.*\\] )(.*)");
+    Matcher m = p.matcher(StringUtils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText()));
+    String playerName = null;
+    if (m.find()) {
+      playerName = m.group(1);
+    } else {
+      System.err.println("Improperly formatted player name. Aborting!");
+    }
+
     for (ItemStack item : items) {
       if (item != null && Item.itemRegistry.getIDForObject(item.getItem()) != 160    // Glass
           && Item.itemRegistry.getIDForObject(item.getItem()) != 102    // Glass
@@ -50,13 +59,13 @@ public class ChestTickHandler {
           lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(j)));
         }
 
-        Pattern p = Pattern.compile("(BUY|SELL):? (.*)");
-        Matcher m = p.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
+        Pattern p2 = Pattern.compile("(BUY|SELL):? (.*)");
+        Matcher m2 = p2.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
         String displayName;
         Order.OrderType type;
-        if (m.find()) {
-          displayName = m.group(2);
-          type = "sell".equalsIgnoreCase(m.group(1)) ? Order.OrderType.SELL : Order.OrderType.BUY;
+        if (m2.find()) {
+          displayName = m2.group(2);
+          type = "sell".equalsIgnoreCase(m2.group(1)) ? Order.OrderType.SELL : Order.OrderType.BUY;
         } else {
           System.err.println("Bazaar item header incorrect. Aborting!");
           return;
@@ -109,6 +118,24 @@ public class ChestTickHandler {
             }
             if (amountLeft > 0) {
               BazaarNotifier.orders.get(orderInQuestion).setAmountRemaining(amountLeft);
+            }
+          } else if (playerName != null) {
+            Pattern p3 = Pattern.compile("By: (?:\\[.*\\] )?(.*)");
+            String creator = "";
+            for (String line : lore) {
+              Matcher m3 = p3.matcher(line);
+              if (m3.find()) {
+                creator = m3.group(1);
+                break;
+              }
+            }
+            if (creator.equals(playerName)) {
+              if (lore.get(3).startsWith("Filled:") || lore.get(4).toLowerCase().contains("expire") || lore.get(5).toLowerCase().contains("expire")) {
+                continue;
+              }
+              String amountLeftString = lore.get(2).split(" ")[2];
+              amountLeft = Integer.parseInt(amountLeftString.substring(0, amountLeftString.length() - 1));
+              BazaarNotifier.orders.add(new Order(displayName, type, Double.parseDouble(priceString), amountLeft));
             }
           }
         } else {
