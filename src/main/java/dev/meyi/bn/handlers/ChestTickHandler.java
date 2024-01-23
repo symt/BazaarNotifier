@@ -38,12 +38,11 @@ public class ChestTickHandler {
 
     Pattern p = Pattern.compile("(?:\\[.*\\] )(.*)");
     Matcher m = p.matcher(StringUtils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText()));
-    String playerName;
+    String playerName = null;
     if (m.find()) {
       playerName = m.group(1);
     } else {
       System.err.println("Improperly formatted player name. Aborting!");
-      return;
     }
 
     for (ItemStack item : items) {
@@ -119,7 +118,7 @@ public class ChestTickHandler {
             if (amountLeft > 0) {
               BazaarNotifier.orders.get(orderInQuestion).setAmountRemaining(amountLeft);
             }
-          } else {
+          } else if (playerName != null) {
             Pattern p3 = Pattern.compile("By: (?:\\[.*\\] )?(.*)");
             String creator = "";
             for (String line : lore) {
