@@ -3,9 +3,7 @@ package dev.meyi.bn.config;
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.Button;
 import cc.polyfrost.oneconfig.config.annotations.HUD;
-import cc.polyfrost.oneconfig.config.annotations.HypixelKey;
 import cc.polyfrost.oneconfig.config.annotations.Switch;
-import cc.polyfrost.oneconfig.config.annotations.Text;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
@@ -27,23 +25,17 @@ public class Configuration extends Config {
   public Configuration() {
     super(new Mod("BazaarNotifier", ModType.SKYBLOCK,"/icon.png", new JsonMigrator("./config/BazaarNotifier/config.json")), "bazaarnotifier.json");
     initialize();
-    addDependency("collectionCheck", "Requires ApiKey", () -> {
-      if ("".equals(api)) collectionCheck = false;
-      return !api.isEmpty();
-    });
+
+    /*
+     * Collection check will remain disabled until the mod reroutes through api.meyi.dev for the interfacing
+     */
+    collectionCheck = false;
   }
 
   public boolean firstLoad = true;
 
   @JsonName("version")
   public String version = BazaarNotifier.VERSION;
-
-  @JsonName("api")
-  @HypixelKey
-  @Text(name = "API-Key",
-          secure = true
-  )
-  public String api = "";
 
   @HUD(name = "Suggestion Module",
           category = "Suggestion Module"

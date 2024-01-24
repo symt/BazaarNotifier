@@ -59,12 +59,10 @@ public class BazaarNotifier {
   public static boolean activeBazaar = true;
   public static boolean inBazaar = false;
   public static boolean forceRender = false;
-  public static boolean apiKeyDisabled = true;
 
 
   public static ArrayList<Order> orders = new ArrayList<>();
   public static BazaarResponse bazaarDataRaw;
-  public static JsonObject playerDataFromAPI = new JsonObject();
   public static ModuleList modules;
   public static Configuration config;
   public static JsonObject resources;

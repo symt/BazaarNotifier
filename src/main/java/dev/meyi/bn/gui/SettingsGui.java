@@ -13,11 +13,6 @@ import net.minecraft.util.EnumChatFormatting;
 
 public class SettingsGui extends GuiScreen {
 
-  GuiTextField apiKey;
-  String previousApiKey;
-  boolean textCleared;
-
-
   @Override
   public void initGui() {
     super.initGui();
@@ -32,15 +27,6 @@ public class SettingsGui extends GuiScreen {
     buttonId++;
     buttonList.add(new GuiButton(buttonId, getButtonX(buttonId), getButtonY(buttonId),
         "Chat Messages: " + SettingsGui.getOnOff(BazaarNotifier.config.showChatMessages)));
-    buttonId++;
-    apiKey = new GuiTextField(buttonId, fontRendererObj, getButtonX(buttonId), getButtonY(buttonId),
-        200, 20);
-    apiKey.setMaxStringLength(40);
-    apiKey.setFocused(true);
-    apiKey.setCanLoseFocus(false);
-    apiKey.setText(BazaarNotifier.config.api.equals("") ? "Api key missing" : "Api key set");
-    previousApiKey = BazaarNotifier.config.api;
-    textCleared = false;
   }
 
   @Override
@@ -60,53 +46,11 @@ public class SettingsGui extends GuiScreen {
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     this.drawDefaultBackground();
     super.drawScreen(mouseX, mouseY, partialTicks);
-    apiKey.drawTextBox();
   }
 
   @Override
   public boolean doesGuiPauseGame() {
     return false;
-  }
-
-  @Override
-  protected void keyTyped(char typedChar, int keyCode) throws IOException {
-    super.keyTyped(typedChar, keyCode);
-    if (apiKey != null && apiKey.isFocused()) {
-      if (!textCleared && (apiKey.getText().equalsIgnoreCase("Api key set")
-          || apiKey.getText().equals("Api key missing"))) {
-        apiKey.setText("");
-        textCleared = true;
-      }
-      apiKey.textboxKeyTyped(typedChar, keyCode);
-    }
-  }
-
-  @Override
-  public void onGuiClosed() {
-    super.onGuiClosed();
-    try {
-      String key = apiKey.getText();
-      if (key.equals("") || key.equals(previousApiKey) || key.equals("Api key missing") || key
-          .equals("Api key set")) {
-        return;
-      }
-      key = key.replaceAll(" ", "");
-      if (Utils.validateApiKey(key)) {
-        BazaarNotifier.config.api = key;
-        Minecraft.getMinecraft().thePlayer.addChatMessage(
-            new ChatComponentText(
-                BazaarNotifier.prefix + EnumChatFormatting.GREEN + "A new api key has been set."));
-      } else {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-            BazaarNotifier.prefix + EnumChatFormatting.RED
-                + "Your api key was not saved because it was invalid."));
-      }
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (NullPointerException | IllegalArgumentException ignored) {
-      // this only happens if the GUI is closed during initialising
-    }
   }
 
   public int getButtonX(int id) {

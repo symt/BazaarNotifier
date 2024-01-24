@@ -86,7 +86,7 @@ public class ScheduledEvents {
   public ScheduledExecutorService getBazaarData() {
     ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
     ex.scheduleAtFixedRate(() -> {
-      if (BazaarNotifier.activeBazaar && (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled)) {
+      if (BazaarNotifier.activeBazaar) {
         try {
           BazaarNotifier.bazaarDataRaw = Utils.getBazaarData();
         } catch (Exception t) {

@@ -128,12 +128,6 @@ public class UpdateHandler {
                       + "You are on a beta version. Please report any bugs you come across in the discord server."));
             }
           }
-
-          if (BazaarNotifier.config.api.isEmpty() && !BazaarNotifier.apiKeyDisabled) {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                BazaarNotifier.prefix + EnumChatFormatting.RED
-                    + "The mod doesn't have access to a valid api key yet. Please run /bn api (key) to set your key"));
-          }
         } catch (IOException e) {
           e.printStackTrace();
         }
