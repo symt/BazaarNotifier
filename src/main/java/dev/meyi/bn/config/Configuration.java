@@ -26,10 +26,9 @@ public class Configuration extends Config {
     super(new Mod("BazaarNotifier", ModType.SKYBLOCK,"/icon.png", new JsonMigrator("./config/BazaarNotifier/config.json")), "bazaarnotifier.json");
     initialize();
 
-    /*
-     * Collection check will remain disabled until the mod reroutes through api.meyi.dev for the interfacing
-     */
-    collectionCheck = false;
+    addListener("collectionCheck", () -> {
+      collectionCheck = false;
+    });
   }
 
   public boolean firstLoad = true;
