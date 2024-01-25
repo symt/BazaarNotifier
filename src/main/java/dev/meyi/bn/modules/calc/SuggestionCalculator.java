@@ -15,28 +15,28 @@ public class SuggestionCalculator {
 
   public static void basic() {
     try {
-      if (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled) {
-        List<String[]> list = new LinkedList<>();
-        for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products
-            .entrySet()) {
-          String key = entry.getKey();
-          BazaarItem product = BazaarNotifier.bazaarDataRaw.products.get(key);
+      List<String[]> list = new LinkedList<>();
+      for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products
+          .entrySet()) {
+        String key = entry.getKey();
+        BazaarItem product = BazaarNotifier.bazaarDataRaw.products.get(key);
 
-          if (!BazaarNotifier.config.suggestionModule.suggestionShowEnchantments && key.startsWith("ENCHANTMENT")) {
-            continue;
-          }
-
-          if (!BazaarNotifier.bazaarConv.containsKey(key)) {
-            BazaarNotifier.bazaarConv.put(key, key);
-          }
-          String productId = BazaarNotifier.bazaarConv.get(key);
-
-          list.add(new String[]{productId, Double.toString(calculateEP(product))});
+        if (!BazaarNotifier.config.suggestionModule.suggestionShowEnchantments &&
+            key.startsWith("ENCHANTMENT")) {
+          continue;
         }
-        list.sort(Comparator.comparingDouble(o -> Double.parseDouble(o[1])));
-        Collections.reverse(list);
-        SuggestionModule.list = list;
+
+        if (!BazaarNotifier.bazaarConv.containsKey(key)) {
+          BazaarNotifier.bazaarConv.put(key, key);
+        }
+        String productId = BazaarNotifier.bazaarConv.get(key);
+
+        list.add(new String[]{productId, Double.toString(calculateEP(product))});
       }
+      list.sort(Comparator.comparingDouble(o -> Double.parseDouble(o[1])));
+      Collections.reverse(list);
+      SuggestionModule.list = list;
+
     } catch (Exception e) {
       e.printStackTrace();
     }

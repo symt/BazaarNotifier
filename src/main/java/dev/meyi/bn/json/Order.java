@@ -55,7 +55,7 @@ public class Order {
 
   public void updateStatus() {
     OrderStatus newOrderStatus = null;
-    if (!(BazaarNotifier.activeBazaar && (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled))) {
+    if (!BazaarNotifier.activeBazaar) {
       return;
     }
     if (OrderType.BUY.equals(this.type)) {
