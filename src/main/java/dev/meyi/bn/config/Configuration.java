@@ -29,6 +29,8 @@ public class Configuration extends Config {
     addListener("collectionCheck", () -> {
       collectionCheck = false;
     });
+
+    collectionCheck = false; // in case the user has it enabled already, we want to force it off
   }
 
   public boolean firstLoad = true;
