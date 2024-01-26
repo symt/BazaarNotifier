@@ -85,10 +85,12 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
   public void drawAllGui(){
-    for (Module m:this) {
-      if(m.shouldShowGui()){
-        m.position.updateSizePosition(m.getModuleWidth(),m.getModuleHeight());
-        m.draw();
+    if (BazaarNotifier.config.enabled) {
+      for (Module m : this) {
+        if (m.shouldShowGui()) {
+          m.position.updateSizePosition(m.getModuleWidth(), m.getModuleHeight());
+          m.draw();
+        }
       }
     }
   }
