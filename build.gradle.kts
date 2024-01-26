@@ -123,7 +123,6 @@ tasks{
                         "ModSide" to "CLIENT",
                         "ForceLoadAsMod" to true,
                         "TweakOrder" to "0",
-                        "MixinConfigs" to "mixin.${mod_id}.json",
                         "TweakClass" to "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker"
                     )
                 )
