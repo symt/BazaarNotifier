@@ -19,12 +19,16 @@ import org.lwjgl.opengl.GL11;
 public class BankModule extends Module {
   @JsonName("bazaarProfit")
   public double bazaarProfit = 0;
+
+  @JsonName("bazaarDailyAmount")
+  public double bazaarDailyAmount = 1E10;
+
   public BankModule() {
     super();
   }
 
   public transient static final ModuleName type = ModuleName.BANK;
-  transient int  lines = 2;
+  transient int lines = 2;
 
   @JsonName("bankRawDifference")
   @Switch(name = "Raw Difference",
@@ -72,7 +76,22 @@ public class BankModule extends Module {
       items.add(bazaarDifferenceMessage);
     }
 
-    lines = BazaarNotifier.config.bankModule.bankRawDifference?3:2;
+    if (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 5E9) {
+      ArrayList<ColoredText> bazaarDifferenceMessage = new ArrayList<>();
+      bazaarDifferenceMessage.add(new ColoredText("Cap Space Remaining: ", BazaarNotifier.config.itemColor.toJavaColor()));
+      if (BazaarNotifier.config.bankModule.bazaarDailyAmount > 0) {
+        bazaarDifferenceMessage.add(new ColoredText(
+            BazaarNotifier.df.format(BazaarNotifier.config.bankModule.bazaarDailyAmount),
+            Color.ORANGE));
+      } else {
+        bazaarDifferenceMessage.add(new ColoredText("NONE", Color.RED));
+      }
+      items.add(bazaarDifferenceMessage);
+    }
+
+    lines = 2 + (BazaarNotifier.config.bankModule.bankRawDifference ? 1 : 0)
+              + (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 5E9 ? 1 : 0);
+
 
     longestString = RenderUtils.getLongestString(items);
     RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
