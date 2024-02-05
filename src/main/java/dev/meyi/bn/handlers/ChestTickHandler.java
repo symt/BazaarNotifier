@@ -134,7 +134,7 @@ public class ChestTickHandler {
                 continue;
               }
               String amountLeftString = lore.get(2).split(" ")[2];
-              amountLeft = Integer.parseInt(amountLeftString.substring(0, amountLeftString.length() - 1));
+              amountLeft = Integer.parseInt(amountLeftString.substring(0, amountLeftString.length() - 1).replace(",", ""));
               BazaarNotifier.orders.add(new Order(displayName, type, Double.parseDouble(priceString), amountLeft));
             }
           }
