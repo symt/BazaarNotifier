@@ -76,9 +76,9 @@ public class BankModule extends Module {
       items.add(bazaarDifferenceMessage);
     }
 
-    if (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 5E9) {
+    if (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 1E9) {
       ArrayList<ColoredText> bazaarDifferenceMessage = new ArrayList<>();
-      bazaarDifferenceMessage.add(new ColoredText("Cap Space Remaining: ", BazaarNotifier.config.itemColor.toJavaColor()));
+      bazaarDifferenceMessage.add(new ColoredText("Daily Limit: ", BazaarNotifier.config.itemColor.toJavaColor()));
       if (BazaarNotifier.config.bankModule.bazaarDailyAmount > 0) {
         bazaarDifferenceMessage.add(new ColoredText(
             BazaarNotifier.df.format(BazaarNotifier.config.bankModule.bazaarDailyAmount),
@@ -90,7 +90,7 @@ public class BankModule extends Module {
     }
 
     lines = 2 + (BazaarNotifier.config.bankModule.bankRawDifference ? 1 : 0)
-              + (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 5E9 ? 1 : 0);
+              + (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 1E9 ? 1 : 0);
 
 
     longestString = RenderUtils.getLongestString(items);
