@@ -81,7 +81,7 @@ public class BankModule extends Module {
       bazaarDifferenceMessage.add(new ColoredText("Daily Limit: ", BazaarNotifier.config.itemColor.toJavaColor()));
       if (BazaarNotifier.config.bankModule.bazaarDailyAmount > 0) {
         bazaarDifferenceMessage.add(new ColoredText(
-            BazaarNotifier.df.format(BazaarNotifier.config.bankModule.bazaarDailyAmount),
+            BazaarNotifier.df.format(Math.max(BazaarNotifier.config.bankModule.bazaarDailyAmount, 0)),
             Color.ORANGE));
       } else {
         bazaarDifferenceMessage.add(new ColoredText("NONE", Color.RED));
