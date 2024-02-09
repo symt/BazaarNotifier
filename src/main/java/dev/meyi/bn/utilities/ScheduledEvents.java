@@ -4,6 +4,8 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,7 +47,7 @@ public class ScheduledEvents {
       case "notification":
         return notificationLoop();
       case "crafting":
-        return craftingLoop();
+        return craftingBankLoop();
       case "suggestion":
         return suggestionLoop();
       case "collection":
@@ -71,13 +73,24 @@ public class ScheduledEvents {
     }, 1, 1, TimeUnit.MINUTES);
   }
 
-  public ScheduledExecutorService craftingLoop() {
+  public ScheduledExecutorService craftingBankLoop() {
     ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
     ex.scheduleAtFixedRate(() -> {
-      try {
-        CraftingCalculator.getBestEnchantRecipes();
-      } catch (Exception t) {
-        t.printStackTrace();
+      if (BazaarNotifier.activeBazaar) {
+        try {
+          CraftingCalculator.getBestEnchantRecipes();
+
+          // Reset the bank calculator on the new day
+          // It probably isn't necessary to do this in a scheduler, but here we are.
+          long currentTime = System.currentTimeMillis();
+          Date reset = new Date(currentTime - (currentTime % 86400000));
+          if (reset.after(new Date(BazaarNotifier.config.lastLogin))) {
+            BazaarNotifier.config.lastLogin = System.currentTimeMillis();
+            BazaarNotifier.config.bankModule.bazaarDailyAmount = 0;
+          }
+        } catch (Exception t) {
+          t.printStackTrace();
+        }
       }
     }, 5, 5, TimeUnit.SECONDS);
     return ex;
@@ -100,10 +113,12 @@ public class ScheduledEvents {
   public ScheduledExecutorService suggestionLoop() {
     ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
     ex.scheduleAtFixedRate(() -> {
-      try {
-        SuggestionCalculator.basic();
-      } catch (Exception t) {
-        t.printStackTrace();
+      if (BazaarNotifier.activeBazaar) {
+        try {
+          SuggestionCalculator.basic();
+        } catch (Exception t) {
+          t.printStackTrace();
+        }
       }
     }, 5, 5, TimeUnit.SECONDS);
     return ex;
@@ -112,10 +127,12 @@ public class ScheduledEvents {
   public ScheduledExecutorService collectionLoop() {
     ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
     ex.scheduleAtFixedRate(() -> {
-      try {
-        CraftingCalculator.getUnlockedRecipes();
-      } catch (Exception t) {
-        t.printStackTrace();
+      if (BazaarNotifier.activeBazaar) {
+        try {
+          CraftingCalculator.getUnlockedRecipes();
+        } catch (Exception t) {
+          t.printStackTrace();
+        }
       }
     }, 5, 5, TimeUnit.MINUTES);
     return ex;
@@ -125,12 +142,14 @@ public class ScheduledEvents {
   public ScheduledExecutorService notificationLoop() {
     ScheduledExecutorService ex = Executors.newScheduledThreadPool(1);
     ex.scheduleAtFixedRate(() -> {
-      try {
-        for (Order order : BazaarNotifier.orders) {
-          order.updateStatus();
+      if (BazaarNotifier.activeBazaar) {
+        try {
+          for (Order order : BazaarNotifier.orders) {
+            order.updateStatus();
+          }
+        } catch (Exception t) {
+          t.printStackTrace();
         }
-      } catch (Exception t) {
-        t.printStackTrace();
       }
     }, 0, 2, TimeUnit.SECONDS);
 

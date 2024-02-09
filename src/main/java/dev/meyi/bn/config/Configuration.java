@@ -108,4 +108,7 @@ public class Configuration extends Config {
           category = "Bank Module"
   )
   Runnable resetBank = BankCalculator::reset;
+
+  @JsonName("lastLogin")
+  public long lastLogin = System.currentTimeMillis();
 }

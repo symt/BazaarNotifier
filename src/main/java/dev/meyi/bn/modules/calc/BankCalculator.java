@@ -2,6 +2,7 @@ package dev.meyi.bn.modules.calc;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Exchange;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.Order.OrderType;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
@@ -168,10 +169,13 @@ public class BankCalculator {
     }
   }
 
+  public static void evaluateCapHit(Order order) {
+    BazaarNotifier.config.bankModule.bazaarDailyAmount -= order.orderValue;
+  }
+
   public static synchronized void reset() {
     BazaarNotifier.config.bankModule.bazaarProfit = 0;
     orderHistory.clear();
     rawDifference = 0;
   }
-
 }
