@@ -31,8 +31,7 @@ public abstract class Module extends Hud {
   protected boolean showEverywhere = false;
 
   public Module() {
-    position.setPosition(20,20);
-    setScale(1, false);
+    super(true, 20, 20, 2, 1);
   }
 
   @Override

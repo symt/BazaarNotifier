@@ -60,7 +60,7 @@ public class BankModule extends Module {
     ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
 
     ArrayList <ColoredText> header = new ArrayList<>();
-    header.add(new ColoredText("Bank Module (Experimental)", BazaarNotifier.config.infoColor.toJavaColor()));
+    header.add(new ColoredText("Bank Module", BazaarNotifier.config.infoColor.toJavaColor()));
     items.add(header);
 
     ArrayList <ColoredText> bazaarProfitMessage = new ArrayList<>();
@@ -102,6 +102,7 @@ public class BankModule extends Module {
   protected void reset() {
     position.setPosition(Defaults.BANK_MODULE_X, Defaults.BANK_MODULE_Y);
     setScale(1, false);
+    this.bazaarProfit = 0;
     enabled = true;
   }
 
