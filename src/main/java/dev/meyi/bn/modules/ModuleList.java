@@ -85,7 +85,7 @@ public class ModuleList extends ArrayList<Module> {
     }
   }
   public void drawAllGui(){
-    if (BazaarNotifier.config.enabled) {
+    if (BazaarNotifier.config.enabled && BazaarNotifier.activeBazaar) {
       for (Module m : this) {
         if (m.shouldShowGui()) {
           m.position.updateSizePosition(m.getModuleWidth(), m.getModuleHeight());
