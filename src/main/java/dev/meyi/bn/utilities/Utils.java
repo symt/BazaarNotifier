@@ -16,10 +16,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagList;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -164,5 +167,41 @@ public class Utils {
 
     return new String[]{closestConversion,
         BazaarNotifier.bazaarConv.inverse().getOrDefault(closestConversion, "")};
+  }
+
+  public static List<String> getLoreFromItemStack(ItemStack item) {
+    NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
+        .getTagList("Lore", 8);
+
+    List<String> lore = new ArrayList<>();
+
+    for (int j = 0; j < lorePreFilter.tagCount(); j++) {
+      lore.add(net.minecraft.util.StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(j)));
+    }
+
+    return lore;
+  }
+
+  public static int getOrderAmountLeft(List<String> lore, int totalAmount) {
+    int amountLeft;
+    if (lore.get(3).startsWith("Filled:")) {
+      if (lore.get(3).split(" ")[2].equals("100%")) {
+        amountLeft = 0;
+      } else {
+        String intToParse = lore.get(3).split(" ")[1].split("/")[0];
+        int amountFulfilled;
+
+        if (intToParse.contains("k")) {
+          amountFulfilled = (int) (Double.parseDouble(intToParse.replace("k", "")) * 1000);
+        } else {
+          amountFulfilled = Integer.parseInt(intToParse);
+        }
+
+        amountLeft = totalAmount - amountFulfilled;
+      }
+    } else {
+      amountLeft = totalAmount;
+    }
+    return amountLeft;
   }
 }
