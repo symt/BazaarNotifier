@@ -9,6 +9,7 @@ import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.RenderUtils;
+import dev.meyi.bn.utilities.Utils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,6 @@ import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
@@ -187,12 +187,7 @@ public class NotificationModule extends Module {
               .equalsIgnoreCase("sell") ? Order.OrderType.SELL : Order.OrderType.BUY;
           String product = itemDisplayName
               .replaceAll("SELL ", "").replaceAll("BUY ", "");
-          NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
-              .getTagList("Lore", 8);
-          List<String> lore = new ArrayList<>();
-          for (int k = 0; k < lorePreFilter.tagCount(); k++) {
-            lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(k)));
-          }
+          List<String> lore = Utils.getLoreFromItemStack(item);
 
           int amount = Integer.parseInt(
               lore.get(2).toLowerCase().split("amount: ")[1].replaceAll("[x,.]", ""));
@@ -210,6 +205,7 @@ public class NotificationModule extends Module {
             for (int i = 0; i < BazaarNotifier.orders.size(); i++) {
               if (o.matches(BazaarNotifier.orders.get(hoveredText))) {
                 drawOnSlot(chest.getSizeInventory(), j, 0xff00ff00);
+                break;
               }
             }
           }

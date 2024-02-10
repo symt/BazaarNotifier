@@ -44,9 +44,13 @@ public class ModuleSettingsGui extends GuiScreen {
         buttonList.add(new GuiButton(ButtonIds.COLLECTION_CHECK.id, getButtonX(),
             getButtonY(), "Collection Check: " +
             SettingsGui.getOnOff(BazaarNotifier.config.collectionCheck)));
-        if ("".equals(BazaarNotifier.config.api)) {
-          buttonList.get(3).enabled = false;
-        }
+
+        /*
+         * This will remain disabled as the way api keys work was changed to be application-based and not user-based
+         * TODO: Change the collection check to go through api.meyi.dev
+         */
+        buttonList.get(3).enabled = false;
+
         buttonList.add(new GuiButton(ButtonIds.SELLING_OPTION.id, getButtonX(),
             getButtonY(), "Sort By: " + (BazaarNotifier.config.craftingModule.craftingSortingOption == 0 ?
             "Instant Sell" : BazaarNotifier.config.craftingModule.craftingSortingOption == 1 ? "Sell Offer"

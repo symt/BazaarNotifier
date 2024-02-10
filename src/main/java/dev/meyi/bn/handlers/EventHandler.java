@@ -42,6 +42,7 @@ public class EventHandler {
           BazaarNotifier.bazaarConv.inverse().get(message.split("x ", 2)[1].split(" for ")[0]))
           && productVerify[1].equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
+        BankCalculator.evaluateCapHit(verify);
         verify = null;
         productVerify = new String[2];
       }
@@ -122,7 +123,7 @@ public class EventHandler {
 
   @SubscribeEvent
   public void menuOpenedEvent(GuiOpenEvent e) {
-    if (e.gui instanceof GuiChest && (!BazaarNotifier.config.api.isEmpty() || BazaarNotifier.apiKeyDisabled)) {
+    if (e.gui instanceof GuiChest) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
       if (chest != null && ((chest.hasCustomName() && (
                   StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())

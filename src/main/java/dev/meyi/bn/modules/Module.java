@@ -13,7 +13,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 
-public abstract class Module extends Hud{
+public abstract class Module extends Hud {
   protected int shift = 0;
   protected boolean moving = false;
   protected boolean needsToMove = false;
@@ -53,7 +53,7 @@ public abstract class Module extends Hud{
   }
 
   public boolean shouldShowGui(){
-    return (BazaarNotifier.inBazaar || showInGuis) && enabled &&BazaarNotifier.config.enabled;
+    return enabled && (BazaarNotifier.inBazaar || showInGuis || showInChat || showInDebug || showEverywhere);
   }
   public abstract void draw();
 

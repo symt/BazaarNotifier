@@ -4,7 +4,6 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.Utils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +12,6 @@ import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StringUtils;
@@ -37,34 +35,34 @@ public class ChestTickHandler {
     }
     items[items.length - 1] = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
 
+    Pattern p = Pattern.compile("(?:\\[.*\\] )(.*)");
+    Matcher m = p.matcher(StringUtils.stripControlCodes(Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText()));
+    String playerName = null;
+    if (m.find()) {
+      playerName = m.group(1);
+    } else {
+      System.err.println("Improperly formatted player name. Aborting!");
+    }
+
     for (ItemStack item : items) {
       if (item != null && Item.itemRegistry.getIDForObject(item.getItem()) != 160    // Glass
           && Item.itemRegistry.getIDForObject(item.getItem()) != 102    // Glass
           && Item.itemRegistry.getIDForObject(item.getItem()) != 262) { // Arrow
-        NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
-            .getTagList("Lore", 8);
+        List<String> lore = Utils.getLoreFromItemStack(item);
 
-        List<String> lore = new ArrayList<>();
-
-        for (int j = 0; j < lorePreFilter.tagCount(); j++) {
-          lore.add(StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(j)));
-        }
-
-        Pattern p = Pattern.compile("(BUY|SELL):? (.*)");
-        Matcher m = p.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
+        Pattern p2 = Pattern.compile("(BUY|SELL):? (.*)");
+        Matcher m2 = p2.matcher(StringUtils.stripControlCodes(item.getDisplayName()));
         String displayName;
         Order.OrderType type;
-        if (m.find()) {
-          displayName = m.group(2);
-          type = "sell".equalsIgnoreCase(m.group(1)) ? Order.OrderType.SELL : Order.OrderType.BUY;
+        if (m2.find()) {
+          displayName = m2.group(2);
+          type = "sell".equalsIgnoreCase(m2.group(1)) ? Order.OrderType.SELL : Order.OrderType.BUY;
         } else {
           System.err.println("Bazaar item header incorrect. Aborting!");
           return;
         }
 
         if (BazaarNotifier.bazaarConv.containsValue(displayName)) {
-          int amountLeft;
-
           String priceString;
           if (lore.get(4).toLowerCase().contains("expire")) {
             priceString = StringUtils.stripControlCodes(lore.get(6)).replaceAll(",", "")
@@ -88,27 +86,33 @@ public class ChestTickHandler {
           }
           if (orderInQuestion != -1) {
             verifiedOrders[orderInQuestion] = 1;
-            int totalAmount = BazaarNotifier.orders.get(orderInQuestion).startAmount;
-            if (lore.get(3).startsWith("Filled:")) {
-              if (lore.get(3).split(" ")[2].equals("100%")) {
-                amountLeft = 0;
-              } else {
-                String intToParse = lore.get(3).split(" ")[1].split("/")[0];
-                int amountFulfilled;
-
-                if (intToParse.contains("k")) {
-                  amountFulfilled = (int) (Double.parseDouble(intToParse.replace("k", "")) * 1000);
-                } else {
-                  amountFulfilled = Integer.parseInt(intToParse);
-                }
-
-                amountLeft = totalAmount - amountFulfilled;
-              }
-            } else {
-              amountLeft = BazaarNotifier.orders.get(orderInQuestion).startAmount;
-            }
+            Order order = BazaarNotifier.orders.get(orderInQuestion);
+            int totalAmount = order.startAmount;
+            int amountLeft = Utils.getOrderAmountLeft(lore, totalAmount);
             if (amountLeft > 0) {
-              BazaarNotifier.orders.get(orderInQuestion).setAmountRemaining(amountLeft);
+              order.setAmountRemaining(amountLeft);
+            }
+          } else if (playerName != null) {
+            Pattern p3 = Pattern.compile("By: (?:\\[.*\\] )?(.*)");
+            String creator = "";
+            for (String line : lore) {
+              Matcher m3 = p3.matcher(line);
+              if (m3.find()) {
+                creator = m3.group(1);
+                break;
+              }
+            }
+            if (creator.equals(playerName)) {
+              if (lore.get(4).toLowerCase().contains("expire") || lore.get(5).toLowerCase().contains("expire")) {
+                continue;
+              }
+              String totalAmount = lore.get(2).split(" ")[2];
+              int startAmount = Integer.parseInt(totalAmount.substring(0, totalAmount.length()-1).replace(",", ""));
+              Order newOrder = new Order(displayName, startAmount, Double.parseDouble(priceString), priceString, type);
+              newOrder.setAmountRemaining(Utils.getOrderAmountLeft(lore, startAmount));
+              if (newOrder.getAmountRemaining() != 0) {
+                BazaarNotifier.orders.add(newOrder);
+              }
             }
           }
         } else {
