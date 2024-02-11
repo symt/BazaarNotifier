@@ -22,9 +22,6 @@ public class SuggestionModule extends Module{
   public transient static final ModuleName type = ModuleName.SUGGESTION;
   public transient static List<String[]> list = new LinkedList<>();
 
-  @Switch(name= "Use Profit per Hour", category = "Suggestion Module")
-  public boolean useProfitPerHour = false;
-
   @JsonName("suggestionListLength")
   @Slider(name = "Suggestion List Entries",
           category = "Suggestion Module",
@@ -32,6 +29,9 @@ public class SuggestionModule extends Module{
           min = 1,max = 25,step = 1
   )
   public int suggestionListLength = Defaults.SUGGESTION_LIST_LENGTH;
+
+  @Switch(name= "Use Profit per Hour", category = "Suggestion Module")
+  public boolean useProfitPerHour = false;
 
   @JsonName("suggestionShowEnchantments")
   @Switch(name = "Show Enchantments",

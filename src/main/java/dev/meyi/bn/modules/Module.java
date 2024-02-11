@@ -25,7 +25,7 @@ public abstract class Module extends Hud {
 
 
 
-  @Switch(name="Show Modules Outside of Bazaar",
+  @Switch(name="Show Module Outside of Bazaar",
   category = "General"
   )
   protected boolean showEverywhere = false;
