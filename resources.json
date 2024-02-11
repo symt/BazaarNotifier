@@ -1418,14 +1418,14 @@
 					"SHARK_FIN",
 					2
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_TITANIUM": {
 				"material": [
 					"TITANIUM_ORE",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_QUARTZ_BLOCK": {
 				"material": [
@@ -1439,7 +1439,7 @@
 					"WHEAT",
 					9
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_REDSTONE": {
 				"material": [
@@ -1498,7 +1498,7 @@
 					"ENCHANTED_NETHER_STALK",
 					32
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_EMERALD_BLOCK": {
 				"material": [
@@ -1519,7 +1519,7 @@
 					"FLAWED_OPAL_GEM",
 					80
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_LEATHER": {
 				"material": [
@@ -1610,7 +1610,7 @@
 					"ANCIENT_CLAW",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_REDSTONE_LAMP": {
 				"material": [
@@ -1647,7 +1647,7 @@
 					"RABBIT",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"FLAWLESS_AMETHYST_GEM": {
 				"material": [
@@ -1781,7 +1781,7 @@
 					"RAW_SOULFLOW",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"FLAWLESS_JASPER_GEM": {
 				"material": [
@@ -1802,7 +1802,7 @@
 					"FINE_OPAL_GEM",
 					80
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"PACKED_ICE": {
 				"material": [
@@ -1816,7 +1816,7 @@
 					"HAY_BLOCK",
 					1
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"SUPER_COMPACTOR_3000": {
 				"material": [
@@ -1853,7 +1853,7 @@
 					"ROUGH_OPAL_GEM",
 					80
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_COOKED_MUTTON": {
 				"material": [
@@ -1895,7 +1895,7 @@
 					"MYCEL",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"FLAWED_RUBY_GEM": {
 				"material": [
@@ -2006,14 +2006,14 @@
 					"SNOW_BALL",
 					4
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"LEATHER": {
 				"material": [
 					"RABBIT_HIDE",
 					4
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_MELON_BLOCK": {
 				"material": [
@@ -2099,7 +2099,7 @@
 					"MELON",
 					9
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"CARROT_BAIT": {
 				"material": [
@@ -2108,7 +2108,7 @@
 					"RAW_FISH",
 					1
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_PRISMARINE_SHARD": {
 				"material": [
@@ -2187,14 +2187,14 @@
 					"ENCHANTED_RED_SAND",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_SHARK_FIN": {
 				"material": [
 					"SHARK_FIN",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_CARROT": {
 				"material": [
@@ -2215,7 +2215,7 @@
 					"SNOW_BLOCK",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_MITHRIL": {
 				"material": [
@@ -2312,7 +2312,7 @@
 					"RAW_FISH",
 					1
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"GOLDEN_TOOTH": {
 				"material": [
@@ -2337,7 +2337,7 @@
 					"SEEDS",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_SPIDER_EYE": {
 				"material": [
@@ -2669,14 +2669,14 @@
 					"COMPOST",
 					160
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"CONDENSED_FERMENTO": {
 				"material": [
 					"FERMENTO",
 					9
 				],
-				"collection": "None"
+				"collection": "NONE"
 			},
 			"ENCHANTED_EGG": {
 				"material": [
