@@ -1,8 +1,9 @@
 package dev.meyi.bn.handlers;
 
+import cc.polyfrost.oneconfig.gui.OneConfigGui;
+import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
+import cc.polyfrost.oneconfig.platform.Platform;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.gui.ModuleSettingsGui;
-import dev.meyi.bn.gui.SettingsGui;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ReflectionHelper;
@@ -31,7 +32,8 @@ public class EventHandler {
     }
     String message = StringUtils.stripControlCodes(e.message.getUnformattedText());
 
-    if (message.startsWith("[Bazaar] Claimed") || message.startsWith("[Bazaar] Bought") || message.startsWith("[Bazaar] Sold")) {
+    if (message.startsWith("[Bazaar] Claimed") || message.startsWith("[Bazaar] Bought")
+        || message.startsWith("[Bazaar] Sold")) {
       BankCalculator.evaluate(message);
     }
 
@@ -126,7 +128,7 @@ public class EventHandler {
     if (e.gui instanceof GuiChest) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
       if (chest != null && ((chest.hasCustomName() && (
-                  StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+          StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
               .startsWith("Bazaar") || StringUtils.stripControlCodes(
                   chest.getDisplayName().getUnformattedText())
               .equalsIgnoreCase("How much do you want to pay?") || StringUtils.stripControlCodes(
@@ -149,12 +151,16 @@ public class EventHandler {
   @SubscribeEvent
   public void renderEvent(TickEvent e) {
     if (BazaarNotifier.guiToOpen.contains("settings")) {
-      Minecraft.getMinecraft().displayGuiScreen(new SettingsGui());
-    } else if (BazaarNotifier.guiToOpen.contains("module")) {
-      int moduleIndex = Integer.parseInt(BazaarNotifier.guiToOpen.replaceAll("module", ""));
-      Minecraft.getMinecraft()
-          .displayGuiScreen(new ModuleSettingsGui(BazaarNotifier.modules.get(moduleIndex)));
+      if (Platform.getGuiPlatform().getCurrentScreen() == null) {
+        Minecraft.getMinecraft().displayGuiScreen(OneConfigGui.create());
+        BazaarNotifier.guiToOpen = "settings-mod";
+      } else if (BazaarNotifier.guiToOpen.equals("settings-mod")
+          && Platform.getGuiPlatform().getCurrentScreen() instanceof OneConfigGui) {
+        OneConfigGui.INSTANCE.openPage(
+            new ModConfigPage(BazaarNotifier.config.mod.defaultPage, true),
+            new cc.polyfrost.oneconfig.gui.animations.DummyAnimation(2128), false);
+        BazaarNotifier.guiToOpen = "";
+      }
     }
-    BazaarNotifier.guiToOpen = "";
   }
 }
