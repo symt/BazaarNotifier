@@ -102,7 +102,8 @@ public class BankModule extends Module {
   protected void reset() {
     position.setPosition(Defaults.BANK_MODULE_X, Defaults.BANK_MODULE_Y);
     setScale(1, false);
-    this.bazaarProfit = 0;
+
+    BankCalculator.reset();
     enabled = true;
   }
 
