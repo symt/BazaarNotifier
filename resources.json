@@ -1292,7 +1292,9 @@
 		"ASCENSION_ROPE": "Ascension Rope",
 		"WORM_BAIT": "Worm Bait",
 		"ENCHANTMENT_SUNDER_6": "Sunder VI",
-		"REFINED_BOTTLE_OF_JYRRE": "Refined Bottle of Jyrre"
+		"REFINED_BOTTLE_OF_JYRRE": "Refined Bottle of Jyrre",
+  		"POLARVOID_BOOK": "Polarvoid Book",
+  		"POISON_SAMPLE": "Poison Sample"
 	},
 	"enchantCraftingList": {
 		"normal": {},
