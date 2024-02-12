@@ -128,7 +128,7 @@ public class EventHandler {
     if (e.gui instanceof GuiChest) {
       IInventory chest = ReflectionHelper.getLowerChestInventory((GuiChest) e.gui);
       if (chest != null && ((chest.hasCustomName() && (
-                  StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
+              StringUtils.stripControlCodes(chest.getDisplayName().getUnformattedText())
               .startsWith("Bazaar") || StringUtils.stripControlCodes(
                   chest.getDisplayName().getUnformattedText())
               .equalsIgnoreCase("How much do you want to pay?") || StringUtils.stripControlCodes(
