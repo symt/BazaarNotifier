@@ -4,6 +4,7 @@ import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
 import dev.meyi.bn.utilities.ReflectionHelper;
 import dev.meyi.bn.utilities.Utils;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,6 +113,7 @@ public class ChestTickHandler {
               newOrder.setAmountRemaining(Utils.getOrderAmountLeft(lore, startAmount));
               if (newOrder.getAmountRemaining() != 0) {
                 BazaarNotifier.orders.add(newOrder);
+                verifiedOrders = Arrays.copyOf(verifiedOrders, verifiedOrders.length + 1);
               }
             }
           }
