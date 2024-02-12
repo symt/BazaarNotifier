@@ -107,10 +107,10 @@ public abstract class Module extends Hud {
   }
 
   public float getModuleWidth(){
-    return this.getWidth(scale, false);
+    return this.getWidth(scale, false) + 2 * padding;
   }
 
   public float getModuleHeight(){
-    return this.getHeight(scale, false);
+    return this.getHeight(scale, false) + 2 * padding;
   }
 }

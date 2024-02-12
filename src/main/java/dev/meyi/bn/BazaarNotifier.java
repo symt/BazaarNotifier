@@ -159,6 +159,7 @@ public class BazaarNotifier {
     if (BazaarNotifier.config.firstLoad){
       for(Module m : modules){
         m.setActive(true);
+        m.position.setPosition(20, 20);
         m.showInChat = false;
         m.showInGuis = false;
       }
