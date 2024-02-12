@@ -21,4 +21,5 @@ public class Defaults {
   public static final boolean SEND_CHAT_MESSAGES = true;
   public static final boolean USE_BUY_ORDERS = true;
   public static final boolean SUGGESTION_SHOW_ENCHANTMENTS = true;
+  public static final boolean BANK_RAW_DIFFERENCE = false;
 }

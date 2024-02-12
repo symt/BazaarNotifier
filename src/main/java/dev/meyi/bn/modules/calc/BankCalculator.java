@@ -2,6 +2,7 @@ package dev.meyi.bn.modules.calc;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Exchange;
+import dev.meyi.bn.json.Order;
 import dev.meyi.bn.json.Order.OrderType;
 import dev.meyi.bn.utilities.Utils;
 import java.util.ArrayList;
@@ -24,11 +25,9 @@ public class BankCalculator {
       "\\[Bazaar] Sold (.*)x (.*) for (.*) coins!");
   private static final Pattern instantBuy = Pattern.compile(
       "\\[Bazaar] Bought (.*)x (.*) for (.*) coins!");
-  private static double calculatedProfit = 0;
-  private static boolean startup = true;
-
-  public static double getBazaarProfit() {
-    return calculatedProfit;
+  private static double rawDifference = 0;
+  public static double getRawDifference() {
+    return rawDifference;
   }
 
   public static void calculateBazaarProfit() {
@@ -39,12 +38,12 @@ public class BankCalculator {
           Exchange buy = orderHistory.get(j);
           if (buy.getAmount() != 0 && sell.matchesOrder(buy)) {
             if (buy.getAmount() >= sell.getAmount()) {
-              calculatedProfit +=
+              BazaarNotifier.config.bankModule.bazaarProfit +=
                   sell.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
               buy.removeAmount(sell.getAmount());
               sell.removeAmount(sell.getAmount());
             } else {
-              calculatedProfit +=
+              BazaarNotifier.config.bankModule.bazaarProfit  +=
                   buy.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
               sell.removeAmount(buy.getAmount());
               buy.removeAmount(buy.getAmount());
@@ -109,7 +108,7 @@ public class BankCalculator {
           }
         }
         orderHistory.get(i).removeAmount(maxCrafting);
-        calculatedProfit +=
+        BazaarNotifier.config.bankModule.bazaarProfit  +=
             ((double) maxCrafting * orderHistory.get(i).getPricePerUnit()) * .99 - buyValue;
       }
     }
@@ -163,20 +162,20 @@ public class BankCalculator {
         orderHistory.add(e);
       }
 
+      rawDifference += (((e.getType() == OrderType.BUY) ? -1.0 : 0.99) * e.getPricePerUnit() * (double)e.getAmount());
       // Regardless of type, because reverse flipping is possible
       //  aka selling an item you already own and buying back cheaper
       calculateBazaarProfit();
     }
   }
 
-  public static synchronized void reset() {
-    if (startup) {
-      startup = false;
-      calculatedProfit = BazaarNotifier.config.bazaarProfit;
-    } else {
-      calculatedProfit = 0;
-    }
-    orderHistory.clear();
+  public static void evaluateCapHit(Order order) {
+    BazaarNotifier.config.bankModule.bazaarDailyAmount -= order.orderValue;
   }
 
+  public static synchronized void reset() {
+    BazaarNotifier.config.bankModule.bazaarProfit = 0;
+    orderHistory.clear();
+    rawDifference = 0;
+  }
 }

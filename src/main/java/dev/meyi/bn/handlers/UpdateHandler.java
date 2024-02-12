@@ -3,7 +3,6 @@ package dev.meyi.bn.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.utilities.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -128,13 +127,6 @@ public class UpdateHandler {
                   new ChatComponentText(BazaarNotifier.prefix + EnumChatFormatting.GREEN
                       + "You are on a beta version. Please report any bugs you come across in the discord server."));
             }
-          }
-
-          BazaarNotifier.validApiKey = Utils.validateApiKey();
-          if (!BazaarNotifier.validApiKey && !BazaarNotifier.apiKeyDisabled) {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(
-                BazaarNotifier.prefix + EnumChatFormatting.RED
-                    + "The mod doesn't have access to a valid api key yet. Please run /bn api (key) to set your key"));
           }
         } catch (IOException e) {
           e.printStackTrace();

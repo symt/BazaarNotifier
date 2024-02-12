@@ -2,10 +2,10 @@ package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
-import java.awt.Color;
-import java.util.LinkedHashMap;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ChatComponentText;
@@ -25,27 +25,27 @@ public class RenderUtils {
    * @return length of the entire text
    */
   public static int drawMulticoloredString(FontRenderer renderer, int x, int y,
-      LinkedHashMap<String, Color> message, boolean dropShadow, float moduleScale) {
+      List<ColoredText> message, boolean dropShadow, float moduleScale) {
 
     int renderLength = 0;
-    for (Entry<String, Color> substring : message.entrySet()) {
+    for (ColoredText substring : message) {
       GL11.glScalef(moduleScale, moduleScale, 1);
-      renderer.drawString(substring.getKey(), (x + renderLength) / moduleScale, y / moduleScale,
-          substring.getValue().getRGB(),
+      renderer.drawString(substring.string, (x + renderLength) / moduleScale, y / moduleScale,
+          substring.color.getRGB(),
           dropShadow);
-      renderLength += renderer.getStringWidth(substring.getKey()) * moduleScale;
+      renderLength += renderer.getStringWidth(substring.string) * moduleScale;
       GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
     }
 
     return renderLength;
   }
 
-  public static int drawColorfulParagraph(List<LinkedHashMap<String, Color>> items, int x, int y,
-      float moduleScale) {
+  public static int drawColorfulParagraph(ArrayList<ArrayList<ColoredText>> items, int x, int y,
+                                          float moduleScale) {
     float longestXString = 0;
     for (int i = 0; i < items.size(); i++) {
       float fontHeight =
-          (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i * moduleScale;
+              (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i * moduleScale;
       int length = RenderUtils
           .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
               x, y
@@ -56,6 +56,28 @@ public class RenderUtils {
       }
     }
     return (int) longestXString;
+  }
+  public static String getLongestString(ArrayList<ArrayList<ColoredText>> items) {
+    FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+    float longestXString = 0;
+    String longestString = "";
+    for (List<ColoredText> item : items) {
+      StringBuilder builder = new StringBuilder("");
+      for (ColoredText entry : item) {
+        builder.append(entry.string);
+      }
+
+      int length = fontRenderer.getStringWidth(builder.toString());
+      if (length > longestXString) {
+        longestXString = length;
+        longestString = builder.toString();
+      }
+    }
+    return longestString;
+  }
+  public static int getStringWidth(String string) {
+    FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
+    return fontRenderer.getStringWidth(string);
   }
 
   public static void chatNotification(Order order, String notification) {
@@ -90,3 +112,4 @@ public class RenderUtils {
     GL11.glScalef((float) Math.pow(moduleScale, -1), (float) Math.pow(moduleScale, -1), 1);
   }
 }
+

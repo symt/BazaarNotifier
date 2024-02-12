@@ -55,8 +55,7 @@ public class Order {
 
   public void updateStatus() {
     OrderStatus newOrderStatus = null;
-    if (!(BazaarNotifier.activeBazaar && (BazaarNotifier.validApiKey
-        || BazaarNotifier.apiKeyDisabled))) {
+    if (!BazaarNotifier.activeBazaar) {
       return;
     }
     if (OrderType.BUY.equals(this.type)) {
@@ -74,14 +73,17 @@ public class Order {
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;
-      } else if (pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders == 1) {
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.SEARCHING;
-      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders > 1) {
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders > 1 &&
+          BazaarNotifier.orders.stream().filter(order -> this.product.equals(order.product)
+              && this.pricePerUnit == order.pricePerUnit).count() != bazaarSubItem.orders) {
         newOrderStatus = OrderStatus.MATCHED;
       }
     } else {
       if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.size() == 0) {
-        newOrderStatus = OrderStatus.SEARCHING;
+        orderStatus = OrderStatus.SEARCHING;
+        return;
       }
       BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
           .get(getProductId()).buy_summary.get(0);
@@ -92,9 +94,11 @@ public class Order {
         newOrderStatus = OrderStatus.BEST;
       } else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.SEARCHING;
-      } else if (pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders == 1) {
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders == 1) {
         newOrderStatus = OrderStatus.SEARCHING;
-      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders > 1) {
+      } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit && bazaarSubItem.orders > 1 &&
+          BazaarNotifier.orders.stream().filter(order -> this.product.equals(order.product)
+              && this.pricePerUnit == order.pricePerUnit).count() != bazaarSubItem.orders) {
         newOrderStatus = OrderStatus.MATCHED;
       }
     }

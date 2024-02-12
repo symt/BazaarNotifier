@@ -1,124 +1,114 @@
 package dev.meyi.bn.config;
 
-import com.google.gson.Gson;
+import cc.polyfrost.oneconfig.config.Config;
+import cc.polyfrost.oneconfig.config.annotations.Button;
+import cc.polyfrost.oneconfig.config.annotations.HUD;
+import cc.polyfrost.oneconfig.config.annotations.Switch;
+import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.config.data.Mod;
+import cc.polyfrost.oneconfig.config.data.ModType;
+import cc.polyfrost.oneconfig.config.migration.JsonMigrator;
+import cc.polyfrost.oneconfig.config.migration.JsonName;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
+import dev.meyi.bn.modules.module.BankModule;
+import dev.meyi.bn.modules.module.CraftingModule;
+import dev.meyi.bn.modules.module.NotificationModule;
+import dev.meyi.bn.modules.module.SuggestionModule;
 import dev.meyi.bn.utilities.Defaults;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-public class Configuration {
+import java.awt.Color;
 
-  private static final int MODULE_LENGTH = 4;
 
-  public boolean collectionCheck;
-  public int craftingSortingOption;
-  public int craftingListLength;
-  public int suggestionListLength;
-  public boolean showChatMessages;
-  public boolean useBuyOrders;
-  public boolean suggestionShowEnchantments;
-  public String api = "";
-  public String version;
-  public ModuleConfig[] modules;
+public class Configuration extends Config {
 
-  public double bazaarProfit = 0;
+  public Configuration() {
+    super(new Mod("BazaarNotifier", ModType.SKYBLOCK,"/icon.png", new JsonMigrator("./config/BazaarNotifier/config.json")), "bazaarnotifier.json");
+    initialize();
 
-  private boolean showInstantSellProfit;
-  private boolean showSellOfferProfit;
-  private boolean showProfitPerMil;
+    addListener("collectionCheck", () -> {
+      collectionCheck = false;
+    });
 
-  public Configuration(boolean collectionCheck, int craftingSortingOption,
-      int craftingListLength, boolean suggestionShowEnchantments,
-      boolean showInstantSellProfit, boolean showSellOfferProfit, boolean showProfitPerMil,
-      int suggestionListLength, boolean showChatMessages, String apiKey, boolean useBuyOrders, double bazaarProfit,
-      ModuleConfig[] modules) {
-    this.collectionCheck = collectionCheck;
-    this.craftingSortingOption = craftingSortingOption;
-    this.craftingListLength = craftingListLength;
-    this.suggestionShowEnchantments = suggestionShowEnchantments;
-    this.showInstantSellProfit = showInstantSellProfit;
-    this.showSellOfferProfit = showSellOfferProfit;
-    this.showProfitPerMil = showProfitPerMil;
-    this.suggestionListLength = suggestionListLength;
-    this.bazaarProfit = bazaarProfit;
-    this.api =
-        apiKey == null ? "" : apiKey; // It is fixed in createDefaultConfig, but redundancies.
-    this.version = BazaarNotifier.VERSION;
-    this.modules = modules;
-    this.showChatMessages = showChatMessages;
-    this.useBuyOrders = useBuyOrders;
+    collectionCheck = false; // in case the user has it enabled already, we want to force it off
   }
 
+  public boolean firstLoad = true;
 
-  public static void saveConfig(File file, Configuration config) {
-    Gson gson = new Gson();
-    BazaarNotifier.config.modules = BazaarNotifier.modules.generateConfig();
-    BazaarNotifier.config.bazaarProfit = BankCalculator.getBazaarProfit();
-    try {
-      if (!file.isFile()) {
-        //noinspection ResultOfMethodCallIgnored
-        file.createNewFile();
-      }
-      Files.write(Paths.get(file.getAbsolutePath()),
-          gson.toJson(config).getBytes(StandardCharsets.UTF_8));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+  @JsonName("version")
+  public String version = BazaarNotifier.VERSION;
 
-  public static Configuration createDefaultConfig() {
-    ModuleConfig[] c = new ModuleConfig[MODULE_LENGTH];
-    int i = 0;
-    for (ModuleName moduleName : ModuleName.values()) {
-      c[i++] = ModuleConfig.generateDefaultConfig(moduleName.name());
-    }
-    return new Configuration(Defaults.COLLECTION_CHECKING,
-        Defaults.CRAFTING_SORTING_OPTION, Defaults.CRAFTING_LIST_LENGTH,
-        Defaults.SUGGESTION_SHOW_ENCHANTMENTS,
-        Defaults.INSTANT_SELL_PROFIT, Defaults.SELL_OFFER_PROFIT,
-        Defaults.PROFIT_PER_MIL, Defaults.SUGGESTION_LIST_LENGTH, Defaults.SEND_CHAT_MESSAGES, "",
-        Defaults.USE_BUY_ORDERS, 0, c);
-  }
+  @HUD(name = "Suggestion Module",
+          category = "Suggestion Module"
+  )
+  public SuggestionModule suggestionModule = new SuggestionModule();
+  @HUD(name = "Crafting Module",
+          category = "Crafting Module"
+  )
+  public CraftingModule craftingModule = new CraftingModule();
+  @HUD(name = "Notification Module",
+          category = "Notification Module"
+  )
+  public NotificationModule notificationModule = new NotificationModule();
+  @HUD(name = "Bank Module",
+          category = "Bank Module"
+  )
+  public BankModule bankModule = new BankModule();
 
-  public boolean isShowSellOfferProfit() {
-    return showSellOfferProfit;
-  }
+  @Switch(name = "Allow old Movement and Rescaling",
+          category = "General",
+          description = "Allows movement and rescaling outside the edit hud window"
+  )
+  public boolean legacyMovement = true;
+  @JsonName("showChatMessages")
+  @Switch(name = "Show Chat Messages",
+          description = "Disables messages from Bazaar Notifier"
+  )
+  public boolean showChatMessages = Defaults.SEND_CHAT_MESSAGES;
 
-  public void setShowSellOfferProfit(boolean showSellOfferProfit) {
-    this.showSellOfferProfit = showSellOfferProfit;
-    if (checkIfDisabled()) {
-      this.showSellOfferProfit = true;
-    }
-  }
+  @JsonName("collectionCheck")
+  @Switch(name = "Collection checks",
+          category = "Crafting Module",
+          description = "Only shows unlocked recipes"
+  )
+  public boolean collectionCheck = Defaults.COLLECTION_CHECKING;
 
-  public boolean isShowProfitPerMil() {
-    return showProfitPerMil;
-  }
 
-  public void setShowProfitPerMil(boolean showProfitPerMil) {
-    this.showProfitPerMil = showProfitPerMil;
-    if (checkIfDisabled()) {
-      this.showProfitPerMil = true;
-    }
-  }
+  @cc.polyfrost.oneconfig.config.annotations.Color(
+          name = "Info Color",
+          allowAlpha = false,
+          description = "The color for all information and less significant elements"
+  )
+  public OneColor infoColor = new OneColor(Color.GRAY);
+  @cc.polyfrost.oneconfig.config.annotations.Color(name = "Item Color",
+          allowAlpha = false,
+          description = "The color the items will be in"
+  )
+  public OneColor itemColor = new OneColor(Color.CYAN);
+  @cc.polyfrost.oneconfig.config.annotations.Color(
+          name = "Number Color",
+          allowAlpha = false,
+          description = "The color the numbers will be in"
+  )
+  public OneColor numberColor = new OneColor(Color.MAGENTA);
 
-  public boolean isShowInstantSellProfit() {
-    return showInstantSellProfit;
-  }
+  @SuppressWarnings("unused")
+  @Button(name = "Reset Colors", text = "Reset")
+  Runnable r = () ->{
+    infoColor = new OneColor(Color.GRAY);
+    itemColor = new OneColor(Color.CYAN);
+    numberColor = new OneColor(Color.MAGENTA);
+  };
 
-  public void setShowInstantSellProfit(boolean showInstantSellProfit) {
-    this.showInstantSellProfit = showInstantSellProfit;
-    if (checkIfDisabled()) {
-      this.showInstantSellProfit = true;
-    }
-  }
 
-  private boolean checkIfDisabled() {
-    return !showProfitPerMil && !showSellOfferProfit && !showInstantSellProfit;
-  }
+  @SuppressWarnings("unused")
+  @Button(
+          name = "Reset Profit",
+          text = "Reset",
+          category = "Bank Module"
+  )
+  Runnable resetBank = BankCalculator::reset;
+
+  @JsonName("lastLogin")
+  public long lastLogin = System.currentTimeMillis();
 }

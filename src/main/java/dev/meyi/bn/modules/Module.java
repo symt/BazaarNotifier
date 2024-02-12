@@ -1,6 +1,10 @@
 package dev.meyi.bn.modules;
 
-import dev.meyi.bn.config.ModuleConfig;
+import cc.polyfrost.oneconfig.config.annotations.Switch;
+import cc.polyfrost.oneconfig.gui.OneConfigGui;
+import cc.polyfrost.oneconfig.hud.Hud;
+import cc.polyfrost.oneconfig.platform.Platform;
+import dev.meyi.bn.BazaarNotifier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -8,39 +12,53 @@ import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-public abstract class Module {
+
+public abstract class Module extends Hud {
+  protected transient int shift = 0;
+  protected transient boolean moving = false;
+  protected transient boolean needsToMove = false;
+  protected transient int mouseWheelShift = 0;
+  protected transient int padding = 3;
+  private transient int lastMouseX, lastMouseY;
+
+  protected transient String longestString = "";
 
 
-  protected int x;
-  protected int y;
-  protected float scale;
-  protected int boundsX, boundsY;
-  protected int shift = 0;
-  protected boolean moving = false;
-  protected boolean active = true;
-  protected boolean needsToMove = false;
-  protected int mouseWheelShift = 0;
-  protected int padding = 3;
-  private int lastMouseX, lastMouseY;
+
+  @Switch(name="Show Module Outside of Bazaar",
+  category = "General"
+  )
+  protected boolean showEverywhere = false;
 
   public Module() {
-    this.x = 0;
-    this.y = 0;
-    this.scale = 1;
+    super(true, 20, 20, 2, 1);
   }
 
-  public Module(ModuleConfig module) {
-    this.x = module.x;
-    this.y = module.y;
-    this.scale = module.scale;
-    this.active = module.active;
+  @Override
+  protected boolean shouldShow() {
+    if(BazaarNotifier.inBazaar || Platform.getGuiPlatform().getCurrentScreen() != null){
+      //Drawing at this case is handled by the ChestTickHandler to keep it above the gray gui background;
+      return false;
+    }
+    if (showInGuis && Platform.getGuiPlatform().getCurrentScreen() != null &&
+            (Platform.getGuiPlatform().getCurrentScreen() instanceof OneConfigGui))  return false;
+    if(enabled) {
+      if (showInChat && Platform.getGuiPlatform().isInChat()) return true;
+      if (showInDebug && Platform.getGuiPlatform().isInDebug()) return true;
+      return showEverywhere;
+    }else {
+      return false;
+    }
   }
 
-  protected abstract void draw();
+  public boolean shouldShowGui(){
+    return enabled && (BazaarNotifier.inBazaar || showInGuis || showInChat || showInDebug || showEverywhere);
+  }
+  public abstract void draw();
 
   protected abstract void reset();
 
-  protected abstract String name();
+  public abstract String name();
 
   protected abstract boolean shouldDrawBounds();
 
@@ -48,8 +66,7 @@ public abstract class Module {
 
   public void handleMovement() {
     if (moving) {
-      x += getMouseCoordinateX() - lastMouseX;
-      y += getMouseCoordinateY() - lastMouseY;
+      position.setPosition(position.getX() + getMouseCoordinateX() - lastMouseX, position.getY() + getMouseCoordinateY() - lastMouseY);
     }
     moving = true;
     lastMouseX = getMouseCoordinateX();
@@ -58,20 +75,18 @@ public abstract class Module {
 
   public void drawBounds() {
     if (shouldDrawBounds()) {
-      Gui.drawRect(x - padding, y - padding, boundsX + padding, boundsY + padding, 0x66000000);
+      Gui.drawRect((int)position.getX() - padding, (int)position.getY() - padding,
+              (int)position.getRightX() + padding, (int)position.getBottomY() + padding, 0x66000000);
     }
   }
 
   public boolean inMovementBox() {
-    return (getMouseCoordinateX() >= x
-        && getMouseCoordinateY() >= y
-        && getMouseCoordinateX() <= boundsX
-        && getMouseCoordinateY() <= boundsY);
+    return (getMouseCoordinateX() >= position.getX()
+        && getMouseCoordinateY() >= position.getY()
+        && getMouseCoordinateX() <= position.getRightX()
+        && getMouseCoordinateY() <= position.getBottomY());
   }
 
-  public ModuleConfig generateModuleConfig() {
-    return new ModuleConfig(name(), x, y, scale, active);
-  }
 
   protected int getMouseCoordinateX() {
     return Mouse.getX() / new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
@@ -87,23 +102,15 @@ public abstract class Module {
     return StringUtils.capitalize(name) + " Module";
   }
 
-  public String getName() {
-    return name();
-  }
-
-  public float getScale() {
-    return scale;
-  }
-
-  public void setScale(float scale) {
-    this.scale = scale;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
   public void setActive(boolean active) {
-    this.active = active;
+    enabled = active;
+  }
+
+  public float getModuleWidth(){
+    return this.getWidth(scale, false) + 2 * padding;
+  }
+
+  public float getModuleHeight(){
+    return this.getHeight(scale, false) + 2 * padding;
   }
 }

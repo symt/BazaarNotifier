@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagList;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -30,21 +31,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Utils {
-
-  private static final Pattern uuidMatcher = Pattern
-      .compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$",
-          Pattern.CASE_INSENSITIVE);
   private static String playerUUID = "";
 
   public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
     CloseableHttpClient client = HttpClientBuilder.create().build();
-    String apiBit = "";
-    if (!BazaarNotifier.apiKeyDisabled) {
-      apiBit = "?key=" + BazaarNotifier.config.api;
-    }
     HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar" + apiBit);
+        "https://api.hypixel.net/skyblock/bazaar");
     HttpResponse response = client.execute(request);
 
     String result = IOUtils.toString(new BufferedReader
@@ -61,89 +54,36 @@ public class Utils {
   }
 
 
+  /**
+   * Waiting until a proper backend is built out before completing this feature.
+   *
+   * @see <a
+   * href="https://github.com/symt/BazaarNotifier/blob/02114fbef16786c69d7b560d76de53f643970f7e/src/main/java/dev/meyi/bn/utilities/Utils.java#L64">the
+   * old code</a>
+   */
   public static List<String> unlockedRecipes() throws IOException {
     Gson gson = new Gson();
-    if (BazaarNotifier.config.collectionCheck && !BazaarNotifier.config.api.isEmpty() && (
-        BazaarNotifier.validApiKey
-            || (BazaarNotifier.validApiKey = validateApiKey()))) {
+    if (BazaarNotifier.config.collectionCheck) {
+      try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+        if (playerUUID.equals("")) {
+          HttpGet request = new HttpGet(
+              "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft()
+                  .getSession().getUsername()); // Change this to your username if testing
+          HttpResponse response = client.execute(request);
 
-      CloseableHttpClient client = HttpClientBuilder.create().build();
-      if (playerUUID.equals("")) {
-        HttpGet request = new HttpGet(
-            "https://api.mojang.com/users/profiles/minecraft/" + Minecraft.getMinecraft()
-                .getSession().getUsername()); // Change this to your username if testing
-        HttpResponse response = client.execute(request);
+          String uuidResponse = IOUtils
+              .toString(
+                  new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
 
-        String uuidResponse = IOUtils
-            .toString(new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-
-        try {
-          playerUUID = gson.fromJson(uuidResponse, JsonObject.class).get("id").getAsString();
-        } catch (JsonSyntaxException e) {
-          return null;
-        }
-      }
-
-      HttpGet request = new HttpGet(
-          "https://api.hypixel.net/skyblock/profiles?key=" + BazaarNotifier.config.api + "&uuid="
-              + playerUUID);
-      HttpResponse response = client.execute(request);
-
-      JsonReader jsonReader = new JsonReader(
-          new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
-      jsonReader.setLenient(true);
-
-      JsonObject results = null;
-
-      try {
-        results = gson.fromJson(jsonReader, JsonObject.class);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-
-      client.close();
-      int profileIndex = 0;
-      if (results == null || !results.get("success").getAsBoolean() || !results.has("profiles")) {
-        return null;
-      }
-
-      for (int i = 0; i < results.get("profiles").getAsJsonArray().size(); i++) {
-        JsonObject playerDataFromAPI = results.getAsJsonArray("profiles").get(i).getAsJsonObject();
-        if (playerDataFromAPI.has("selected")) {
-          if (playerDataFromAPI.get("selected").getAsBoolean()) {
-            profileIndex = i;
+          try {
+            playerUUID = gson.fromJson(uuidResponse, JsonObject.class).get("id").getAsString();
+          } catch (JsonSyntaxException e) {
+            return null;
           }
         }
       }
-      BazaarNotifier.playerDataFromAPI = results.getAsJsonArray("profiles")
-          .get(profileIndex).getAsJsonObject().getAsJsonObject("members")
-          .getAsJsonObject(playerUUID);
-      if (!BazaarNotifier.playerDataFromAPI.has("unlocked_coll_tiers")
-          || !BazaarNotifier.playerDataFromAPI.has("slayer_bosses")) {
-        System.out.println("could not load unlocked collection tiers from API");
-        return null;
-      }
-      List<String> unlockedCollections = new ArrayList<>();
-
-      BazaarNotifier.playerDataFromAPI.getAsJsonArray("unlocked_coll_tiers")
-          .forEach(cmd -> unlockedCollections.add(cmd.getAsString()));
-
-      JsonObject slayer = BazaarNotifier.playerDataFromAPI.getAsJsonObject("slayer_bosses");
-      Set<Map.Entry<String, JsonElement>> set = slayer.entrySet();
-      for (Map.Entry<String, JsonElement> entry : set) {
-        Set<Map.Entry<String, JsonElement>> set2 = slayer.getAsJsonObject(entry.getKey())
-            .getAsJsonObject("claimed_levels").entrySet();
-        for (Map.Entry<String, JsonElement> entry2 : set2) {
-          unlockedCollections.add(
-              entry.getKey().toUpperCase() + entry2.getKey().replace("level", "").toUpperCase());
-        }
-      }
-      return unlockedCollections;
-    } else {
-      BazaarNotifier.config.collectionCheck = false;
-
-      return null;
     }
+    return null;
   }
 
   public static boolean isJSONValid(String jsonInString) {
@@ -155,39 +95,6 @@ public class Utils {
       return false;
     }
   }
-
-  public static boolean validateApiKey(String key) throws IOException {
-    Gson gson = new Gson();
-    if (uuidMatcher.matcher(key).find()) {
-      try {
-        if (gson.fromJson(IOUtils.toString(new BufferedReader
-                (new InputStreamReader(HttpClientBuilder.create().build().execute(new HttpGet(
-                        "https://api.hypixel.net/key?key=" + key)).getEntity()
-                    .getContent()))), JsonObject.class).getAsJsonObject().get("success")
-            .getAsBoolean()) {
-          return true;
-        } else {
-          BazaarNotifier.config.collectionCheck = false;
-          return false;
-        }
-      } catch (JsonSyntaxException e) {
-        BazaarNotifier.config.collectionCheck = false;
-        return false;
-      }
-    }
-    BazaarNotifier.config.collectionCheck = false;
-    return false;
-  }
-
-  public static boolean validateApiKey() throws IOException {
-    if (validateApiKey(BazaarNotifier.config.api)) {
-      return true;
-    } else {
-      BazaarNotifier.config.collectionCheck = false;
-      return false;
-    }
-  }
-
 
   public static void updateResources() throws IOException {
     Gson gson = new Gson();
@@ -260,5 +167,41 @@ public class Utils {
 
     return new String[]{closestConversion,
         BazaarNotifier.bazaarConv.inverse().getOrDefault(closestConversion, "")};
+  }
+
+  public static List<String> getLoreFromItemStack(ItemStack item) {
+    NBTTagList lorePreFilter = item.getTagCompound().getCompoundTag("display")
+        .getTagList("Lore", 8);
+
+    List<String> lore = new ArrayList<>();
+
+    for (int j = 0; j < lorePreFilter.tagCount(); j++) {
+      lore.add(net.minecraft.util.StringUtils.stripControlCodes(lorePreFilter.getStringTagAt(j)));
+    }
+
+    return lore;
+  }
+
+  public static int getOrderAmountLeft(List<String> lore, int totalAmount) {
+    int amountLeft;
+    if (lore.get(3).startsWith("Filled:")) {
+      if (lore.get(3).split(" ")[2].equals("100%")) {
+        amountLeft = 0;
+      } else {
+        String intToParse = lore.get(3).split(" ")[1].split("/")[0];
+        int amountFulfilled;
+
+        if (intToParse.contains("k")) {
+          amountFulfilled = (int) (Double.parseDouble(intToParse.replace("k", "")) * 1000);
+        } else {
+          amountFulfilled = Integer.parseInt(intToParse);
+        }
+
+        amountLeft = totalAmount - amountFulfilled;
+      }
+    } else {
+      amountLeft = totalAmount;
+    }
+    return amountLeft;
   }
 }
