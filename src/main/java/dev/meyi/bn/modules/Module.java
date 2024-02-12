@@ -3,6 +3,7 @@ package dev.meyi.bn.modules;
 import cc.polyfrost.oneconfig.config.annotations.Switch;
 import cc.polyfrost.oneconfig.gui.OneConfigGui;
 import cc.polyfrost.oneconfig.hud.Hud;
+import cc.polyfrost.oneconfig.platform.GuiPlatform;
 import cc.polyfrost.oneconfig.platform.Platform;
 import dev.meyi.bn.BazaarNotifier;
 import net.minecraft.client.Minecraft;
@@ -36,23 +37,20 @@ public abstract class Module extends Hud {
 
   @Override
   protected boolean shouldShow() {
-    if(BazaarNotifier.inBazaar || Platform.getGuiPlatform().getCurrentScreen() != null){
-      //Drawing at this case is handled by the ChestTickHandler to keep it above the gray gui background;
-      return false;
-    }
-    if (showInGuis && Platform.getGuiPlatform().getCurrentScreen() != null &&
-            (Platform.getGuiPlatform().getCurrentScreen() instanceof OneConfigGui))  return false;
     if(enabled) {
-      if (showInChat && Platform.getGuiPlatform().isInChat()) return true;
-      if (showInDebug && Platform.getGuiPlatform().isInDebug()) return true;
+      GuiPlatform guiPlatform = Platform.getGuiPlatform();
+      if(BazaarNotifier.inBazaar){
+        //Drawing at this case is handled by the ChestTickHandler to keep it above the gray gui background;
+        return false;
+      }
+      if (showInGuis && (guiPlatform.getCurrentScreen() instanceof OneConfigGui))  return false;
+      if (showInChat && guiPlatform.isInChat()) return true;
+      if (showInDebug && guiPlatform.isInDebug()) return true;
+      if (showInGuis && guiPlatform.getCurrentScreen() != null) return true;
       return showEverywhere;
     }else {
       return false;
     }
-  }
-
-  public boolean shouldShowGui(){
-    return enabled && (BazaarNotifier.inBazaar || showInGuis || showInChat || showInDebug || showEverywhere);
   }
   public abstract void draw();
 
