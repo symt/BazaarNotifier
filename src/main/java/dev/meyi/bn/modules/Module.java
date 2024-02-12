@@ -14,12 +14,12 @@ import org.lwjgl.opengl.Display;
 
 
 public abstract class Module extends Hud {
-  protected int shift = 0;
-  protected boolean moving = false;
-  protected boolean needsToMove = false;
-  protected int mouseWheelShift = 0;
-  protected int padding = 3;
-  private int lastMouseX, lastMouseY;
+  protected transient int shift = 0;
+  protected transient boolean moving = false;
+  protected transient boolean needsToMove = false;
+  protected transient int mouseWheelShift = 0;
+  protected transient int padding = 3;
+  private transient int lastMouseX, lastMouseY;
 
   protected transient String longestString = "";
 
