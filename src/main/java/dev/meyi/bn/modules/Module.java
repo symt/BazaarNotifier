@@ -14,25 +14,24 @@ import org.lwjgl.opengl.Display;
 
 
 public abstract class Module extends Hud {
-  protected int shift = 0;
-  protected boolean moving = false;
-  protected boolean needsToMove = false;
-  protected int mouseWheelShift = 0;
-  protected int padding = 3;
-  private int lastMouseX, lastMouseY;
+  protected transient int shift = 0;
+  protected transient boolean moving = false;
+  protected transient boolean needsToMove = false;
+  protected transient int mouseWheelShift = 0;
+  protected transient int padding = 3;
+  private transient int lastMouseX, lastMouseY;
 
   protected transient String longestString = "";
 
 
 
-  @Switch(name="Show Modules Outside of Bazaar",
+  @Switch(name="Show Module Outside of Bazaar",
   category = "General"
   )
   protected boolean showEverywhere = false;
 
   public Module() {
-    position.setPosition(20,20);
-    setScale(1, false);
+    super(true, 20, 20, 2, 1);
   }
 
   @Override
@@ -108,10 +107,10 @@ public abstract class Module extends Hud {
   }
 
   public float getModuleWidth(){
-    return this.getWidth(scale, false);
+    return this.getWidth(scale, false) + 2 * padding;
   }
 
   public float getModuleHeight(){
-    return this.getHeight(scale, false);
+    return this.getHeight(scale, false) + 2 * padding;
   }
 }

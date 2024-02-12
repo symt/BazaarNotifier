@@ -86,7 +86,7 @@ public class ScheduledEvents {
           Date reset = new Date(currentTime - (currentTime % 86400000));
           if (reset.after(new Date(BazaarNotifier.config.lastLogin))) {
             BazaarNotifier.config.lastLogin = System.currentTimeMillis();
-            BazaarNotifier.config.bankModule.bazaarDailyAmount = 0;
+            BazaarNotifier.config.bankModule.bazaarDailyAmount = 1E10;
           }
         } catch (Exception t) {
           t.printStackTrace();

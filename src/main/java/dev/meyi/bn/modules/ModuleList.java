@@ -8,7 +8,7 @@ import org.lwjgl.input.Mouse;
 
 public class ModuleList extends ArrayList<Module> {
 
-  Module movingModule = null;
+  private Module movingModule = null;
 
   public ModuleList() {
      add(BazaarNotifier.config.suggestionModule);
@@ -88,7 +88,7 @@ public class ModuleList extends ArrayList<Module> {
     if (BazaarNotifier.config.enabled && BazaarNotifier.activeBazaar) {
       for (Module m : this) {
         if (m.shouldShowGui()) {
-          m.position.updateSizePosition(m.getModuleWidth(), m.getModuleHeight());
+          m.position.setSize(m.getModuleWidth(), m.getModuleHeight());
           m.draw();
         }
       }

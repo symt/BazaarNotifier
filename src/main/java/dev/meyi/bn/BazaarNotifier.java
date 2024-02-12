@@ -42,7 +42,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.7.0-beta1";
+  public static final String VERSION = "1.8.0-beta1";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -159,6 +159,7 @@ public class BazaarNotifier {
     if (BazaarNotifier.config.firstLoad){
       for(Module m : modules){
         m.setActive(true);
+        m.position.setPosition(20, 20);
         m.showInChat = false;
         m.showInGuis = false;
       }
