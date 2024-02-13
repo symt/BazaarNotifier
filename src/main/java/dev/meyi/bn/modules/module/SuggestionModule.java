@@ -51,7 +51,7 @@ public class SuggestionModule extends Module{
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    return RenderUtils.getStringWidth(longestString)*scale;
+    return RenderUtils.getStringWidth(longestString)*scale + 2 * padding * scale;
   }
 
   @Override
@@ -61,7 +61,8 @@ public class SuggestionModule extends Module{
     }
     return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT
             * BazaarNotifier.config.suggestionModule.suggestionListLength
-            + BazaarNotifier.config.suggestionModule.suggestionListLength * 2)*scale - 2;
+            + BazaarNotifier.config.suggestionModule.suggestionListLength * 2)*scale - 2
+            + 2 * padding * scale;
   }
 
   @Override
@@ -81,7 +82,7 @@ public class SuggestionModule extends Module{
         items.add(message);
       }
       longestString = RenderUtils.getLongestString(items);
-      RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
+      RenderUtils.drawColorfulParagraph(items, (int)position.getX() + padding, (int)position.getY() + padding, scale);
     } else {
       RenderUtils.drawCenteredString("Waiting for bazaar data", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
       //Todo add height and width

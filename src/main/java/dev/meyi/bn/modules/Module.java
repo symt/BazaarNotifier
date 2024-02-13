@@ -73,8 +73,8 @@ public abstract class Module extends Hud {
 
   public void drawBounds() {
     if (shouldDrawBounds()) {
-      Gui.drawRect((int)position.getX() - padding, (int)position.getY() - padding,
-              (int)position.getRightX() + padding, (int)position.getBottomY() + padding, 0x66000000);
+      Gui.drawRect((int)position.getX(), (int)position.getY(),
+              (int)position.getRightX(), (int)position.getBottomY(), 0x66000000);
     }
   }
 
@@ -105,10 +105,9 @@ public abstract class Module extends Hud {
   }
 
   public float getModuleWidth(){
-    return this.getWidth(scale, false) + 2 * padding;
+    return this.getWidth(scale, false);
   }
 
   public float getModuleHeight(){
-    return this.getHeight(scale, false) + 2 * padding;
-  }
+    return this.getHeight(scale, false);  }
 }

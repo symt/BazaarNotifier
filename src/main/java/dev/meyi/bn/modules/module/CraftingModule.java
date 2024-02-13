@@ -77,15 +77,16 @@ public class CraftingModule extends Module {
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    return RenderUtils.getStringWidth(longestString) * scale;
+    return RenderUtils.getStringWidth(longestString) * scale + 2 * padding * scale;
   }
 
   @Override
   protected float getHeight(float scale, boolean example) {
     try {
-      return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT
+      return ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT
           * (BazaarNotifier.config.craftingModule.craftingListLength + 1)
-          + (BazaarNotifier.config.craftingModule.craftingListLength + 1) * 2) * scale - 2;
+          + (BazaarNotifier.config.craftingModule.craftingListLength + 1) * 2) * scale - 2)
+          + 2 * scale * padding;
     } catch (NullPointerException e) {
       return 1;
     }
@@ -243,7 +244,7 @@ public class CraftingModule extends Module {
       }
       longestString = RenderUtils.getLongestString(items);
 
-      RenderUtils.drawColorfulParagraph(items, (int) position.getX(), (int) position.getY(), scale);
+      RenderUtils.drawColorfulParagraph(items, (int) position.getX() + padding, (int) position.getY() + padding, scale);
       if (BazaarNotifier.inBazaar) {
         renderMaterials(checkHoveredText(), list);
       }
@@ -299,12 +300,12 @@ public class CraftingModule extends Module {
   }
 
   protected int checkHoveredText() {
-    float _y = position.getY() + 11 * scale;
+    float _y = position.getY() +(-padding + 11) * scale;
     float y2 = _y + ((BazaarNotifier.config.craftingModule.craftingListLength) * 11 * scale);
     int mouseYFormatted = getMouseCoordinateY();
     float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
     if (getWidth(scale, false) != 0) {
-      if (inMovementBox() && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
+      if (inMovementBox() && mouseYFormatted >= _y && mouseYFormatted <= y2) {
         return (int) relativeYMouse + shift;
       } else {
         return -1;
