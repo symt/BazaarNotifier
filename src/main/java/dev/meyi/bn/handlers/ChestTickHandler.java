@@ -103,7 +103,7 @@ public class ChestTickHandler {
                 break;
               }
             }
-            if (creator.equals(playerName)) {
+            if (creator.equals(playerName) || creator.isEmpty()) { //isEmpty for non Coop Islands
               if (lore.get(4).toLowerCase().contains("expire") || lore.get(5).toLowerCase().contains("expire")) {
                 continue;
               }
@@ -114,6 +114,7 @@ public class ChestTickHandler {
               if (newOrder.getAmountRemaining() != 0) {
                 BazaarNotifier.orders.add(newOrder);
                 verifiedOrders = Arrays.copyOf(verifiedOrders, verifiedOrders.length + 1);
+                verifiedOrders[verifiedOrders.length-1] = 1;
               }
             }
           }

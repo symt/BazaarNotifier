@@ -11,7 +11,7 @@ public class Order {
   public int startAmount;
   public double pricePerUnit;
   public String priceString;
-  public OrderStatus orderStatus = OrderStatus.BEST;
+  public OrderStatus orderStatus = OrderStatus.SEARCHING;
   public double orderValue;
   public OrderType type;
   private int amountRemaining;
