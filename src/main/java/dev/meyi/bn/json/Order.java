@@ -54,12 +54,12 @@ public class Order {
   }
 
   public void updateStatus() {
-    OrderStatus newOrderStatus = null;
+    OrderStatus newOrderStatus;
     if (!BazaarNotifier.activeBazaar) {
       return;
     }
     if (OrderType.BUY.equals(this.type)) {
-      if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).sell_summary.size() == 0) {
+      if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).sell_summary.isEmpty()) {
         orderStatus = OrderStatus.SEARCHING;
         return;
       }
@@ -79,9 +79,11 @@ public class Order {
           BazaarNotifier.orders.stream().filter(order -> this.product.equals(order.product)
               && this.pricePerUnit == order.pricePerUnit).count() != bazaarSubItem.orders) {
         newOrderStatus = OrderStatus.MATCHED;
+      } else {
+        newOrderStatus = OrderStatus.BEST;
       }
     } else {
-      if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.size() == 0) {
+      if (BazaarNotifier.bazaarDataRaw.products.get(getProductId()).buy_summary.isEmpty()) {
         orderStatus = OrderStatus.SEARCHING;
         return;
       }
@@ -100,6 +102,8 @@ public class Order {
           BazaarNotifier.orders.stream().filter(order -> this.product.equals(order.product)
               && this.pricePerUnit == order.pricePerUnit).count() != bazaarSubItem.orders) {
         newOrderStatus = OrderStatus.MATCHED;
+      } else {
+        newOrderStatus = OrderStatus.BEST;
       }
     }
     if (this.orderStatus != newOrderStatus) {
@@ -125,5 +129,4 @@ public class Order {
       this.longName = longName;
     }
   }
-
 }
