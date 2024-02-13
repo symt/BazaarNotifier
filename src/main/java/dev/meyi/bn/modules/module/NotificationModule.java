@@ -41,7 +41,7 @@ public class NotificationModule extends Module {
   protected float getWidth(float scale, boolean example) {
     if (longestString != null) {
       if (!longestString.isEmpty()) {
-        return RenderUtils.getStringWidth(longestString) * scale;
+        return RenderUtils.getStringWidth(longestString) * scale + 2 * padding * scale;
       }
     }
     return 200*scale;
@@ -49,7 +49,7 @@ public class NotificationModule extends Module {
 
   @Override
   protected float getHeight(float scale, boolean example) {
-    return (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * 10 + 20)*scale  - 2;
+    return ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * 10 + 20) * scale  - 2) + 2 * padding * scale;
   }
   //source dsm
   public static void drawOnSlot(int chestSize, int slot, int color) {
@@ -105,7 +105,7 @@ public class NotificationModule extends Module {
         items.add(message);
       }
       longestString = RenderUtils.getLongestString(items);
-      RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
+      RenderUtils.drawColorfulParagraph(items, (int)position.getX() + padding, (int)position.getY() + padding, scale);
     } else {
       longestString = "";
       RenderUtils.drawCenteredString("No orders found", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);

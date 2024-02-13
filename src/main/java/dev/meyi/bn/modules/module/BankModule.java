@@ -44,12 +44,12 @@ public class BankModule extends Module {
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    return RenderUtils.getStringWidth(longestString)*scale;
+    return RenderUtils.getStringWidth(longestString)* scale  + 2 * padding * scale;
   }
 
   @Override
   protected float getHeight(float scale, boolean example) {
-    return ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * lines) + lines )*scale - 2;
+    return (((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * lines) + lines ) * scale - 2) + 2 * padding * scale;
   }
 
 
@@ -94,7 +94,7 @@ public class BankModule extends Module {
 
 
     longestString = RenderUtils.getLongestString(items);
-    RenderUtils.drawColorfulParagraph(items, (int)position.getX(), (int)position.getY(), scale);
+    RenderUtils.drawColorfulParagraph(items, (int)position.getX() + padding, (int)position.getY() + padding, scale);
     GL11.glTranslated(0, 0, -1);
   }
 
