@@ -80,6 +80,10 @@ public class RenderUtils {
     return fontRenderer.getStringWidth(string);
   }
 
+  public static void sendSound() {
+    if (!BazaarNotifier.config.sendSound) return;
+    Minecraft.getMinecraft().thePlayer.playSound("ENTITY_PLAYER_LEVELUP", 1.0F, 1.0F);
+  }
   public static void chatNotification(Order order, String notification) {
     if (!BazaarNotifier.config.showChatMessages) {
       return;

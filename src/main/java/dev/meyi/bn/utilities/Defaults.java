@@ -19,6 +19,7 @@ public class Defaults {
   public static final boolean PROFIT_PER_MIL = true;
   public static final boolean COLLECTION_CHECKING = false;
   public static final boolean SEND_CHAT_MESSAGES = true;
+  public static final boolean SEND_SOUND = false;
   public static final boolean USE_BUY_ORDERS = true;
   public static final boolean SUGGESTION_SHOW_ENCHANTMENTS = true;
   public static final boolean BANK_RAW_DIFFERENCE = false;

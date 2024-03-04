@@ -9,32 +9,6 @@ import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.utilities.RenderUtils;
 
 public class Order {
-  public static void playCustomSound(String soundName, float volume, float pitch) { // Horrible implementation placing the code here 😂 sorry. do whatever though
-          Minecraft mc = Minecraft.getInstance();
-          SoundHandler soundHandler = mc.getSoundHandler();
-          
-          ResourceLocation soundLocation = new ResourceLocation("minecraft", soundName);
-          
-          soundHandler.play(new CustomSound(soundLocation, volume, pitch, false));
-      }
-      
-      static class CustomSound extends net.minecraft.client.audio.Sound {
-          
-          public CustomSound(ResourceLocation soundLocation, float volume, float pitch, boolean repeat) {
-              super(soundLocation, volume, pitch, repeat);
-          }
-          
-          @Override
-          public float getVolume() {
-              return super.getVolume();
-          }
-          
-          @Override
-          public float getPitch() {
-              return super.getPitch();
-          }
-      }
-
   public String product;
   public int startAmount;
   public double pricePerUnit;
@@ -141,7 +115,8 @@ public class Order {
         RenderUtils.chatNotification(this, "MATCHED");
       } else if (OrderStatus.OUTDATED.equals(newOrderStatus)) {
         RenderUtils.chatNotification(this, "OUTDATED");
-        playCustomSound("entity.player.levelup", 1.0f, 1.0f); // Plays sound once order is outdated. TODO: Maybe make toggleable (later)
+        RenderUtils.sendSound();
+
       }
       this.orderStatus = newOrderStatus;
     }
