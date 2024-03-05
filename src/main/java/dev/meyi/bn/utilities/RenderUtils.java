@@ -82,7 +82,7 @@ public class RenderUtils {
 
   public static void sendSound() {
     if (!BazaarNotifier.config.sendSound) return;
-    Minecraft.getMinecraft().thePlayer.playSound("mob.horse.donkey.death", 2.0F, 1.0F);
+    Minecraft.getMinecraft().thePlayer.playSound("mob.horse.donkey.death", 2.0F, 1.0F); // Todo: add option for which sound to play (possibly)
   }
   public static void chatNotification(Order order, String notification) {
     if (!BazaarNotifier.config.showChatMessages) {
