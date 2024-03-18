@@ -37,7 +37,7 @@ public class Utils {
     Gson gson = new Gson();
     CloseableHttpClient client = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar");
+        "https://api.hypixel.net/v2/skyblock/bazaar");
     HttpResponse response = client.execute(request);
 
     String result = IOUtils.toString(new BufferedReader
