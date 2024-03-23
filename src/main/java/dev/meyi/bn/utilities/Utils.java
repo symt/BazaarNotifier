@@ -35,11 +35,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
 
 public class Utils {
   private static final TrustManager[] trustAllCerts = new TrustManager[] {
@@ -145,7 +143,7 @@ public class Utils {
               .getAsJsonObject("enchantCraftingList");
     } catch (JsonSyntaxException e) {
       e.printStackTrace();
-    } finally {
+    }finally {
       client.close();
     }
   }

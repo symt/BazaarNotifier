@@ -100,7 +100,7 @@ public class BazaarNotifier {
           byte[] bytes = Files.readAllBytes(Paths.get(resourcesFile.getPath()));
           if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Resources File");
           JsonReader resourcesReader = new JsonReader(new StringReader(new String(
-              bytes)));
+              bytes, StandardCharsets.UTF_8)));
           resourcesReader.setLenient(true);
           resources = gson.fromJson(resourcesReader, JsonObject.class);
         } catch (JsonSyntaxException | ClassCastException e) {
@@ -124,6 +124,7 @@ public class BazaarNotifier {
       Utils.updateResources();
     } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
       System.err.println("Error while getting resources from GitHub");
+      System.out.println("Error while getting resources from GitHub");
       e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
       enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
