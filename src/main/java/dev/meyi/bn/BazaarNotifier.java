@@ -124,7 +124,6 @@ public class BazaarNotifier {
       Utils.updateResources();
     } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
       System.err.println("Error while getting resources from GitHub");
-      System.out.println("Error while getting resources from GitHub");
       e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
       enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");

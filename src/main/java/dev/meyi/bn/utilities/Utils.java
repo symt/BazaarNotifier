@@ -122,7 +122,6 @@ public class Utils {
     }
   }
 
-
   public static void updateResources() throws IOException, KeyManagementException, NoSuchAlgorithmException {
     Gson gson = new Gson();
     HttpGet request;
@@ -132,6 +131,7 @@ public class Utils {
     CloseableHttpClient client = HttpClientBuilder.create().setSslcontext(sc).build();
     request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
+
     JsonReader jsonReader = new JsonReader(
             new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)));
     jsonReader.setLenient(true);
@@ -143,7 +143,7 @@ public class Utils {
               .getAsJsonObject("enchantCraftingList");
     } catch (JsonSyntaxException e) {
       e.printStackTrace();
-    }finally {
+    } finally {
       client.close();
     }
   }
