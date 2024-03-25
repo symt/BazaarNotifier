@@ -3,7 +3,6 @@ package dev.meyi.bn.json;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.utilities.RenderUtils;
-import net.minecraft.client.Minecraft;
 
 public class Order {
   public String product;
