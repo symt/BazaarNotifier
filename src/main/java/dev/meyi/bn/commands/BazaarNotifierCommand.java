@@ -1,15 +1,14 @@
 package dev.meyi.bn.commands;
 
-import cc.polyfrost.oneconfig.gui.OneConfigGui;
-import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.config.Configuration;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.modules.calc.SuggestionCalculator;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.command.CommandBase;
@@ -194,7 +193,7 @@ public class BazaarNotifierCommand extends CommandBase {
             try {
               Utils.updateResources();
               date = System.currentTimeMillis();
-            } catch (IOException e) {
+            } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Resource update failed. Please try again."));
@@ -272,5 +271,3 @@ public class BazaarNotifierCommand extends CommandBase {
     return arguments;
   }
 }
-
-

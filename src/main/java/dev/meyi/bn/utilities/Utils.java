@@ -16,6 +16,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +35,35 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 public class Utils {
+  private static final TrustManager[] trustAllCerts = new TrustManager[] {
+          new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
+            }
+
+            @Override
+            public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+              return null;
+            }
+
+          }
+  };
   private static String playerUUID = "";
 
   public static BazaarResponse getBazaarData() throws IOException {
     Gson gson = new Gson();
     CloseableHttpClient client = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(
-        "https://api.hypixel.net/skyblock/bazaar");
+        "https://api.hypixel.net/v2/skyblock/bazaar");
     HttpResponse response = client.execute(request);
 
     String result = IOUtils.toString(new BufferedReader
@@ -96,23 +122,25 @@ public class Utils {
     }
   }
 
-  public static void updateResources() throws IOException {
+  public static void updateResources() throws IOException, KeyManagementException, NoSuchAlgorithmException {
     Gson gson = new Gson();
     HttpGet request;
     HttpResponse response;
-    CloseableHttpClient client = HttpClientBuilder.create().build();
+    SSLContext sc = SSLContext.getInstance("SSL");
+    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+    CloseableHttpClient client = HttpClientBuilder.create().setSslcontext(sc).build();
     request = new HttpGet(BazaarNotifier.RESOURCE_LOCATION);
     response = client.execute(request);
 
     JsonReader jsonReader = new JsonReader(
-        new BufferedReader(new InputStreamReader(response.getEntity().getContent())));
+            new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)));
     jsonReader.setLenient(true);
     try {
       BazaarNotifier.resources = gson.fromJson(jsonReader, JsonObject.class);
       BazaarNotifier.bazaarConv = jsonToBimap(
-          BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
+              BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
       BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
-          .getAsJsonObject("enchantCraftingList");
+              .getAsJsonObject("enchantCraftingList");
     } catch (JsonSyntaxException e) {
       e.printStackTrace();
     } finally {

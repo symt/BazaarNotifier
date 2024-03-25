@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "dev.meyi.bazaarnotifier"
-version = "1.7.1"
+version = "1.7.2"
 val mod_id = "bazaarnotifier"
 
 java {
