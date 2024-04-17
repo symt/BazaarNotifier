@@ -1293,8 +1293,8 @@
 		"WORM_BAIT": "Worm Bait",
 		"ENCHANTMENT_SUNDER_6": "Sunder VI",
 		"REFINED_BOTTLE_OF_JYRRE": "Refined Bottle of Jyrre",
-  		"POLARVOID_BOOK": "Polarvoid Book",
-  		"POISON_SAMPLE": "Poison Sample",
+		"POLARVOID_BOOK": "Polarvoid Book",
+		"POISON_SAMPLE": "Poison Sample",
 		"ARCHITECT_FIRST_DRAFT": "Architect First Draft",
 		"REFINED_TUNGSTEN": "Refined Tungsten",
 		"ENCHANTED_UMBER": "Enchanted Umber",
@@ -3214,6 +3214,104 @@
 					1
 				],
 				"collection": "NONE"
+			},
+			"ENCHANTED_GLACITE": {
+				"material": [
+					"ENCHANTED_GLACITE",
+					160
+				],
+				"collection": "NONE"
+			},
+			"FLAWLESS_ONYX_GEM": {
+				"material": [
+					"FINE_ONYX_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FLAWLESS_PERIDOT_GEM": {
+				"material": [
+					"FINE_PERIDOT_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FLAWLESS_CITRINE_GEM": {
+				"material": [
+					"FINE_CITRINE_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FLAWED_ONYX_GEM": {
+				"material": [
+					"ROUGH_ONYX_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"ENCHANTED_TUNGSTEN": {
+				"material": [
+					"REFINED_TUNGSTEN",
+					160
+				],
+				"collection": "NONE"
+			},
+			"FLAWED_PERIDOT_GEM": {
+				"material": [
+					"ROUGH_PERIDOT_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FINE_ONYX_GEM": {
+				"material": [
+					"FLAWED_ONYX_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FLAWLESS_AQUAMARINE_GEM": {
+				"material": [
+					"FINE_AQUAMARINE_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FINE_CITRINE_GEM": {
+				"material": [
+					"FLAWED_CITRINE_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FLAWED_AQUAMARINE_GEM": {
+				"material": [
+					"ROUGH_AQUAMARINE_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FLAWED_CITRINE_GEM": {
+				"material": [
+					"ROUGH_CITRINE_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FINE_AQUAMARINE_GEM": {
+				"material": [
+					"FLAWED_AQUAMARINE_GEM",
+					80
+				],
+				"collection": "NONE"
+			},
+			"FINE_PERIDOT_GEM": {
+				"material": [
+					"FLAWED_PERIDOT_GEM",
+					80
+				],
+				"collection": "NONE"
 			}
 		}
 	},
@@ -3631,6 +3729,60 @@
 		"MINION_STORAGE_EXPANDER",
 		"VOLT_CRUX",
 		"WILTED_BERBERIS",
-		"WATER_HYDRA_HEAD"
+		"WATER_HYDRA_HEAD",
+		"LAPIS_BLOCK",
+		"MILK_BUCKET",
+		"HYPER_CATALYST_UPGRADE",
+		"COLOSSAL_EXP_BOTTLE_UPGRADE",
+		"HEAT_CORE",
+		"HEAT_CORE",
+		"CORRUPTED_FRAGMENT",
+		"HORN_OF_TAURUS",
+		"SILVER_FANG",
+		"BLAZE_ASHES",
+		"MAGMA_CHUNK",
+		"BEZOS",
+		"GAZING_PEARL",
+		"THUNDER_SHARDS",
+		"ULTIMATE_CARROT_CANDY_UPGRADE",
+		"BOWL",
+		"BOWL",
+		"CORRUPTED_FRAGMENT",
+		"MINION_STORAGE_EXPANDER",
+		"VINE",
+		"INK_SACK:15",
+		"MINION_STORAGE_EXPANDER",
+		"VOLT_CRUX",
+		"WILTED_BERBERIS",
+		"WATER_HYDRA_HEAD",
+		"FROSTY_CRUX",
+		"POISON_SAMPLE",
+		"ARCHITECT_FIRST_DRAFT",
+		"REFINED_TUNGSTEN",
+		"ENCHANTED_UMBER",
+		"ROUGH_AQUAMARINE_GEM",
+		"ROUGH_ONYX_GEM",
+		"UMBER",
+		"SUSPICIOUS_SCRAP",
+		"PERFECT_AQUAMARINE_GEM",
+		"ARACHNE_FRAGMENT",
+		"SKELETON_KEY",
+		"UMBER_KEY",
+		"TUNGSTEN_PLATE",
+		"PERFECT_PERIDOT_GEM",
+		"UMBER_PLATE",
+		"PERFECT_ONYX_GEM",
+		"REFINED_UMBER",
+		"ROUGH_CITRINE_GEM",
+		"GLACITE_SHARD",
+		"PERFECT_PLATE",
+		"ROUGH_PERIDOT_GEM",
+		"TUNGSTEN_KEY",
+		"GLACITE",
+		"FRIGID_HUSK",
+		"TUNGSTEN",
+		"PERFECT_CITRINE_GEM",
+		"GLACITE_AMALGAMATION",
+		"ARACHNE_FANG"
 	]
 }
