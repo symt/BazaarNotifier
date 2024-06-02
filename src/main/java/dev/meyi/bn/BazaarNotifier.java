@@ -26,6 +26,8 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -42,7 +44,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class BazaarNotifier {
 
   public static final String MODID = "BazaarNotifier";
-  public static final String VERSION = "1.7.1";
+  public static final String VERSION = "1.7.2";
   public static final String prefix =
       EnumChatFormatting.GOLD + "[" + EnumChatFormatting.YELLOW + "BN" + EnumChatFormatting.GOLD
           + "] " + EnumChatFormatting.RESET;
@@ -98,7 +100,7 @@ public class BazaarNotifier {
           byte[] bytes = Files.readAllBytes(Paths.get(resourcesFile.getPath()));
           if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Resources File");
           JsonReader resourcesReader = new JsonReader(new StringReader(new String(
-              bytes)));
+              bytes, StandardCharsets.UTF_8)));
           resourcesReader.setLenient(true);
           resources = gson.fromJson(resourcesReader, JsonObject.class);
         } catch (JsonSyntaxException | ClassCastException e) {
@@ -120,7 +122,7 @@ public class BazaarNotifier {
 
     try {
       Utils.updateResources();
-    } catch (IOException e) {
+    } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
       System.err.println("Error while getting resources from GitHub");
       e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
