@@ -28,4 +28,4 @@ Join the discord server: https://discord.com/invite/wjpJSVSwvD
 
 <hr/>
 
-<sub>[License](https://github.com/symt/BazaarNotifier/blob/master/license.txt) | [Site](https://meyi.dev)</sub>
+<sub>[License](https://github.com/symt/BazaarNotifier/blob/master/LICENSE.txt) | [Site](https://meyi.dev)</sub>
