@@ -14,6 +14,7 @@ public class Order {
   public OrderStatus orderStatus = OrderStatus.SEARCHING;
   public double orderValue;
   public OrderType type;
+  public long creationTime;
   private int amountRemaining;
 
   public Order(String product, int startAmount, double pricePerUnit, String priceString,
@@ -25,6 +26,7 @@ public class Order {
     this.priceString = priceString;
     this.type = type;
     orderValue = startAmount * pricePerUnit;
+    creationTime = System.currentTimeMillis();
   }
 
   public Order(String product, OrderType type, double pricePerUnit, int startAmount) {
@@ -65,7 +67,10 @@ public class Order {
       }
       BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
           .get(getProductId()).sell_summary.get(0);
-      if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
+      if(creationTime > BazaarNotifier.bazaarDataRaw.lastUpdated){
+        newOrderStatus = OrderStatus.SEARCHING;
+      }
+      else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
           && this.startAmount >= bazaarSubItem.amount
@@ -89,7 +94,10 @@ public class Order {
       }
       BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
           .get(getProductId()).buy_summary.get(0);
-      if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
+      if(creationTime > BazaarNotifier.bazaarDataRaw.lastUpdated){
+        newOrderStatus = OrderStatus.SEARCHING;
+      }
+      else if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
           && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {
