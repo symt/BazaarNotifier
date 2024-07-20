@@ -1358,7 +1358,11 @@
 		"FINE_FLOUR": "Fine Flour",
 		"AVARICIOUS_CHALICE": "Avaricious Chalice",
 		"ENCHANTMENT_TOXOPHILITE_1": "Toxophilite I",
-		"GOLDEN_BOUNTY": "Golden Bounty"
+		"GOLDEN_BOUNTY": "Golden Bounty",
+		"BLOOD_STAINED_COINS": "Blood Stained Coins",
+		"DARK_QUEENS_SOUL_DROP": "Dark Queens Soul Drop",
+		"GOLDEN_FRAGMENT": "Golden Fragment",
+		"SUPREME_CHOCOLATE_BAR": "Supreme Chocolate Bar"
 	},
 	"enchantCraftingList": {
 		"normal": {},
