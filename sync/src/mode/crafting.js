@@ -39,8 +39,8 @@ export default {
 
       if (name === "ENCHANTED_CARROT_ON_A_STICK" || name.startsWith("ENCHANTMENT") || Object.keys(resources.enchantCraftingList.other).includes(name) || resources.invalidBazaarCraftingRecipe.includes(name)) continue
 
-      let response = (await axios.get(template))
-
+      let response = (await axios.get(template).catch(e => { return { status: 400 } } ))
+	
       if (response.status === 200) {
         let itemData = response.data
 
