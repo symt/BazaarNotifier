@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: '20.x'
       - name: Build resources.json
+        env:
+          KEY: ${{ secrets.KEY }}
         run: |
           cd sync
           npm ci
