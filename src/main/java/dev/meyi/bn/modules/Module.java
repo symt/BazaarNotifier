@@ -32,7 +32,7 @@ public abstract class Module extends Hud {
   protected boolean showEverywhere = false;
 
   public Module() {
-    super(true, 20, 20, 2, 1);
+    super(true, 0, 0, 0, 1);
   }
 
   @Override
