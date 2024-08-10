@@ -179,6 +179,7 @@ public class NotificationModule extends Module {
           if (item == null
               || Item.itemRegistry.getIDForObject(item.getItem()) == 160
               || Item.itemRegistry.getIDForObject(item.getItem()) == 102
+              || Item.itemRegistry.getIDForObject(item.getItem()) == 154
               || Item.itemRegistry.getIDForObject(item.getItem()) == 262) {
             continue;
           }
