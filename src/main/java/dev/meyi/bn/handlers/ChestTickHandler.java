@@ -48,7 +48,8 @@ public class ChestTickHandler {
     for (ItemStack item : items) {
       if (item != null && Item.itemRegistry.getIDForObject(item.getItem()) != 160    // Glass
           && Item.itemRegistry.getIDForObject(item.getItem()) != 102    // Glass
-          && Item.itemRegistry.getIDForObject(item.getItem()) != 262) { // Arrow
+          && Item.itemRegistry.getIDForObject(item.getItem()) != 262    // Arrow
+          && Item.itemRegistry.getIDForObject(item.getItem()) != 154  ) { //Hopper
         List<String> lore = Utils.getLoreFromItemStack(item);
 
         Pattern p2 = Pattern.compile("(BUY|SELL):? (.*)");
