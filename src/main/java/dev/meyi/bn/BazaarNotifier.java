@@ -122,7 +122,7 @@ public class BazaarNotifier {
 
     try {
       Utils.updateResources();
-    } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
+    } catch (IOException | KeyManagementException | NoSuchAlgorithmException | ClassCastException e) {
       System.err.println("Error while getting resources from GitHub");
       e.printStackTrace();
       JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");

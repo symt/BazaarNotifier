@@ -122,7 +122,7 @@ public class Utils {
     }
   }
 
-  public static void updateResources() throws IOException, KeyManagementException, NoSuchAlgorithmException {
+  public static void updateResources() throws IOException, KeyManagementException, NoSuchAlgorithmException, ClassCastException {
     Gson gson = new Gson();
     HttpGet request;
     HttpResponse response;

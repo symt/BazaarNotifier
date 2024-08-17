@@ -193,7 +193,7 @@ public class BazaarNotifierCommand extends CommandBase {
             try {
               Utils.updateResources();
               date = System.currentTimeMillis();
-            } catch (IOException | KeyManagementException | NoSuchAlgorithmException e) {
+            } catch (IOException | KeyManagementException | NoSuchAlgorithmException | ClassCastException e) {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Resource update failed. Please try again."));
