@@ -148,11 +148,11 @@ public class ChestTickHandler {
 
         if (chest.hasCustomName() && !lastScreenDisplayName.equalsIgnoreCase(chestName)) {
           if (chestName.equals("confirm buy order") || chestName.equals("confirm sell offer")) {
-
             if (chest.getStackInSlot(13) != null) {
-              lastScreenDisplayName = StringUtils.stripControlCodes(
-                  chest.getDisplayName().getUnformattedText());
-              orderConfirmation(chest);
+              if (orderConfirmation(chest)){ // Don´t reset the lastScreenDisplayName to retry in the next tick
+                lastScreenDisplayName = StringUtils.stripControlCodes(
+                        chest.getDisplayName().getUnformattedText());
+              }
             }
 
           } else if (chestName.contains("bazaar orders")) {
@@ -174,19 +174,28 @@ public class ChestTickHandler {
     }
   }
 
-  private void orderConfirmation(IInventory chest) {
+  /**
+   * @return success
+   */
+  private boolean orderConfirmation(IInventory chest) {
 
     if (chest.getStackInSlot(13) != null) {
+      String priceString = "";
+      String product = "";
+      double price = 0;
 
-      String priceString = StringUtils.stripControlCodes(
-          chest.getStackInSlot(13).getTagCompound().getCompoundTag("display").getTagList("Lore", 8)
-              .getStringTagAt(2)).split(" ")[3].replaceAll(",", "");
-      double price = Double.parseDouble(priceString);
+      try {
+        priceString = StringUtils.stripControlCodes(
+                chest.getStackInSlot(13).getTagCompound().getCompoundTag("display").getTagList("Lore", 8)
+                        .getStringTagAt(2)).split(" ")[3].replaceAll(",", "");
+        price = Double.parseDouble(priceString);
 
-      String product = StringUtils.stripControlCodes(
-          chest.getStackInSlot(13).getTagCompound().getCompoundTag("display").getTagList("Lore", 8)
-              .getStringTagAt(4)).split("x ", 2)[1];
-
+        product = StringUtils.stripControlCodes(
+                chest.getStackInSlot(13).getTagCompound().getCompoundTag("display").getTagList("Lore", 8)
+                        .getStringTagAt(4)).split("x ", 2)[1];
+      }catch (Exception e){
+        return false;
+      }
       String productName;
 
       if (!BazaarNotifier.bazaarConv.containsValue(product)) {
@@ -230,6 +239,7 @@ public class ChestTickHandler {
         EventHandler.verify = new Order(product, amount, price, priceString, type);
       }
     }
+    return true;
   }
   @SubscribeEvent
   public void renderInChest(GuiScreenEvent.BackgroundDrawnEvent e){
