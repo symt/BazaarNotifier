@@ -141,7 +141,7 @@ public class Utils {
               BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
       BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
               .getAsJsonObject("enchantCraftingList");
-    } catch (JsonSyntaxException e) {
+    } catch (JsonSyntaxException | ClassCastException e) { //ClassCastException is thrown when GitHub is down
       e.printStackTrace();
     } finally {
       client.close();
@@ -213,7 +213,7 @@ public class Utils {
   public static int getOrderAmountLeft(List<String> lore, int totalAmount) {
     int amountLeft;
     if (lore.get(3).startsWith("Filled:")) {
-      if (lore.get(3).split(" ")[2].equals("100%")) {
+      if (lore.get(3).split(" ")[2].contains("100%")) {
         amountLeft = 0;
       } else {
         String intToParse = lore.get(3).split(" ")[1].split("/")[0];
