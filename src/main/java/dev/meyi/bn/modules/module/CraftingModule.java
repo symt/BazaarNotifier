@@ -111,8 +111,7 @@ public class CraftingModule extends Module {
           (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Sell Offer ") * scale)
           : 0;
       width[3] = BazaarNotifier.config.craftingModule.showProfitPerMil ?
-          (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Profit %")
-              * scale)
+          (int) (Minecraft.getMinecraft().fontRendererObj.getStringWidth("/ Profit %") * scale)
           : 0;
 
       for (int i : width) {
@@ -163,7 +162,8 @@ public class CraftingModule extends Module {
       helperLine.add(new ColoredText(" Instant Sell",
           BazaarNotifier.config.craftingModule.craftingSortingOption == 0 ?
               new Color(141, 152, 201) : BazaarNotifier.config.infoColor.toJavaColor()));
-      if (BazaarNotifier.config.craftingModule.showSellOfferProfit) {
+      if (BazaarNotifier.config.craftingModule.showSellOfferProfit
+              || BazaarNotifier.config.craftingModule.showProfitPerMil) {
         helperLine.add(new ColoredText(" /", BazaarNotifier.config.infoColor.toJavaColor()));
       }
     }
@@ -172,11 +172,11 @@ public class CraftingModule extends Module {
           BazaarNotifier.config.craftingModule.craftingSortingOption == 1 ?
               new Color(141, 152, 201) : BazaarNotifier.config.infoColor.toJavaColor()));
       if (BazaarNotifier.config.craftingModule.showProfitPerMil) {
-        helperLine.add(new ColoredText(" / ", BazaarNotifier.config.infoColor.toJavaColor()));
+        helperLine.add(new ColoredText(" /", BazaarNotifier.config.infoColor.toJavaColor()));
       }
     }
     if (BazaarNotifier.config.craftingModule.showProfitPerMil) {
-      helperLine.add(new ColoredText("Profit %",
+      helperLine.add(new ColoredText(" Profit %",
           BazaarNotifier.config.craftingModule.craftingSortingOption == 2 ?
               new Color(141, 152, 201) : BazaarNotifier.config.infoColor.toJavaColor()));
     }
