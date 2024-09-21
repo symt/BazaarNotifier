@@ -1362,7 +1362,21 @@
 		"BLOOD_STAINED_COINS": "Blood Stained Coins",
 		"DARK_QUEENS_SOUL_DROP": "Dark Queens Soul Drop",
 		"GOLDEN_FRAGMENT": "Golden Fragment",
-		"SUPREME_CHOCOLATE_BAR": "Supreme Chocolate Bar"
+		"SUPREME_CHOCOLATE_BAR": "Supreme Chocolate Bar",
+		"DWARVEN_OS_ORE_OATS": "Dwarven Os Ore Oats",
+		"TITANIUM_TESSERACT": "Titanium Tesseract",
+		"DWARVEN_OS_GEMSTONE_GRAHAMS": "Dwarven Os Gemstone Grahams",
+		"DWARVEN_OS_BLOCK_BRAN": "Dwarven Os Block Bran",
+		"PET_ITEM_CHOCOLATE_SYRINGE": "Pet Item Chocolate Syringe",
+		"BLAZEN_SPHERE": "Blazen Sphere",
+		"DWARVEN_OS_METALLIC_MINIS": "Dwarven Os Metallic Minis",
+		"POCKET_ICEBERG": "Pocket Iceberg",
+		"MANA_DISINTEGRATOR": "Mana Disintegrator",
+		"PRECURSOR_APPARATUS": "Precursor Apparatus",
+		"ENCHANTMENT_ULTIMATE_FLOWSTATE_1": "Flowstate I",
+		"ENCHANTMENT_ULTIMATE_FLOWSTATE_3": "Flowstate III",
+		"ENCHANTMENT_ULTIMATE_FLOWSTATE_2": "Flowstate II",
+		"DWARVEN_TREASURE": "Dwarven Treasure"
 	},
 	"enchantCraftingList": {
 		"normal": {},
@@ -3347,6 +3361,23 @@
 					1
 				],
 				"collection": "NONE"
+			},
+			"PRECURSOR_APPARATUS": {
+				"material": [
+					"CONTROL_SWITCH",
+					1,
+					"ELECTRON_TRANSMITTER",
+					1,
+					"FTX_3070",
+					1,
+					"ROBOTRON_REFLECTOR",
+					1,
+					"SUPERLITE_MOTOR",
+					1,
+					"SYNTHETIC_HEART",
+					1
+				],
+				"collection": "NONE"
 			}
 		}
 	},
@@ -3884,6 +3915,42 @@
 		"GOLDEN_BOUNTY",
 		"DARK_QUEENS_SOUL_DROP",
 		"GOLDEN_FRAGMENT",
-		"SUPREME_CHOCOLATE_BAR"
+		"SUPREME_CHOCOLATE_BAR",
+		"LAPIS_BLOCK",
+		"MILK_BUCKET",
+		"HYPER_CATALYST_UPGRADE",
+		"COLOSSAL_EXP_BOTTLE_UPGRADE",
+		"HEAT_CORE",
+		"HEAT_CORE",
+		"CORRUPTED_FRAGMENT",
+		"HORN_OF_TAURUS",
+		"SILVER_FANG",
+		"BLAZE_ASHES",
+		"MAGMA_CHUNK",
+		"BEZOS",
+		"GAZING_PEARL",
+		"THUNDER_SHARDS",
+		"ULTIMATE_CARROT_CANDY_UPGRADE",
+		"BOWL",
+		"BOWL",
+		"CORRUPTED_FRAGMENT",
+		"MINION_STORAGE_EXPANDER",
+		"VINE",
+		"INK_SACK:15",
+		"MINION_STORAGE_EXPANDER",
+		"VOLT_CRUX",
+		"WILTED_BERBERIS",
+		"WATER_HYDRA_HEAD",
+		"FROSTY_CRUX",
+		"DWARVEN_OS_ORE_OATS",
+		"TITANIUM_TESSERACT",
+		"DWARVEN_OS_GEMSTONE_GRAHAMS",
+		"DWARVEN_OS_BLOCK_BRAN",
+		"PET_ITEM_CHOCOLATE_SYRINGE",
+		"BLAZEN_SPHERE",
+		"DWARVEN_OS_METALLIC_MINIS",
+		"POCKET_ICEBERG",
+		"MANA_DISINTEGRATOR",
+		"DWARVEN_TREASURE"
 	]
 }
