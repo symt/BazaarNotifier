@@ -1362,7 +1362,21 @@
 		"BLOOD_STAINED_COINS": "Blood Stained Coins",
 		"DARK_QUEENS_SOUL_DROP": "Dark Queens Soul Drop",
 		"GOLDEN_FRAGMENT": "Golden Fragment",
-		"SUPREME_CHOCOLATE_BAR": "Supreme Chocolate Bar"
+		"SUPREME_CHOCOLATE_BAR": "Supreme Chocolate Bar",
+		"DWARVEN_OS_ORE_OATS": "Dwarven O's Ore Oats",
+		"TITANIUM_TESSERACT": "Titanium Tesseract",
+		"DWARVEN_OS_GEMSTONE_GRAHAMS": "Dwarven O's Gemstone Grahams",
+		"DWARVEN_OS_BLOCK_BRAN": "Dwarven O's Block Bran",
+		"PET_ITEM_CHOCOLATE_SYRINGE": "Pet Item Chocolate Syringe",
+		"BLAZEN_SPHERE": "Blazen Sphere",
+		"DWARVEN_OS_METALLIC_MINIS": "Dwarven O's Metallic Minis",
+		"POCKET_ICEBERG": "Pocket Iceberg",
+		"MANA_DISINTEGRATOR": "Mana Disintegrator",
+		"PRECURSOR_APPARATUS": "Precursor Apparatus",
+		"ENCHANTMENT_ULTIMATE_FLOWSTATE_1": "Flowstate I",
+		"ENCHANTMENT_ULTIMATE_FLOWSTATE_3": "Flowstate III",
+		"ENCHANTMENT_ULTIMATE_FLOWSTATE_2": "Flowstate II",
+		"DWARVEN_TREASURE": "Dwarven Treasure"
 	},
 	"enchantCraftingList": {
 		"normal": {},
@@ -3344,6 +3358,23 @@
 					"HEMOGLASS",
 					4,
 					"FRESHLY_MINTED_COINS",
+					1
+				],
+				"collection": "NONE"
+			},
+			"PRECURSOR_APPARATUS": {
+				"material": [
+					"CONTROL_SWITCH",
+					1,
+					"ELECTRON_TRANSMITTER",
+					1,
+					"FTX_3070",
+					1,
+					"ROBOTRON_REFLECTOR",
+					1,
+					"SUPERLITE_MOTOR",
+					1,
+					"SYNTHETIC_HEART",
 					1
 				],
 				"collection": "NONE"
