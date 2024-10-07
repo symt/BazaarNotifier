@@ -1,12 +1,10 @@
 package dev.meyi.bn.json;
 
-
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.utilities.RenderUtils;
 
 public class Order {
-
   public String product;
   public int startAmount;
   public double pricePerUnit;
@@ -121,6 +119,7 @@ public class Order {
         RenderUtils.chatNotification(this, "MATCHED");
       } else if (OrderStatus.OUTDATED.equals(newOrderStatus)) {
         RenderUtils.chatNotification(this, "OUTDATED");
+        RenderUtils.sendSound(); // might be loud if multiple become oudated at the same time
       }
       this.orderStatus = newOrderStatus;
     }

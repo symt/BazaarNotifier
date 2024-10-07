@@ -66,6 +66,11 @@ public class Configuration extends Config {
   )
   public boolean showChatMessages = Defaults.SEND_CHAT_MESSAGES;
 
+  @JsonName("sendSound")
+  @Switch(name = "Send Sound for Outdated Orders")
+
+  public boolean sendSound = Defaults.SEND_SOUND;
+
   @JsonName("collectionCheck")
   @Switch(name = "Collection checks",
           category = "Crafting Module",

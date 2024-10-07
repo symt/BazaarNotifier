@@ -80,6 +80,12 @@ public class RenderUtils {
     return fontRenderer.getStringWidth(string);
   }
 
+  public static void sendSound() {
+    if (BazaarNotifier.config.sendSound) {
+      Minecraft.getMinecraft().thePlayer.playSound("mob.horse.donkey.death", 2.0F, 1.0F); 
+      // TODO: add option for which sound to play (possibly)
+    }
+  }
   public static void chatNotification(Order order, String notification) {
     if (!BazaarNotifier.config.showChatMessages) {
       return;
