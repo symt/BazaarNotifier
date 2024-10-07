@@ -1376,7 +1376,12 @@
 		"ENCHANTMENT_ULTIMATE_FLOWSTATE_1": "Flowstate I",
 		"ENCHANTMENT_ULTIMATE_FLOWSTATE_3": "Flowstate III",
 		"ENCHANTMENT_ULTIMATE_FLOWSTATE_2": "Flowstate II",
-		"DWARVEN_TREASURE": "Dwarven Treasure"
+		"DWARVEN_TREASURE": "Dwarven Treasure",
+		"ENCHANTMENT_LAPIDARY_4": "Lapidary IV",
+		"ENCHANTMENT_LAPIDARY_3": "Lapidary III",
+		"ENCHANTMENT_LAPIDARY_2": "Lapidary II",
+		"ENCHANTMENT_LAPIDARY_1": "Lapidary I",
+		"ENCHANTMENT_LAPIDARY_5": "Lapidary V"
 	},
 	"enchantCraftingList": {
 		"normal": {},
