@@ -111,8 +111,7 @@ public class Order {
         RenderUtils.chatNotification(this, "MATCHED");
       } else if (OrderStatus.OUTDATED.equals(newOrderStatus)) {
         RenderUtils.chatNotification(this, "OUTDATED");
-        RenderUtils.sendSound();
-
+        RenderUtils.sendSound(); // might be loud if multiple become oudated at the same time
       }
       this.orderStatus = newOrderStatus;
     }
