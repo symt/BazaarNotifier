@@ -3,11 +3,14 @@ package dev.meyi.bn.utilities;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.crafting.CraftingRecipe;
+import dev.meyi.bn.json.crafting.CraftingRecipeMap;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,12 +23,15 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
 import org.apache.commons.io.IOUtils;
@@ -35,27 +41,26 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 public class Utils {
-  private static final TrustManager[] trustAllCerts = new TrustManager[] {
-          new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
-            }
 
-            @Override
-            public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
-            }
+  private static final TrustManager[] trustAllCerts = new TrustManager[]{
+      new X509TrustManager() {
+        @Override
+        public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates,
+            String s) throws CertificateException {
+        }
 
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-              return null;
-            }
+        @Override
+        public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates,
+            String s) throws CertificateException {
+        }
 
-          }
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+          return null;
+        }
+
+      }
   };
   private static String playerUUID = "";
 
@@ -122,7 +127,8 @@ public class Utils {
     }
   }
 
-  public static void updateResources() throws IOException, KeyManagementException, NoSuchAlgorithmException, ClassCastException {
+  public static void updateResources()
+      throws IOException, KeyManagementException, NoSuchAlgorithmException, ClassCastException {
     Gson gson = new Gson();
     HttpGet request;
     HttpResponse response;
@@ -133,15 +139,13 @@ public class Utils {
     response = client.execute(request);
 
     JsonReader jsonReader = new JsonReader(
-            new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)));
+        new BufferedReader(
+            new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)));
     jsonReader.setLenient(true);
     try {
-      BazaarNotifier.resources = gson.fromJson(jsonReader, JsonObject.class);
-      BazaarNotifier.bazaarConv = jsonToBimap(
-              BazaarNotifier.resources.getAsJsonObject("bazaarConversions"));
-      BazaarNotifier.enchantCraftingList = BazaarNotifier.resources
-              .getAsJsonObject("enchantCraftingList");
-    } catch (JsonSyntaxException | ClassCastException e) { //ClassCastException is thrown when GitHub is down
+      populateResources(gson.fromJson(jsonReader, JsonObject.class));
+    } catch (JsonSyntaxException |
+             ClassCastException e) { //ClassCastException is thrown when GitHub is down
       e.printStackTrace();
     } finally {
       client.close();
@@ -160,13 +164,39 @@ public class Utils {
     return b;
   }
 
-  public static void saveResources(File file, JsonObject resources) {
-    Gson gson = new Gson();
+  public static void populateResources(JsonObject resources) {
+    BazaarNotifier.itemConversionMap = jsonToBimap(resources.getAsJsonObject("bazaarConversions"));
+
+    Gson craftingGson = new GsonBuilder().registerTypeAdapter(CraftingRecipe.class,
+        CraftingRecipe.getDeserializer()).create();
+
+    BazaarNotifier.craftingRecipeMap = craftingGson.fromJson(
+        resources.getAsJsonObject("enchantCraftingList").getAsJsonObject("other"),
+        CraftingRecipeMap.class);
+  }
+
+  public static void saveResources(File file, BiMap<String, String> itemConversionMap, CraftingRecipeMap craftingRecipeMap) {
+    Gson gson = new GsonBuilder().registerTypeAdapter(CraftingRecipe.class, CraftingRecipe.getSerializer()).create();
     try {
       if (!file.isFile()) {
         //noinspection ResultOfMethodCallIgnored
         file.createNewFile();
       }
+
+      // Not ideal, but it combines the 2 and gets the job done.
+      class InnerCraftingList {
+        CraftingRecipeMap other;
+      }
+      class Resources {
+        BiMap<String, String> bazaarConversions;
+        InnerCraftingList enchantCraftingList;
+      }
+
+      Resources resources = new Resources();
+      resources.bazaarConversions = itemConversionMap;
+      resources.enchantCraftingList = new InnerCraftingList();
+      resources.enchantCraftingList.other = craftingRecipeMap;
+
       Files.write(Paths.get(file.getAbsolutePath()),
           gson.toJson(resources).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
@@ -179,7 +209,7 @@ public class Utils {
     String closestConversion = "";
     int minLevenshteinDistance = threshold + 1;
 
-    for (String key : BazaarNotifier.bazaarConv.values()) {
+    for (String key : BazaarNotifier.itemConversionMap.values()) {
       int levenshteinDistance = StringUtils
           .getLevenshteinDistance(userInput.toLowerCase(), key.toLowerCase(), threshold);
       if (levenshteinDistance != -1) {
@@ -194,7 +224,7 @@ public class Utils {
     }
 
     return new String[]{closestConversion,
-        BazaarNotifier.bazaarConv.inverse().getOrDefault(closestConversion, "")};
+        BazaarNotifier.itemConversionMap.inverse().getOrDefault(closestConversion, "")};
   }
 
   public static List<String> getLoreFromItemStack(ItemStack item) {
@@ -231,5 +261,18 @@ public class Utils {
       amountLeft = totalAmount;
     }
     return amountLeft;
+  }
+
+  public static boolean shouldSkipChestItem(ItemStack item) {
+    if (item == null) {
+      return true;
+    }
+    int itemID = Item.itemRegistry.getIDForObject(item.getItem());
+    //Hopper
+    return itemID == 160    // Glass
+        || itemID == 102    // Glass
+        || itemID == 262    // Arrow
+        || (itemID == 154 && net.minecraft.util.StringUtils.stripControlCodes(item.getDisplayName())
+        .equals("Claim All Coins"));
   }
 }

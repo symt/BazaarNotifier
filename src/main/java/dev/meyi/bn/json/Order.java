@@ -5,6 +5,7 @@ import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.utilities.RenderUtils;
 
 public class Order {
+
   public String product;
   public int startAmount;
   public double pricePerUnit;
@@ -50,7 +51,7 @@ public class Order {
   }
 
   public String getProductId() {
-    return BazaarNotifier.bazaarConv.inverse().get(product);
+    return BazaarNotifier.itemConversionMap.inverse().get(product);
   }
 
   public void updateStatus() {
@@ -65,10 +66,9 @@ public class Order {
       }
       BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
           .get(getProductId()).sell_summary.get(0);
-      if(creationTime > BazaarNotifier.bazaarDataRaw.lastUpdated){
+      if (creationTime > BazaarNotifier.bazaarDataRaw.lastUpdated) {
         newOrderStatus = OrderStatus.SEARCHING;
-      }
-      else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
+      } else if (this.pricePerUnit < bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
           && this.startAmount >= bazaarSubItem.amount
@@ -92,10 +92,9 @@ public class Order {
       }
       BazaarItem.BazaarSubItem bazaarSubItem = BazaarNotifier.bazaarDataRaw.products
           .get(getProductId()).buy_summary.get(0);
-      if(creationTime > BazaarNotifier.bazaarDataRaw.lastUpdated){
+      if (creationTime > BazaarNotifier.bazaarDataRaw.lastUpdated) {
         newOrderStatus = OrderStatus.SEARCHING;
-      }
-      else if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
+      } else if (this.pricePerUnit > bazaarSubItem.pricePerUnit) {
         newOrderStatus = OrderStatus.OUTDATED;
       } else if (this.pricePerUnit == bazaarSubItem.pricePerUnit
           && this.startAmount >= bazaarSubItem.amount && bazaarSubItem.orders == 1) {

@@ -13,6 +13,7 @@ import dev.meyi.bn.handlers.EventHandler;
 import dev.meyi.bn.handlers.MouseHandler;
 import dev.meyi.bn.handlers.UpdateHandler;
 import dev.meyi.bn.json.Order;
+import dev.meyi.bn.json.crafting.CraftingRecipeMap;
 import dev.meyi.bn.json.resp.BazaarResponse;
 import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleList;
@@ -67,12 +68,11 @@ public class BazaarNotifier {
   public static BazaarResponse bazaarDataRaw;
   public static ModuleList modules;
   public static Configuration config;
-  public static JsonObject resources;
 
   public static String guiToOpen = "";
 
-  public static JsonObject enchantCraftingList;
-  public static BiMap<String, String> bazaarConv = HashBiMap.create();
+  public static CraftingRecipeMap craftingRecipeMap;
+  public static BiMap<String, String> itemConversionMap = HashBiMap.create();
 
   public static File resourcesFile;
 
@@ -92,42 +92,40 @@ public class BazaarNotifier {
     //noinspection ResultOfMethodCallIgnored
     bnDir.mkdirs();
     resourcesFile = new File(bnDir, "resources.json");
-    Gson gson = new Gson();
 
     try {
-      if (resourcesFile.isFile()) {
-        try {
+      Utils.updateResources();
+    } catch (IOException | KeyManagementException | NoSuchAlgorithmException |
+             ClassCastException e) {
+      System.err.println("Error while getting resources from GitHub - will use fallback");
+      e.printStackTrace();
+
+      Gson gson = new Gson();
+      JsonObject resources = null;
+
+      try {
+        if (resourcesFile.isFile()) {
           byte[] bytes = Files.readAllBytes(Paths.get(resourcesFile.getPath()));
-          if (bytes.length == 0) throw new JsonSyntaxException("Invalid JSON in Resources File");
+          if (bytes.length == 0) {
+            throw new JsonSyntaxException("Invalid JSON in Resources File");
+          }
           JsonReader resourcesReader = new JsonReader(new StringReader(new String(
               bytes, StandardCharsets.UTF_8)));
           resourcesReader.setLenient(true);
           resources = gson.fromJson(resourcesReader, JsonObject.class);
-        } catch (JsonSyntaxException | ClassCastException e) {
-          e.printStackTrace();
-          JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(
-              BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8));
-          reader.setLenient(true);
-          resources = gson.fromJson(reader, JsonObject.class);
         }
-      } else {
+      } catch (JsonSyntaxException | ClassCastException | IOException e2) {
+        e2.printStackTrace();
+      }
+
+      if (resources == null) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(
             BazaarNotifier.class.getResourceAsStream("/resources.json")), StandardCharsets.UTF_8));
         reader.setLenient(true);
         resources = gson.fromJson(reader, JsonObject.class);
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
-    try {
-      Utils.updateResources();
-    } catch (IOException | KeyManagementException | NoSuchAlgorithmException | ClassCastException e) {
-      System.err.println("Error while getting resources from GitHub");
-      e.printStackTrace();
-      JsonObject bazaarConversions = resources.getAsJsonObject("bazaarConversions");
-      enchantCraftingList = resources.getAsJsonObject("enchantCraftingList");
-      bazaarConv = Utils.jsonToBimap(bazaarConversions);
+      Utils.populateResources(resources);
     }
   }
 
@@ -140,26 +138,21 @@ public class BazaarNotifier {
     MinecraftForge.EVENT_BUS.register(new UpdateHandler());
     ClientCommandHandler.instance.registerCommand(new BazaarNotifierCommand());
 
-
-
     config = new Configuration();
-
 
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                () -> {
-                  Utils.saveResources(resourcesFile, resources);
-                  //config.save();
-                }));
+                () -> Utils.saveResources(resourcesFile, itemConversionMap, craftingRecipeMap)));
 
   }
+
   @Mod.EventHandler
-  public void done(FMLLoadCompleteEvent e){
+  public void done(FMLLoadCompleteEvent e) {
     ScheduledEvents.create();
     modules = new ModuleList();
-    if (BazaarNotifier.config.firstLoad){
-      for(Module m : modules){
+    if (BazaarNotifier.config.firstLoad) {
+      for (Module m : modules) {
         m.setActive(true);
         m.position.setPosition(20, 20);
         m.showInChat = false;

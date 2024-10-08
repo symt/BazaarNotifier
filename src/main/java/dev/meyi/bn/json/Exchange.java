@@ -9,10 +9,9 @@ public class Exchange {
 
   private final String productId;
   private final double pricePerUnit;
-  private int amount;
   private final OrderType type;
-
   private final Map<String, Integer> craftingResources;
+  private int amount;
 
   public Exchange(OrderType type, String productId, double pricePerUnit, int amount) {
     this.type = type;
@@ -20,11 +19,7 @@ public class Exchange {
     this.pricePerUnit = pricePerUnit;
     this.amount = amount;
 
-    if (canCraft()) {
-      craftingResources = CraftingCalculator.getMaterialsMap(productId);
-    } else {
-      craftingResources = null;
-    }
+    this.craftingResources = BazaarNotifier.craftingRecipeMap.get(productId).material;
   }
 
   public String getProductId() {
@@ -60,8 +55,7 @@ public class Exchange {
   }
 
   public boolean canCraft() {
-    return type == OrderType.SELL && BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-        .has(productId);
+    return type == OrderType.SELL && BazaarNotifier.craftingRecipeMap.containsKey(productId);
   }
 
   @Override

@@ -17,7 +17,7 @@ public class MouseHandler {
   public void mouseActionCheck(TickEvent e) {
     if (e.phase == TickEvent.Phase.START) {
       if (BazaarNotifier.inBazaar) {
-        if(BazaarNotifier.config.legacyMovement) {
+        if (BazaarNotifier.config.legacyMovement) {
           BazaarNotifier.modules.movementCheck();
         }
         if (tick >= 8 && !inPageFlip) { // 2.5 times per second

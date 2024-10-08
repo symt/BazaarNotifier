@@ -52,7 +52,7 @@ public class UpdateHandler {
             try {
               buildGradle = IOUtils.toString(new BufferedReader(new InputStreamReader(
                   HttpClientBuilder.create().build().execute(new HttpGet(
-                      "https://raw.githubusercontent.com/symt/BazaarNotifier/beta/build.gradle.kts"))
+                          "https://raw.githubusercontent.com/symt/BazaarNotifier/beta/build.gradle.kts"))
                       .getEntity().getContent())));
             } catch (IOException e) {
               Minecraft.getMinecraft().thePlayer.addChatMessage(
@@ -75,7 +75,7 @@ public class UpdateHandler {
             JsonObject json = gson
                 .fromJson(IOUtils.toString(new BufferedReader(new InputStreamReader(
                         HttpClientBuilder.create().build().execute(new HttpGet(
-                            "https://api.github.com/repos/symt/BazaarNotifier/releases/latest"))
+                                "https://api.github.com/repos/symt/BazaarNotifier/releases/latest"))
                             .getEntity().getContent()))),
                     JsonObject.class).getAsJsonObject();
             latestTag = json.get("tag_name").getAsString().split("\\.");

@@ -1,14 +1,13 @@
 package dev.meyi.bn.modules.calc;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.calculation.CraftingPriceCalculation;
+import dev.meyi.bn.json.crafting.CraftingRecipe;
+import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.module.CraftingModule;
 import dev.meyi.bn.utilities.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,50 +18,38 @@ public class CraftingCalculator {
 
 
   public static void getBestEnchantRecipes() {
-    ArrayList<String[]> list = new ArrayList<>();
-    if (BazaarNotifier.enchantCraftingList == null
+    ArrayList<CraftingPriceCalculation> craftingPrices = new ArrayList<>();
+    if (BazaarNotifier.craftingRecipeMap == null
         || BazaarNotifier.bazaarDataRaw.products.size() == 0) {
       return;
     }
-    for (Map.Entry<String, JsonElement> keys : BazaarNotifier.enchantCraftingList
-        .getAsJsonObject("other").entrySet()) {
+    for (Map.Entry<String, CraftingRecipe> craftingRecipeEntry : BazaarNotifier.craftingRecipeMap.entrySet()) {
 
-      String itemName = keys.getKey();
-      String collection = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-          .getAsJsonObject(itemName)
-          .get("collection").getAsString();
+      String itemName = craftingRecipeEntry.getKey();
+      String collection = craftingRecipeEntry.getValue().collection;
 
       if (BazaarNotifier.config.collectionCheck && !(unlockedRecipes.contains(collection)
           || collection.equalsIgnoreCase("NONE"))) {
         continue;
       }
 
-      String[] itemCrafting = getEnchantCraft(itemName);
-
-      if (!itemCrafting[6].equalsIgnoreCase("0")) {
-        list.add(itemCrafting);
+      CraftingPriceCalculation cpc = getEnchantCraft(itemName);
+      if (cpc != null) {
+        craftingPrices.add(cpc);
       }
+
+      CraftingModule.craftingPrices = craftingPrices;
     }
-    CraftingModule.list = list;
 
     sort();
   }
 
-
-  public static void toggleCrafting() {
-    BazaarNotifier.config.craftingModule.craftingSortingOption =
-        (BazaarNotifier.config.craftingModule.craftingSortingOption + 1) % 3;
-  }
-
-  public static String[] getEnchantCraft(String itemName) {
-    String[] values = new String[7];
-    Arrays.fill(values, "0");
-
-    if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemName)) {
+  public static CraftingPriceCalculation getEnchantCraft(String itemName) {
+    if (BazaarNotifier.craftingRecipeMap.containsKey(itemName)) {
       if (BazaarNotifier.bazaarDataRaw.products.size() != 0) {
         if (BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary.size() == 0
             || BazaarNotifier.bazaarDataRaw.products.get(itemName).sell_summary.size() == 0) {
-          return values;
+          return null;
         }
 
         // buy order / instant sell
@@ -72,93 +59,57 @@ public class CraftingCalculator {
         // instant buy / sell offer
         double itemBuyPrice = BazaarNotifier.bazaarDataRaw.products.get(itemName).buy_summary
             .get(0).getPriceWithTax();
-        double ingredientPrice = 0d;
-        int ingredientCount;
-        double materialCost = 0d;
-        double ingredientPrice2 = 0d;
-        int ingredientCount2;
-        double materialCost2 = 0d;
+
+        double orderMaterialCost = 0d;
+        double instantMaterialCost = 0d;
 
         boolean missingMaterialOrder = false;
         boolean missingMaterialInstant = false;
 
-        //Buy orders
-        for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-            .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
-          if (h % 2 == 0) {
-            if (BazaarNotifier.bazaarDataRaw.products.get(
-                BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                    .getAsJsonObject(itemName)
-                    .getAsJsonArray("material").get(h).getAsString()).sell_summary.size() == 0) {
-              missingMaterialOrder = true;
-              break;
-            }
-            ingredientPrice = BazaarNotifier.bazaarDataRaw.products.get(
-                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                        .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())
-                .sell_summary.get(0).pricePerUnit;
-          } else {
-            ingredientCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsInt();
-            materialCost += (ingredientPrice * ingredientCount);
+        for (Map.Entry<String, Integer> recipe : BazaarNotifier.craftingRecipeMap.get(
+            itemName).material.entrySet()) {
+
+          BazaarItem item = BazaarNotifier.bazaarDataRaw.products.get(recipe.getKey());
+
+          if (item.sell_summary.size() == 0) {
+            missingMaterialOrder = true;
           }
+
+          if (item.buy_summary.size() == 0) {
+            missingMaterialInstant = true;
+          }
+
+          if (!missingMaterialOrder) {
+            orderMaterialCost += (item.sell_summary.get(0).pricePerUnit * recipe.getValue());
+          }
+
+          if (!missingMaterialInstant) {
+            instantMaterialCost += (item.buy_summary.get(0).pricePerUnit * recipe.getValue());
+          }
+
         }
 
-        //Instant buy
-        for (int h = 0; h < BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-            .getAsJsonObject(itemName).getAsJsonArray("material").size(); h++) {
-          if (h % 2 == 0) {
-            if (BazaarNotifier.bazaarDataRaw.products.get(
-                BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                    .getAsJsonObject(itemName)
-                    .getAsJsonArray("material").get(h).getAsString()).buy_summary.size() == 0) {
-              missingMaterialInstant = true;
-              break;
-            }
-            ingredientPrice2 = BazaarNotifier.bazaarDataRaw.products.get(
-                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                        .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsString())
-                .buy_summary.get(0).pricePerUnit;
-          } else {
-            ingredientCount2 = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                .getAsJsonObject(itemName).getAsJsonArray("material").get(h).getAsInt();
-            materialCost2 += (ingredientPrice2 * ingredientCount2);
-          }
-        }
+        CraftingPriceCalculation priceCalculation = new CraftingPriceCalculation();
+        priceCalculation.itemName = itemName;
 
         if (!missingMaterialOrder) {
-          double profitInstaSell = itemSellPrice - materialCost;
-          double profitSellOffer = itemBuyPrice - materialCost;
-          double profitPercentage = (itemSellPrice / materialCost - 1) * 100;
-          values[0] = String.valueOf(profitInstaSell);
-          values[1] = String.valueOf(profitSellOffer);
-          values[2] = String.valueOf(profitPercentage);
+          priceCalculation.buyOrderInstantSell = itemSellPrice - orderMaterialCost;
+          priceCalculation.buyOrderSellOffer = itemBuyPrice - orderMaterialCost;
+          priceCalculation.buyOrderSellPercentage = (itemSellPrice / orderMaterialCost - 1) * 100;
         }
 
         if (!missingMaterialInstant) {
-          double profitInstaSell2 = itemSellPrice - materialCost2;
-          double profitSellOffer2 = itemBuyPrice - materialCost2;
-          double profitPercentage2 = (itemSellPrice / materialCost2 - 1) * 100;
-          values[3] = String.valueOf(profitInstaSell2);
-          values[4] = String.valueOf(profitSellOffer2);
-          values[5] = String.valueOf(profitPercentage2);
+          priceCalculation.instantBuyInstantSell = itemSellPrice - instantMaterialCost;
+          priceCalculation.instantBuySellOffer = itemBuyPrice - instantMaterialCost;
+          priceCalculation.instantBuySellPercentage =
+              (itemSellPrice / instantMaterialCost - 1) * 100;
         }
+
+        return priceCalculation;
       }
-      values[6] = itemName;
     }
 
-    return values;
-
-  }
-
-  public static Map<String, Integer> getMaterialsMap(String productId) {
-    JsonArray materialsArray = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-        .getAsJsonObject(productId).getAsJsonArray("material");
-    Map<String, Integer> materials = new HashMap<>();
-    for (int i = 0; i < materialsArray.size(); i += 2) {
-      materials.put(materialsArray.get(i).getAsString(), materialsArray.get(i + 1).getAsInt());
-    }
-    return materials;
+    return null;
   }
 
   public static void getUnlockedRecipes() {
@@ -180,11 +131,25 @@ public class CraftingCalculator {
   }
 
   public static void sort() {
-    int i = BazaarNotifier.config.craftingModule.useBuyOrders ? 0 : 3;
+    int offset = (BazaarNotifier.config.craftingModule.useBuyOrders ? 0 : 3)
+        + BazaarNotifier.config.craftingModule.craftingSortingOption;
 
-    CraftingModule.list.sort((o1, o2) -> Double.compare(
-        Double.parseDouble(o2[i + BazaarNotifier.config.craftingModule.craftingSortingOption]),
-        Double.parseDouble(o1[i + BazaarNotifier.config.craftingModule.craftingSortingOption])
-    ));
+    CraftingModule.craftingPrices.sort((o1, o2) -> {
+      switch (offset) {
+        case 0:
+          return Double.compare(o2.buyOrderInstantSell, o1.buyOrderInstantSell);
+        case 1:
+          return Double.compare(o2.buyOrderSellOffer, o1.buyOrderSellOffer);
+        case 2:
+          return Double.compare(o2.buyOrderSellPercentage, o1.buyOrderSellPercentage);
+        case 3:
+          return Double.compare(o2.instantBuyInstantSell, o1.instantBuyInstantSell);
+        case 4:
+          return Double.compare(o2.instantBuySellOffer, o1.instantBuySellOffer);
+        case 5:
+          return Double.compare(o2.instantBuySellPercentage, o1.instantBuySellPercentage);
+      }
+      return 0;
+    });
   }
 }

@@ -2,10 +2,8 @@ package dev.meyi.bn.utilities;
 
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ChatComponentText;
@@ -41,11 +39,11 @@ public class RenderUtils {
   }
 
   public static int drawColorfulParagraph(ArrayList<ArrayList<ColoredText>> items, int x, int y,
-                                          float moduleScale) {
+      float moduleScale) {
     float longestXString = 0;
     for (int i = 0; i < items.size(); i++) {
       float fontHeight =
-              (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i * moduleScale;
+          (Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT + 2) * i * moduleScale;
       int length = RenderUtils
           .drawMulticoloredString(Minecraft.getMinecraft().fontRendererObj,
               x, y
@@ -57,6 +55,7 @@ public class RenderUtils {
     }
     return (int) longestXString;
   }
+
   public static String getLongestString(ArrayList<ArrayList<ColoredText>> items) {
     FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
     float longestXString = 0;
@@ -75,6 +74,7 @@ public class RenderUtils {
     }
     return longestString;
   }
+
   public static int getStringWidth(String string) {
     FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
     return fontRenderer.getStringWidth(string);
@@ -82,10 +82,11 @@ public class RenderUtils {
 
   public static void sendSound() {
     if (BazaarNotifier.config.sendSound) {
-      Minecraft.getMinecraft().thePlayer.playSound("mob.horse.donkey.death", 2.0F, 1.0F); 
+      Minecraft.getMinecraft().thePlayer.playSound("mob.horse.donkey.death", 2.0F, 1.0F);
       // TODO: add option for which sound to play (possibly)
     }
   }
+
   public static void chatNotification(Order order, String notification) {
     if (!BazaarNotifier.config.showChatMessages) {
       return;

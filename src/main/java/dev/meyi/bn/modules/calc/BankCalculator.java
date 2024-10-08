@@ -26,6 +26,7 @@ public class BankCalculator {
   private static final Pattern instantBuy = Pattern.compile(
       "\\[Bazaar] Bought (.*)x (.*) for (.*) coins!");
   private static double rawDifference = 0;
+
   public static double getRawDifference() {
     return rawDifference;
   }
@@ -43,7 +44,7 @@ public class BankCalculator {
               buy.removeAmount(sell.getAmount());
               sell.removeAmount(sell.getAmount());
             } else {
-              BazaarNotifier.config.bankModule.bazaarProfit  +=
+              BazaarNotifier.config.bankModule.bazaarProfit +=
                   buy.getAmount() * (sell.getPricePerUnit() * .99 - buy.getPricePerUnit());
               sell.removeAmount(buy.getAmount());
               buy.removeAmount(buy.getAmount());
@@ -108,7 +109,7 @@ public class BankCalculator {
           }
         }
         orderHistory.get(i).removeAmount(maxCrafting);
-        BazaarNotifier.config.bankModule.bazaarProfit  +=
+        BazaarNotifier.config.bankModule.bazaarProfit +=
             ((double) maxCrafting * orderHistory.get(i).getPricePerUnit()) * .99 - buyValue;
       }
     }
@@ -146,8 +147,8 @@ public class BankCalculator {
       return;
     }
 
-    if (BazaarNotifier.bazaarConv.containsValue(m.group(2))) {
-      productId = BazaarNotifier.bazaarConv.inverse().get(m.group(2));
+    if (BazaarNotifier.itemConversionMap.containsValue(m.group(2))) {
+      productId = BazaarNotifier.itemConversionMap.inverse().get(m.group(2));
     } else {
       productId = Utils.getItemIdFromName(m.group(2))[1];
     }
@@ -162,7 +163,8 @@ public class BankCalculator {
         orderHistory.add(e);
       }
 
-      rawDifference += (((e.getType() == OrderType.BUY) ? -1.0 : 0.99) * e.getPricePerUnit() * (double)e.getAmount());
+      rawDifference += (((e.getType() == OrderType.BUY) ? -1.0 : 0.99) * e.getPricePerUnit()
+          * (double) e.getAmount());
       // Regardless of type, because reverse flipping is possible
       //  aka selling an item you already own and buying back cheaper
       calculateBazaarProfit();

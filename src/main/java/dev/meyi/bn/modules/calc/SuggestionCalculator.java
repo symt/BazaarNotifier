@@ -2,6 +2,7 @@ package dev.meyi.bn.modules.calc;
 
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.calculation.SuggestionCalculation;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.module.SuggestionModule;
 import java.util.Collections;
@@ -15,7 +16,7 @@ public class SuggestionCalculator {
 
   public static void basic() {
     try {
-      List<String[]> list = new LinkedList<>();
+      List<SuggestionCalculation> list = new LinkedList<>();
       for (Map.Entry<String, BazaarItem> entry : BazaarNotifier.bazaarDataRaw.products
           .entrySet()) {
         String key = entry.getKey();
@@ -26,16 +27,16 @@ public class SuggestionCalculator {
           continue;
         }
 
-        if (!BazaarNotifier.bazaarConv.containsKey(key)) {
-          BazaarNotifier.bazaarConv.put(key, key);
+        if (!BazaarNotifier.itemConversionMap.containsKey(key)) {
+          BazaarNotifier.itemConversionMap.put(key, key);
         }
-        String productId = BazaarNotifier.bazaarConv.get(key);
+        String conversion = BazaarNotifier.itemConversionMap.get(key);
 
-        list.add(new String[]{productId, Double.toString(calculateEP(product))});
+        list.add(new SuggestionCalculation(key, conversion, calculateEP(product)));
       }
-      list.sort(Comparator.comparingDouble(o -> Double.parseDouble(o[1])));
+      list.sort(Comparator.comparingDouble(o -> o.estimatedProfit));
       Collections.reverse(list);
-      SuggestionModule.list = list;
+      SuggestionModule.suggestions = list;
 
     } catch (Exception e) {
       e.printStackTrace();

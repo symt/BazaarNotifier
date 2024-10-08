@@ -41,7 +41,7 @@ public class EventHandler {
         || message.startsWith("[Bazaar] Buy Order Setup!") || message.startsWith(
         "[Bazaar] Sell Offer Setup!")) {
       if (productVerify[0] != null && productVerify[1] != null && productVerify[0].equals(
-          BazaarNotifier.bazaarConv.inverse().get(message.split("x ", 2)[1].split(" for ")[0]))
+          BazaarNotifier.itemConversionMap.inverse().get(message.split("x ", 2)[1].split(" for ")[0]))
           && productVerify[1].equals(message.split("! ")[1].split(" for ")[0])) {
         BazaarNotifier.orders.add(verify);
         BankCalculator.evaluateCapHit(verify);

@@ -7,7 +7,8 @@ import cc.polyfrost.oneconfig.config.annotations.Slider;
 import cc.polyfrost.oneconfig.config.migration.JsonName;
 import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
-import dev.meyi.bn.modules.Module;
+import dev.meyi.bn.json.calculation.CraftingPriceCalculation;
+import dev.meyi.bn.modules.HoverableModule;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
 import dev.meyi.bn.utilities.ColoredText;
@@ -15,16 +16,16 @@ import dev.meyi.bn.utilities.Defaults;
 import dev.meyi.bn.utilities.RenderUtils;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 
-public class CraftingModule extends Module {
+public class CraftingModule extends HoverableModule {
 
   public transient static final ModuleName type = ModuleName.CRAFTING;
-  public transient static ArrayList<String[]> list = new ArrayList<>();
+  public transient static ArrayList<CraftingPriceCalculation> craftingPrices = new ArrayList<>();
   private transient static boolean mouseButtonDown;
   @JsonName("craftingListLength")
   @Slider(name = "Crafting List Entries",
@@ -150,8 +151,8 @@ public class CraftingModule extends Module {
     helperLine.add(new ColoredText("   ", BazaarNotifier.config.infoColor.toJavaColor()));
     helperLine
         .add(new ColoredText(
-            BazaarNotifier.config.craftingModule.useBuyOrders ? "Profits (Buy Orders)"
-                : "Profits (Instant Buy)",
+            BazaarNotifier.config.craftingModule.useBuyOrders ? "Crafting (Buy Orders)"
+                : "Crafting (Instant Buy)",
             BazaarNotifier.config.infoColor.toJavaColor()));
     if (BazaarNotifier.config.craftingModule.showProfitPerMil || BazaarNotifier.config
         .craftingModule.showInstantSellProfit
@@ -163,7 +164,7 @@ public class CraftingModule extends Module {
           BazaarNotifier.config.craftingModule.craftingSortingOption == 0 ?
               new Color(141, 152, 201) : BazaarNotifier.config.infoColor.toJavaColor()));
       if (BazaarNotifier.config.craftingModule.showSellOfferProfit
-              || BazaarNotifier.config.craftingModule.showProfitPerMil) {
+          || BazaarNotifier.config.craftingModule.showProfitPerMil) {
         helperLine.add(new ColoredText(" /", BazaarNotifier.config.infoColor.toJavaColor()));
       }
     }
@@ -187,67 +188,64 @@ public class CraftingModule extends Module {
   @Override
   public void draw() {
     GL11.glTranslated(0, 0, 1);
-    drawBounds();
     if (BazaarNotifier.bazaarDataRaw != null) {
       ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
       items.add(generateHelperLine());
       for (int i = shift; i < BazaarNotifier.config.craftingModule.craftingListLength + shift;
           i++) {
         ArrayList<ColoredText> message = new ArrayList<>();
-        if (i < list.size()) {
-          if (list.get(i).length != 0) {
-            Double profitInstaSell = Double.valueOf(list.get(i)[BazaarNotifier.config.craftingModule.useBuyOrders ? 0 : 3]);
-            Double profitSellOffer = Double.valueOf(list.get(i)[BazaarNotifier.config.craftingModule.useBuyOrders ? 1 : 4]);
-            Double profitPercentage = Double.valueOf(list.get(i)[BazaarNotifier.config.craftingModule.useBuyOrders ? 2 : 5]);
-            String itemName = list.get(i)[6];
+        if (i < craftingPrices.size()) {
+          boolean flag = BazaarNotifier.config.craftingModule.useBuyOrders;
+          CraftingPriceCalculation prices = craftingPrices.get(i);
 
-            String itemNameConverted = BazaarNotifier.bazaarConv.get(itemName);
-            message.add(new ColoredText(String.valueOf(i + 1),
-                BazaarNotifier.config.numberColor.toJavaColor()));
-            message.add(new ColoredText(". ", BazaarNotifier.config.numberColor.toJavaColor()));
-            message.add(
-                new ColoredText(itemNameConverted, BazaarNotifier.config.itemColor.toJavaColor()));
+          Double profitInstaSell = flag ? prices.buyOrderInstantSell : prices.instantBuyInstantSell;
+          Double profitSellOffer = flag ? prices.buyOrderSellOffer : prices.instantBuySellOffer;
+          Double profitPercentage =
+              flag ? prices.buyOrderSellPercentage : prices.instantBuySellPercentage;
+          String itemName = prices.itemName;
 
-            if (BazaarNotifier.config.craftingModule.showProfitPerMil
-                || BazaarNotifier.config.craftingModule.showInstantSellProfit
-                || BazaarNotifier.config.craftingModule.showSellOfferProfit) {
-              message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
-            }
+          String itemNameConverted = BazaarNotifier.itemConversionMap.get(itemName);
+          message.add(new ColoredText(String.valueOf(i + 1),
+              BazaarNotifier.config.numberColor.toJavaColor()));
+          message.add(new ColoredText(". ", BazaarNotifier.config.numberColor.toJavaColor()));
+          message.add(
+              new ColoredText(itemNameConverted, BazaarNotifier.config.itemColor.toJavaColor()));
 
-            if (BazaarNotifier.config.craftingModule.showInstantSellProfit) {
-              message.add(new ColoredText(BazaarNotifier.df.format(profitInstaSell),
-                  getColor(profitInstaSell.intValue())));
+          if (BazaarNotifier.config.craftingModule.showProfitPerMil
+              || BazaarNotifier.config.craftingModule.showInstantSellProfit
+              || BazaarNotifier.config.craftingModule.showSellOfferProfit) {
+            message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
+          }
 
-              if (BazaarNotifier.config.craftingModule.showSellOfferProfit) {
-                message.add(new ColoredText(" / ", BazaarNotifier.config.infoColor.toJavaColor()));
-              }
-            }
+          if (BazaarNotifier.config.craftingModule.showInstantSellProfit) {
+            message.add(new ColoredText(BazaarNotifier.df.format(profitInstaSell),
+                getColor(profitInstaSell.intValue())));
 
             if (BazaarNotifier.config.craftingModule.showSellOfferProfit) {
-              message.add(new ColoredText(BazaarNotifier.df.format(profitSellOffer),
-                  getColor(profitSellOffer.intValue())));
-
-              if (BazaarNotifier.config.craftingModule.showProfitPerMil) {
-                message.add(new ColoredText(" /  ", BazaarNotifier.config.infoColor.toJavaColor()));
-              }
+              message.add(new ColoredText(" / ", BazaarNotifier.config.infoColor.toJavaColor()));
             }
+          }
+
+          if (BazaarNotifier.config.craftingModule.showSellOfferProfit) {
+            message.add(new ColoredText(BazaarNotifier.df.format(profitSellOffer),
+                getColor(profitSellOffer.intValue())));
 
             if (BazaarNotifier.config.craftingModule.showProfitPerMil) {
-              message.add(new ColoredText(BazaarNotifier.df.format(profitPercentage) + "%",
-                  getColorForPercentage(profitPercentage.intValue())));
+              message.add(new ColoredText(" /  ", BazaarNotifier.config.infoColor.toJavaColor()));
             }
-          } else {
-            message.add(new ColoredText("Error, just wait", Color.RED));
+          }
+
+          if (BazaarNotifier.config.craftingModule.showProfitPerMil) {
+            message.add(new ColoredText(BazaarNotifier.df.format(profitPercentage) + "%",
+                getColorForPercentage(profitPercentage.intValue())));
           }
           items.add(message);
         }
       }
       longestString = RenderUtils.getLongestString(items);
 
-      RenderUtils.drawColorfulParagraph(items, (int) position.getX() + padding, (int) position.getY() + padding, scale);
-      if (BazaarNotifier.inBazaar) {
-        renderMaterials(checkHoveredText(), list);
-      }
+      RenderUtils.drawColorfulParagraph(items, (int) position.getX() + padding,
+          (int) position.getY() + padding, scale);
     } else {
       RenderUtils.drawCenteredString("Waiting for bazaar data", (int) position.getX(),
           (int) position.getY(), 0xAAAAAA, scale);
@@ -296,77 +294,42 @@ public class CraftingModule extends Module {
 
   @Override
   protected int getMaxShift() {
-    return list.size() - BazaarNotifier.config.craftingModule.craftingListLength;
+    return craftingPrices.size() - BazaarNotifier.config.craftingModule.craftingListLength;
   }
 
-  protected int checkHoveredText() {
-    float _y = position.getY() +(-padding + 11) * scale;
-    float y2 = _y + ((BazaarNotifier.config.craftingModule.craftingListLength) * 11 * scale);
-    int mouseYFormatted = getMouseCoordinateY();
-    float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
-    if (getWidth(scale, false) != 0) {
-      if (inMovementBox() && mouseYFormatted >= _y && mouseYFormatted <= y2) {
-        return (int) relativeYMouse + shift;
-      } else {
-        return -1;
-      }
-    } else {
-      return 1;
-    }
-  }
+  protected ArrayList<ArrayList<ColoredText>> generateTooltipText(int lineNumber) {
+    lineNumber--; // remove header from crafting module line number
 
-  protected void renderMaterials(int hoveredText, ArrayList<String[]> list) {
     checkMouseMovement();
-    ArrayList<ArrayList<ColoredText>> material = new ArrayList<>();
-    ArrayList<ColoredText> text = new ArrayList<>();
+    ArrayList<ArrayList<ColoredText>> para = new ArrayList<>();
 
-    if (hoveredText > -1) {
-      if (hoveredText < list.size()) {
+    if (lineNumber > -1) {
+      if (lineNumber < craftingPrices.size()) {
 
-        int materialCount;
-        materialCount = BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-            .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material").size();
-        for (int b = 0; b < materialCount / 2; b++) {
-          StringBuilder _material = new StringBuilder();
-          if (b == 0) {
-            _material.append((BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material").get(1)
-                .getAsInt()
-                * mouseWheelShift)).append("x ").append(BazaarNotifier.bazaarConv
-                .get(BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                    .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material")
-                    .get(0).getAsString()));
-          } else {
-            _material.append(" | ").append(
-                BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                    .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material")
-                    .get(b * 2 + 1).getAsInt() * mouseWheelShift).append("x ").append(
-                BazaarNotifier.bazaarConv.get(
-                    BazaarNotifier.enchantCraftingList.getAsJsonObject("other")
-                        .getAsJsonObject(list.get(hoveredText)[6]).getAsJsonArray("material")
-                        .get(b * 2).getAsString()));
-          }
+        CraftingPriceCalculation prices = craftingPrices.get(lineNumber);
 
-          text.add(new ColoredText(_material.toString(), Color.LIGHT_GRAY));
+        for (Map.Entry<String, Integer> recipe : BazaarNotifier.craftingRecipeMap.get(
+            prices.itemName).material.entrySet()) {
+          ArrayList<ColoredText> text = new ArrayList<>();
+
+          text.add(new ColoredText(BazaarNotifier.itemConversionMap.get(recipe.getKey()), Color.YELLOW));
+          text.add(new ColoredText(" (", Color.LIGHT_GRAY));
+          text.add(new ColoredText(BazaarNotifier.dfNoDecimal.format(recipe.getValue()) + "x",
+              Color.MAGENTA));
+          text.add(new ColoredText(")", Color.LIGHT_GRAY));
+
+          para.add(text);
         }
-        material.add(text);
-        int longestXString = RenderUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
-            getMouseCoordinateY() - (int) (8 * scale), scale);
-        Gui.drawRect(getMouseCoordinateX() - padding,
-            getMouseCoordinateY() - (int) (8 * scale) - (int) (padding * scale),
-            (int) (getMouseCoordinateX() + longestXString + padding * scale),
-            (int) (getMouseCoordinateY() + padding * scale), 0xFF404040);
-        RenderUtils.drawColorfulParagraph(material, getMouseCoordinateX(),
-            getMouseCoordinateY() - (int) (8 * scale), scale);
       }
     }
+    return para;
   }
 
 
   public void checkMouseMovement() {
-    if (lastHovered != checkHoveredText()) {
+    if (lastHovered != getHoveredLineNumber()) {
       mouseWheelShift = 1;
     }
-    lastHovered = checkHoveredText();
+    lastHovered = getHoveredLineNumber();
   }
 }

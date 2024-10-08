@@ -16,53 +16,38 @@ import dev.meyi.bn.modules.module.CraftingModule;
 import dev.meyi.bn.modules.module.NotificationModule;
 import dev.meyi.bn.modules.module.SuggestionModule;
 import dev.meyi.bn.utilities.Defaults;
-
 import java.awt.Color;
 
 
 public class Configuration extends Config {
 
-  public Configuration() {
-    super(new Mod("BazaarNotifier", ModType.SKYBLOCK,"/icon.png", new JsonMigrator("./config/BazaarNotifier/config.json")), "bazaarnotifier.json");
-    initialize();
-
-    addListener("collectionCheck", () -> {
-      collectionCheck = false;
-    });
-
-    collectionCheck = false; // in case the user has it enabled already, we want to force it off
-  }
-
   public boolean firstLoad = true;
-
   @JsonName("version")
   public String version = BazaarNotifier.VERSION;
-
   @HUD(name = "Suggestion Module",
-          category = "Suggestion Module"
+      category = "Suggestion Module"
   )
   public SuggestionModule suggestionModule = new SuggestionModule();
   @HUD(name = "Crafting Module",
-          category = "Crafting Module"
+      category = "Crafting Module"
   )
   public CraftingModule craftingModule = new CraftingModule();
   @HUD(name = "Notification Module",
-          category = "Notification Module"
+      category = "Notification Module"
   )
   public NotificationModule notificationModule = new NotificationModule();
   @HUD(name = "Bank Module",
-          category = "Bank Module"
+      category = "Bank Module"
   )
   public BankModule bankModule = new BankModule();
-
   @Switch(name = "Allow old Movement and Rescaling",
-          category = "General",
-          description = "Allows movement and rescaling outside the edit hud window"
+      category = "General",
+      description = "Allows movement and rescaling outside the edit hud window"
   )
   public boolean legacyMovement = true;
   @JsonName("showChatMessages")
   @Switch(name = "Show Chat Messages",
-          description = "Disables messages from Bazaar Notifier"
+      description = "Disables messages from Bazaar Notifier"
   )
   public boolean showChatMessages = Defaults.SEND_CHAT_MESSAGES;
 
@@ -70,36 +55,34 @@ public class Configuration extends Config {
   @Switch(name = "Send Sound for Outdated Orders")
 
   public boolean sendSound = Defaults.SEND_SOUND;
-
   @JsonName("collectionCheck")
   @Switch(name = "Collection checks",
-          category = "Crafting Module",
-          description = "Only shows unlocked recipes"
+      category = "Crafting Module",
+      description = "Only shows unlocked recipes"
   )
   public boolean collectionCheck = Defaults.COLLECTION_CHECKING;
-
-
   @cc.polyfrost.oneconfig.config.annotations.Color(
-          name = "Info Color",
-          allowAlpha = false,
-          description = "The color for all information and less significant elements"
+      name = "Info Color",
+      allowAlpha = false,
+      description = "The color for all information and less significant elements"
   )
   public OneColor infoColor = new OneColor(Color.GRAY);
   @cc.polyfrost.oneconfig.config.annotations.Color(name = "Item Color",
-          allowAlpha = false,
-          description = "The color the items will be in"
+      allowAlpha = false,
+      description = "The color the items will be in"
   )
   public OneColor itemColor = new OneColor(Color.CYAN);
   @cc.polyfrost.oneconfig.config.annotations.Color(
-          name = "Number Color",
-          allowAlpha = false,
-          description = "The color the numbers will be in"
+      name = "Number Color",
+      allowAlpha = false,
+      description = "The color the numbers will be in"
   )
   public OneColor numberColor = new OneColor(Color.MAGENTA);
-
+  @JsonName("lastLogin")
+  public long lastLogin = System.currentTimeMillis();
   @SuppressWarnings("unused")
   @Button(name = "Reset Colors", text = "Reset")
-  Runnable r = () ->{
+  Runnable r = () -> {
     infoColor = new OneColor(Color.GRAY);
     itemColor = new OneColor(Color.CYAN);
     numberColor = new OneColor(Color.MAGENTA);
@@ -108,12 +91,21 @@ public class Configuration extends Config {
 
   @SuppressWarnings("unused")
   @Button(
-          name = "Reset Profit",
-          text = "Reset",
-          category = "Bank Module"
+      name = "Reset Profit",
+      text = "Reset",
+      category = "Bank Module"
   )
   Runnable resetBank = BankCalculator::reset;
 
-  @JsonName("lastLogin")
-  public long lastLogin = System.currentTimeMillis();
+  public Configuration() {
+    super(new Mod("BazaarNotifier", ModType.SKYBLOCK, "/icon.png",
+        new JsonMigrator("./config/BazaarNotifier/config.json")), "bazaarnotifier.json");
+    initialize();
+
+    addListener("collectionCheck", () -> {
+      collectionCheck = false;
+    });
+
+    collectionCheck = false; // in case the user has it enabled already, we want to force it off
+  }
 }

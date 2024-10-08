@@ -8,34 +8,31 @@ import dev.meyi.bn.modules.Module;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.utilities.ColoredText;
-import dev.meyi.bn.utilities.RenderUtils;
 import dev.meyi.bn.utilities.Defaults;
+import dev.meyi.bn.utilities.RenderUtils;
 import java.awt.Color;
 import java.util.ArrayList;
-
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 
 public class BankModule extends Module {
+
+  public transient static final ModuleName type = ModuleName.BANK;
   @JsonName("bazaarProfit")
   public double bazaarProfit = 0;
-
   @JsonName("bazaarDailyAmount")
   public double bazaarDailyAmount = 1E10;
+  @JsonName("bankRawDifference")
+  @Switch(name = "Raw Difference",
+      category = "Bank Module",
+      description = "Show profit including current orders"
+  )
+  public boolean bankRawDifference = Defaults.BANK_RAW_DIFFERENCE;
+  transient int lines = 2;
 
   public BankModule() {
     super();
   }
-
-  public transient static final ModuleName type = ModuleName.BANK;
-  transient int lines = 2;
-
-  @JsonName("bankRawDifference")
-  @Switch(name = "Raw Difference",
-          category = "Bank Module",
-          description = "Show profit including current orders"
-  )
-  public boolean bankRawDifference = Defaults.BANK_RAW_DIFFERENCE;
 
   @Override
   protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
@@ -44,44 +41,49 @@ public class BankModule extends Module {
 
   @Override
   protected float getWidth(float scale, boolean example) {
-    return RenderUtils.getStringWidth(longestString)* scale  + 2 * padding * scale;
+    return RenderUtils.getStringWidth(longestString) * scale + 2 * padding * scale;
   }
 
   @Override
   protected float getHeight(float scale, boolean example) {
-    return (((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * lines) + lines ) * scale - 2) + 2 * padding * scale;
+    return (((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * lines) + lines) * scale - 2)
+        + 2 * padding * scale;
   }
 
 
   @Override
   public void draw() {
     GL11.glTranslated(0, 0, 1);
-    drawBounds();
     ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
 
-    ArrayList <ColoredText> header = new ArrayList<>();
+    ArrayList<ColoredText> header = new ArrayList<>();
     header.add(new ColoredText("Bank Module", BazaarNotifier.config.infoColor.toJavaColor()));
     items.add(header);
 
-    ArrayList <ColoredText> bazaarProfitMessage = new ArrayList<>();
-    bazaarProfitMessage.add(new ColoredText("Bazaar Profit: ", BazaarNotifier.config.itemColor.toJavaColor()));
+    ArrayList<ColoredText> bazaarProfitMessage = new ArrayList<>();
+    bazaarProfitMessage.add(
+        new ColoredText("Bazaar Profit: ", BazaarNotifier.config.itemColor.toJavaColor()));
     bazaarProfitMessage.add(new ColoredText(BazaarNotifier.df.format(bazaarProfit), Color.ORANGE));
     items.add(bazaarProfitMessage);
 
-
     if (BazaarNotifier.config.bankModule.bankRawDifference) {
       ArrayList<ColoredText> bazaarDifferenceMessage = new ArrayList<>();
-      bazaarDifferenceMessage.add(new ColoredText("Bazaar Difference: ", BazaarNotifier.config.itemColor.toJavaColor()));
-      bazaarDifferenceMessage.add(new ColoredText(BazaarNotifier.df.format(BankCalculator.getRawDifference()), Color.ORANGE));
+      bazaarDifferenceMessage.add(
+          new ColoredText("Bazaar Difference: ", BazaarNotifier.config.itemColor.toJavaColor()));
+      bazaarDifferenceMessage.add(
+          new ColoredText(BazaarNotifier.df.format(BankCalculator.getRawDifference()),
+              Color.ORANGE));
       items.add(bazaarDifferenceMessage);
     }
 
     if (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 1E9) {
       ArrayList<ColoredText> bazaarDifferenceMessage = new ArrayList<>();
-      bazaarDifferenceMessage.add(new ColoredText("Daily Limit: ", BazaarNotifier.config.itemColor.toJavaColor()));
+      bazaarDifferenceMessage.add(
+          new ColoredText("Daily Limit: ", BazaarNotifier.config.itemColor.toJavaColor()));
       if (BazaarNotifier.config.bankModule.bazaarDailyAmount > 0) {
         bazaarDifferenceMessage.add(new ColoredText(
-            BazaarNotifier.df.format(Math.max(BazaarNotifier.config.bankModule.bazaarDailyAmount, 0)),
+            BazaarNotifier.df.format(
+                Math.max(BazaarNotifier.config.bankModule.bazaarDailyAmount, 0)),
             Color.ORANGE));
       } else {
         bazaarDifferenceMessage.add(new ColoredText("NONE", Color.RED));
@@ -90,11 +92,11 @@ public class BankModule extends Module {
     }
 
     lines = 2 + (BazaarNotifier.config.bankModule.bankRawDifference ? 1 : 0)
-              + (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 1E9 ? 1 : 0);
-
+        + (BazaarNotifier.config.bankModule.bazaarDailyAmount <= 1E9 ? 1 : 0);
 
     longestString = RenderUtils.getLongestString(items);
-    RenderUtils.drawColorfulParagraph(items, (int)position.getX() + padding, (int)position.getY() + padding, scale);
+    RenderUtils.drawColorfulParagraph(items, (int) position.getX() + padding,
+        (int) position.getY() + padding, scale);
     GL11.glTranslated(0, 0, -1);
   }
 

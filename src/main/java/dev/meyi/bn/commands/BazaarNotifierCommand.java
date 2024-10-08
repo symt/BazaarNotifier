@@ -1,6 +1,7 @@
 package dev.meyi.bn.commands;
 
 import dev.meyi.bn.BazaarNotifier;
+import dev.meyi.bn.json.calculation.CraftingPriceCalculation;
 import dev.meyi.bn.json.resp.BazaarItem;
 import dev.meyi.bn.modules.calc.BankCalculator;
 import dev.meyi.bn.modules.calc.CraftingCalculator;
@@ -89,7 +90,7 @@ public class BazaarNotifierCommand extends CommandBase {
             String bulletPoint = EnumChatFormatting.WHITE + "\u2022 ";
             String separator = EnumChatFormatting.RED + " / ";
 
-            if (BazaarNotifier.bazaarConv.containsKey(itemConv)) {
+            if (BazaarNotifier.itemConversionMap.containsKey(itemConv)) {
               findItemString = BazaarNotifier.header + "\n" +
                   EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + WordUtils
                   .capitalize(itemName) + "\n  " + bulletPoint +
@@ -104,33 +105,35 @@ public class BazaarNotifierCommand extends CommandBase {
                   .format(SuggestionCalculator.calculateEP(item)) + "\n";
             }
 
-            if (BazaarNotifier.enchantCraftingList.getAsJsonObject("other").has(itemConv)) {
+            if (BazaarNotifier.craftingRecipeMap.containsKey(itemConv)) {
 
-              String[] prices = CraftingCalculator.getEnchantCraft(itemConv);
+              CraftingPriceCalculation prices = CraftingCalculator.getEnchantCraft(itemConv);
 
-              findItemString +=
-                  EnumChatFormatting.DARK_RED + "" + EnumChatFormatting.BOLD + "Crafting (" +
-                      EnumChatFormatting.GRAY
-                      + "Buy order" + separator + EnumChatFormatting.GRAY + "Instant buy"
-                      + EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + ")" + "\n  " +
-                      bulletPoint +
-                      EnumChatFormatting.RED + "Profit (Instant Sell): " +
-                      EnumChatFormatting.GRAY + BazaarNotifier.df
-                      .format(Double.parseDouble(prices[0])) + separator + EnumChatFormatting.GRAY +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[3])) + "\n  " + bulletPoint
-                      +
-                      EnumChatFormatting.RED + "Profit (Sell Offer): " +
-                      EnumChatFormatting.GRAY + BazaarNotifier.df
-                      .format(Double.parseDouble(prices[1])) + separator + EnumChatFormatting.GRAY +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[4])) + "\n  " + bulletPoint
-                      +
-                      EnumChatFormatting.RED + "Profit per 1M: " +
-                      EnumChatFormatting.GRAY + BazaarNotifier.df
-                      .format(Double.parseDouble(prices[2])) + separator + EnumChatFormatting.GRAY +
-                      BazaarNotifier.df.format(Double.parseDouble(prices[5])) + "\n" +
-                      BazaarNotifier.header;
-
-            } else if (BazaarNotifier.bazaarConv.containsKey(itemConv)) {
+              if (prices != null) {
+                findItemString +=
+                    EnumChatFormatting.DARK_RED + "" + EnumChatFormatting.BOLD + "Crafting (" +
+                        EnumChatFormatting.GRAY
+                        + "Buy order" + separator + EnumChatFormatting.GRAY + "Instant buy"
+                        + EnumChatFormatting.DARK_RED + EnumChatFormatting.BOLD + ")" + "\n  " +
+                        bulletPoint +
+                        EnumChatFormatting.RED + "Profit (Instant Sell): " +
+                        EnumChatFormatting.GRAY + BazaarNotifier.df
+                        .format(prices.buyOrderInstantSell) + separator + EnumChatFormatting.GRAY +
+                        BazaarNotifier.df.format(prices.instantBuyInstantSell) + "\n  "
+                        + bulletPoint
+                        +
+                        EnumChatFormatting.RED + "Profit (Sell Offer): " +
+                        EnumChatFormatting.GRAY + BazaarNotifier.df
+                        .format(prices.buyOrderSellOffer) + separator + EnumChatFormatting.GRAY +
+                        BazaarNotifier.df.format(prices.instantBuySellOffer) + "\n  " + bulletPoint
+                        +
+                        EnumChatFormatting.RED + "Profit per 1M: " +
+                        EnumChatFormatting.GRAY + BazaarNotifier.df.format(
+                        prices.buyOrderSellPercentage) + separator + EnumChatFormatting.GRAY +
+                        BazaarNotifier.df.format(prices.instantBuySellPercentage) + "\n" +
+                        BazaarNotifier.header;
+              }
+            } else if (BazaarNotifier.itemConversionMap.containsKey(itemConv)) {
               findItemString += BazaarNotifier.header;
             }
 
@@ -193,7 +196,8 @@ public class BazaarNotifierCommand extends CommandBase {
             try {
               Utils.updateResources();
               date = System.currentTimeMillis();
-            } catch (IOException | KeyManagementException | NoSuchAlgorithmException | ClassCastException e) {
+            } catch (IOException | KeyManagementException | NoSuchAlgorithmException |
+                     ClassCastException e) {
               player.addChatMessage(new ChatComponentText(
                   BazaarNotifier.prefix + EnumChatFormatting.RED
                       + "Resource update failed. Please try again."));
@@ -254,7 +258,7 @@ public class BazaarNotifierCommand extends CommandBase {
         });
       } else if (args.length <= 2 && args[0].equalsIgnoreCase("find")) {
         ArrayList<String> a = new ArrayList<>();
-        for (String s : BazaarNotifier.bazaarConv.values()) {
+        for (String s : BazaarNotifier.itemConversionMap.values()) {
           s = s.replace(' ', '-');
           a.add(s.toLowerCase());
         }

@@ -3,7 +3,7 @@ package dev.meyi.bn.modules.module;
 import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import dev.meyi.bn.BazaarNotifier;
 import dev.meyi.bn.json.Order;
-import dev.meyi.bn.modules.Module;
+import dev.meyi.bn.modules.HoverableModule;
 import dev.meyi.bn.modules.ModuleName;
 import dev.meyi.bn.utilities.ColoredText;
 import dev.meyi.bn.utilities.Defaults;
@@ -18,13 +18,12 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
 
-public class NotificationModule extends Module {
+public class NotificationModule extends HoverableModule {
 
   public transient static final ModuleName type = ModuleName.NOTIFICATION;
 
@@ -32,25 +31,6 @@ public class NotificationModule extends Module {
     super();
   }
 
-  @Override
-  protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
-    draw();
-  }
-
-  @Override
-  protected float getWidth(float scale, boolean example) {
-    if (longestString != null) {
-      if (!longestString.isEmpty()) {
-        return RenderUtils.getStringWidth(longestString) * scale + 2 * padding * scale;
-      }
-    }
-    return 200*scale;
-  }
-
-  @Override
-  protected float getHeight(float scale, boolean example) {
-    return ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * 10 + 20) * scale  - 2) + 2 * padding * scale;
-  }
   //source dsm
   public static void drawOnSlot(int chestSize, int slot, int color) {
     chestSize += 36;
@@ -72,10 +52,31 @@ public class NotificationModule extends Module {
   }
 
   @Override
+  protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
+    draw();
+  }
+
+  @Override
+  protected float getWidth(float scale, boolean example) {
+    if (longestString != null) {
+      if (!longestString.isEmpty()) {
+        return RenderUtils.getStringWidth(longestString) * scale + 2 * padding * scale;
+      }
+    }
+    return 200 * scale;
+  }
+
+  @Override
+  protected float getHeight(float scale, boolean example) {
+    return ((Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT * 10 + 20) * scale - 2)
+        + 2 * padding * scale;
+  }
+
+  @Override
   public void draw() {
     GL11.glTranslated(0, 0, 1);
     // add extra space after "Buy" so it lines up with sell
-    drawBounds();
+
     ArrayList<ArrayList<ColoredText>> items = new ArrayList<>();
 
     if (BazaarNotifier.orders.size() != 0) {
@@ -87,30 +88,36 @@ public class NotificationModule extends Module {
         ArrayList<ColoredText> message = new ArrayList<>();
 
         Color statusSpecificColor = currentOrder.orderStatus == Order.OrderStatus.BEST
-                || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
-                ? Color.GREEN : currentOrder.orderStatus == Order.OrderStatus.MATCHED? 
-                Color.YELLOW : Color.RED;
-        Color typeSpecificColor = currentOrder.type == Order.OrderType.BUY?new Color( 90, 0, 250):Color.CYAN;
+            || currentOrder.orderStatus == Order.OrderStatus.SEARCHING
+            ? Color.GREEN : currentOrder.orderStatus == Order.OrderStatus.MATCHED ?
+            Color.YELLOW : Color.RED;
+        Color typeSpecificColor =
+            currentOrder.type == Order.OrderType.BUY ? new Color(90, 0, 250) : Color.CYAN;
 
-        message.add(new ColoredText(i+1 + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
-        message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()),typeSpecificColor));
+        message.add(new ColoredText(i + 1 + ". ", BazaarNotifier.config.numberColor.toJavaColor()));
+        message.add(new ColoredText(WordUtils.capitalizeFully(currentOrder.type.name()),
+            typeSpecificColor));
         message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
-        message.add(new ColoredText(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount)+ "x ",
+        message.add(
+            new ColoredText(BazaarNotifier.dfNoDecimal.format(currentOrder.startAmount) + "x ",
                 BazaarNotifier.config.itemColor.toJavaColor()));
-        message.add(new ColoredText(currentOrder.product , BazaarNotifier.config.itemColor.toJavaColor()));
+        message.add(
+            new ColoredText(currentOrder.product, BazaarNotifier.config.itemColor.toJavaColor()));
         message.add(new ColoredText(" - ", BazaarNotifier.config.infoColor.toJavaColor()));
         message.add(new ColoredText(currentOrder.orderStatus.name() + " ", statusSpecificColor));
-
 
         items.add(message);
       }
       longestString = RenderUtils.getLongestString(items);
-      RenderUtils.drawColorfulParagraph(items, (int)position.getX() + padding, (int)position.getY() + padding, scale);
+      RenderUtils.drawColorfulParagraph(items, (int) position.getX() + padding,
+          (int) position.getY() + padding, scale);
     } else {
       longestString = "";
-      RenderUtils.drawCenteredString("No orders found", (int)position.getX(), (int)position.getY(), 0xAAAAAA, scale);
+      RenderUtils.drawCenteredString("No orders found", (int) position.getX(),
+          (int) position.getY(), 0xAAAAAA, scale);
     }
-    highlightOrder(checkHoveredText());
+
+    highlightOrder(getHoveredLineNumber());
     GL11.glTranslated(0, 0, -1);
   }
 
@@ -136,25 +143,8 @@ public class NotificationModule extends Module {
     return BazaarNotifier.orders.size() - 10;
   }
 
-  protected int checkHoveredText() {
-    float _y = position.getY();
-    float y2 = _y + (10 * 11 * scale);
-    int mouseYFormatted = getMouseCoordinateY();
-    int mouseXFormatted = getMouseCoordinateX();
-    float relativeYMouse = (mouseYFormatted - _y) / (11 * scale);
-    if (this.getWidth(scale, false) != 0) {
-      if (inMovementBox() && mouseYFormatted >= _y && mouseYFormatted <= y2 - 3 * scale) {
-        return Math.round(relativeYMouse + shift);
-      } else {
-        return -1;
-      }
-    } else {
-      return -1;
-    }
-  }
-
   public void highlightOrder(int hoveredText) {
-    if (BazaarNotifier.orders.size() <= hoveredText || hoveredText == -1) {
+    if (!renderTooltips || BazaarNotifier.orders.size() <= hoveredText || hoveredText == -1) {
       return;
     }
 
@@ -176,11 +166,7 @@ public class NotificationModule extends Module {
         for (int j = 0; j < items.length; j++) {
           ItemStack item = items[j];
 
-          if (item == null
-              || Item.itemRegistry.getIDForObject(item.getItem()) == 160
-              || Item.itemRegistry.getIDForObject(item.getItem()) == 102
-              || Item.itemRegistry.getIDForObject(item.getItem()) == 154
-              || Item.itemRegistry.getIDForObject(item.getItem()) == 262) {
+          if (Utils.shouldSkipChestItem(item)) {
             continue;
           }
           String itemDisplayName = StringUtils.stripControlCodes(item.getDisplayName());
@@ -197,7 +183,7 @@ public class NotificationModule extends Module {
           ppu = ppu.toLowerCase().replace("price per unit: ", "").replace(" coins", "")
               .replaceAll(",", "");
 
-          if (!ppu.contains("expired!") && !ppu.contains("expires in")) {
+          if (!(ppu.contains("expired!") || ppu.contains("expires in"))) {
 
             double pricePerUnit = Double.parseDouble(ppu);
 
@@ -213,5 +199,10 @@ public class NotificationModule extends Module {
         }
       }
     }
+  }
+
+  @Override
+  protected ArrayList<ArrayList<ColoredText>> generateTooltipText(int lineNumber) {
+    return null;
   }
 }

@@ -11,17 +11,17 @@ public class ModuleList extends ArrayList<Module> {
   private Module movingModule = null;
 
   public ModuleList() {
-     add(BazaarNotifier.config.suggestionModule);
-     add(BazaarNotifier.config.bankModule);
-     add(BazaarNotifier.config.notificationModule);
-     add(BazaarNotifier.config.craftingModule);
+    add(BazaarNotifier.config.suggestionModule);
+    add(BazaarNotifier.config.bankModule);
+    add(BazaarNotifier.config.notificationModule);
+    add(BazaarNotifier.config.craftingModule);
   }
 
   public void rescaleCheck() {
     for (Module m : this) {
       if (m.inMovementBox() && Keyboard.isKeyDown(29) && !Keyboard.isKeyDown(42)) {
         float newScale = m.getScale() + (float) MouseHandler.mouseWheelMovement / 20;
-        m.setScale(Math.max(newScale, 0.1f),false);
+        m.setScale(Math.max(newScale, 0.1f), false);
       }
     }
   }
@@ -84,12 +84,19 @@ public class ModuleList extends ArrayList<Module> {
       }
     }
   }
-  public void drawAllGui(){
+
+  public void drawAllGui() {
     if (BazaarNotifier.config.enabled && BazaarNotifier.activeBazaar) {
       for (Module m : this) {
         if (m.isEnabled() && BazaarNotifier.inBazaar) {
           m.position.setSize(m.getModuleWidth(), m.getModuleHeight());
+
+          m.drawBounds();
           m.draw();
+
+          if (m instanceof HoverableModule) {
+            ((HoverableModule) m).renderTooltip();
+          }
         }
       }
     }
