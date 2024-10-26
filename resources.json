@@ -400,7 +400,7 @@
 		"MAGMA_URCHIN": "Magma Urchin",
 		"SEARING_STONE": "Searing Stone",
 		"BLESSED_FRUIT": "Blessed Fruit",
-		"HOT_STUFF": "Hot Stuff",
+		"HOT_STUFF": "Scorched Topaz",
 		"SUSPICIOUS_VIAL": "Suspicious Vial",
 		"DIRT_BOTTLE": "Dirt Bottle",
 		"RED_NOSE": "Red Nose",
@@ -621,12 +621,12 @@
 		"ESSENCE_ICE": "Ice Essence",
 		"ENCHANTMENT_COMPACT_1": "Compact I",
 		"ESSENCE_GOLD": "Gold Essence",
-		"ENCHANTMENT_PRISTINE_1": "Pristine I",
-		"ENCHANTMENT_PRISTINE_2": "Pristine II",
+		"ENCHANTMENT_PRISTINE_1": "Prismatic I",
+		"ENCHANTMENT_PRISTINE_2": "Prismatic II",
 		"ENCHANTMENT_BLAST_PROTECTION_6": "Blast Protection VI",
-		"ENCHANTMENT_PRISTINE_5": "Pristine V",
-		"ENCHANTMENT_PRISTINE_3": "Pristine III",
-		"ENCHANTMENT_PRISTINE_4": "Pristine IV",
+		"ENCHANTMENT_PRISTINE_5": "Prismatic V",
+		"ENCHANTMENT_PRISTINE_3": "Prismatic III",
+		"ENCHANTMENT_PRISTINE_4": "Prismatic IV",
 		"ENCHANTMENT_FEROCIOUS_MANA_10": "Ferocious Mana X",
 		"ENCHANTMENT_LIFE_STEAL_5": "Life Steal V",
 		"ENCHANTMENT_LIFE_STEAL_4": "Life Steal IV",
@@ -1183,7 +1183,7 @@
 		"ENCHANTED_POISONOUS_POTATO": "Enchanted Poisonous Potato",
 		"SYNTHETIC_HEART": "Synthetic Heart",
 		"XXLARGE_ENCHANTED_CHEST": "XX-Large Storage",
-		"FUEL_TANK": "Fuel Tank",
+		"FUEL_TANK": "Fuel Canister",
 		"JALAPENO_BOOK": "Jalapeno Book",
 		"ELECTRON_TRANSMITTER": "Electron Transmitter",
 		"STUFFED_CHILI_PEPPER": "Stuffed Chili Pepper",
@@ -1217,7 +1217,7 @@
 		"AUTO_SMELTER": "Auto Smelter",
 		"WOOL": "White Wool",
 		"WHIPPED_MAGMA_CREAM": "Whipped Magma Cream",
-		"DRILL_ENGINE": "Drill Engine",
+		"DRILL_ENGINE": "Drill Motor",
 		"BOX_OF_SEEDS": "Box of Seeds",
 		"XLARGE_ENCHANTED_CHEST": "X-Large Storage",
 		"PET_ITEM_TIER_BOOST_DROP": "Tier Boost Core",
@@ -2835,15 +2835,6 @@
 				],
 				"collection": "NONE"
 			},
-			"HOT_STUFF": {
-				"material": [
-					"ENCHANTED_HARD_STONE",
-					96,
-					"ENCHANTED_LAVA_BUCKET",
-					1
-				],
-				"collection": "NONE"
-			},
 			"ENTROPY_SUPPRESSOR": {
 				"material": [
 					"CHILI_PEPPER",
@@ -3384,55 +3375,6 @@
 				],
 				"collection": "NONE"
 			},
-			"IRON_INGOT": {
-				"material": [
-					"ENCHANTED_IRON_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
-			"DIAMOND": {
-				"material": [
-					"ENCHANTED_DIAMOND_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
-			"GOLD_INGOT": {
-				"material": [
-					"ENCHANTED_GOLD_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
-			"EMERALD": {
-				"material": [
-					"ENCHANTED_EMERALD_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
-			"REDSTONE": {
-				"material": [
-					"ENCHANTED_REDSTONE_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
-			"COAL": {
-				"material": [
-					"ENCHANTED_COAL_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
-			"SLIME_BALL": {
-				"material": [
-					"ENCHANTED_SLIME_BLOCK",
-					1
-				],
-				"collection": "NONE"
-			},
 			"FULL_CHUM_BUCKET": {
 				"material": [
 					"CHUM",
@@ -3444,7 +3386,7 @@
 			},
 			"ENCHANTED_UMBER": {
 				"material": [
-					"ENCHANTED_UMBER",
+					"UMBER",
 					160
 				],
 				"collection": "NONE"
@@ -3452,6 +3394,14 @@
 		}
 	},
 	"invalidBazaarCraftingRecipe": [
+		"HOT_STUFF",
+		"IRON_INGOT",
+		"GOLD_INGOT",
+		"DIAMOND",
+		"EMERALD",
+		"COAL",
+		"REDSTONE",
+		"SLIME_BALL",
 		"INK_SACK:3",
 		"BROWN_MUSHROOM",
 		"LAPIS_BLOCK",
