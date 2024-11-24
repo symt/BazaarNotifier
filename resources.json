@@ -1381,7 +1381,11 @@
 		"ENCHANTMENT_LAPIDARY_3": "Lapidary III",
 		"ENCHANTMENT_LAPIDARY_2": "Lapidary II",
 		"ENCHANTMENT_LAPIDARY_1": "Lapidary I",
-		"ENCHANTMENT_LAPIDARY_5": "Lapidary V"
+		"ENCHANTMENT_LAPIDARY_5": "Lapidary V",
+		"ENCHANTED_HAY_BALE": "Enchanted Hay Bale",
+		"SQUEAKY_TOY": "Squeaky Toy",
+		"PESTHUNTING_GUIDE": "Pesthunting Guide",
+		"ENCHANTED_WHEAT": "Enchanted Wheat"
 	},
 	"enchantCraftingList": {
 		"normal": {},
@@ -3390,6 +3394,20 @@
 					160
 				],
 				"collection": "NONE"
+			},
+			"ENCHANTED_HAY_BALE": {
+				"material": [
+					"ENCHANTED_WHEAT",
+					160
+				],
+				"collection": "NONE"
+			},
+			"ENCHANTED_WHEAT": {
+				"material": [
+					"WHEAT",
+					160
+				],
+				"collection": "NONE"
 			}
 		}
 	},
@@ -3834,6 +3852,34 @@
 		"DWARVEN_OS_METALLIC_MINIS",
 		"POCKET_ICEBERG",
 		"MANA_DISINTEGRATOR",
-		"DWARVEN_TREASURE"
+		"DWARVEN_TREASURE",
+		"LAPIS_BLOCK",
+		"MILK_BUCKET",
+		"HYPER_CATALYST_UPGRADE",
+		"COLOSSAL_EXP_BOTTLE_UPGRADE",
+		"HEAT_CORE",
+		"HEAT_CORE",
+		"CORRUPTED_FRAGMENT",
+		"HORN_OF_TAURUS",
+		"SILVER_FANG",
+		"BLAZE_ASHES",
+		"MAGMA_CHUNK",
+		"BEZOS",
+		"GAZING_PEARL",
+		"THUNDER_SHARDS",
+		"ULTIMATE_CARROT_CANDY_UPGRADE",
+		"BOWL",
+		"BOWL",
+		"CORRUPTED_FRAGMENT",
+		"MINION_STORAGE_EXPANDER",
+		"VINE",
+		"INK_SACK:15",
+		"MINION_STORAGE_EXPANDER",
+		"VOLT_CRUX",
+		"WILTED_BERBERIS",
+		"WATER_HYDRA_HEAD",
+		"FROSTY_CRUX",
+		"SQUEAKY_TOY",
+		"PESTHUNTING_GUIDE"
 	]
 }
