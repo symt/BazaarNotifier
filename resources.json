@@ -1385,7 +1385,49 @@
 		"ENCHANTED_HAY_BALE": "Enchanted Hay Bale",
 		"SQUEAKY_TOY": "Squeaky Toy",
 		"PESTHUNTING_GUIDE": "A Beginner's Guide to Pesthunting",
-		"ENCHANTED_WHEAT": "Enchanted Wheat"
+		"ENCHANTED_WHEAT": "Enchanted Wheat",
+		"MAGMAG": "Magmag",
+		"HORN_OF_TAURUS": "Horn of Taurus",
+		"MAGMA_LORD_FRAGMENT": "Magma Lord Fragment",
+		"X": "X",
+		"Y": "Y",
+		"Z": "Z",
+		"FLAMES": "Flames",
+		"MUTATED_BLAZE_ASHES": "Mutated Blaze Ashes",
+		"THUNDER_SHARDS": "Thunder Shards",
+		"FAKE_SHURIKEN": "Fake Shuriken",
+		"SPOTLITE": "Spotlite",
+		"MILLENIA_OLD_BLAZE_ASHES": "Millenia Old Blaze Ashes",
+		"CUP_OF_BLOOD": "Cup of Blood",
+		"SPECTRE_DUST": "Spectre Dust",
+		"CORRUPTED_FRAGMENT": "Corrupted Fragment",
+		"MATCH_STICKS": "Match Sticks",
+		"COMPACT_OOZE": "Compact Ooze",
+		"LUMP_OF_MAGMA": "Lump of Magma",
+		"DIGESTED_MUSHROOMS": "Digested Mushrooms",
+		"BEZOS": "Bezos",
+		"HEAVY_PEARL": "Heavy Pearl",
+		"ORB_OF_ENERGY": "Orb of Energy",
+		"FREE_WILL": "Free Will",
+		"CORRUPTED_NETHER_STAR": "Corrupted Nether Star",
+		"MOOGMA_PELT": "Moogma Pelt",
+		"GAZING_PEARL": "Gazing Pearl",
+		"REKINDLED_EMBER_FRAGMENT": "Rekindled Ember Fragment",
+		"LEATHER_CLOTH": "Leather Cloth",
+		"KUUDRA_TEETH": "Kuudra Teeth",
+		"WITHER_SOUL": "Wither Soul",
+		"HALLOWED_SKULL": "Hallowed Skull",
+		"BURNING_EYE": "Burning Eye",
+		"LAVA_SHELL": "Lava Shell",
+		"PYROCLASTIC_SCALE": "Pyroclastic Scale",
+		"TENTACLE_MEAT": "Tentacle Meat",
+		"KADA_LEAD": "Kada Lead",
+		"BLAZE_ASHES": "Blaze Ashes",
+		"SPELL_POWDER": "Spell Powder",
+		"LUMINO_FIBER": "Lumino Fiber",
+		"FLAMING_HEART": "Flaming Heart",
+		"HIGHLITE": "Highlite",
+		"MAGMA_CHUNK": "Magma Chunk"
 	},
 	"enchantCraftingList": {
 		"normal": {},
@@ -3408,6 +3450,101 @@
 					160
 				],
 				"collection": "NONE"
+			},
+			"CORRUPTED_BAIT": {
+				"material": [
+					"CORRUPTED_FRAGMENT",
+					1,
+					"MAGMA_FISH",
+					1
+				],
+				"collection": "NONE"
+			},
+			"HORNS_OF_TORMENT": {
+				"material": [
+					"ENCHANTED_MUTTON",
+					192,
+					"HORN_OF_TAURUS",
+					32
+				],
+				"collection": "NONE"
+			},
+			"HOT_BAIT": {
+				"material": [
+					"MUTATED_BLAZE_ASHES",
+					1,
+					"MAGMA_FISH",
+					1
+				],
+				"collection": "NONE"
+			},
+			"SEARING_STONE": {
+				"material": [
+					"ENCHANTED_MAGMA_CREAM",
+					50,
+					"MAGMA_CHUNK",
+					50,
+					"ENCHANTED_NETHERRACK",
+					30
+				],
+				"collection": "NONE"
+			},
+			"BLAZE_WAX": {
+				"material": [
+					"ENCHANTED_BLAZE_POWDER",
+					80,
+					"BEZOS",
+					10
+				],
+				"collection": "NONE"
+			},
+			"SHINY_PRISM": {
+				"material": [
+					"ENCHANTED_GLOWSTONE_DUST",
+					80,
+					"GAZING_PEARL",
+					10
+				],
+				"collection": "NONE"
+			},
+			"LAVA_WATER_ORB": {
+				"material": [
+					"MAGMA_FISH_SILVER",
+					32,
+					"THUNDER_SHARDS",
+					2,
+					"MOOGMA_PELT",
+					64,
+					"LAVA_WATER_ORB",
+					1,
+					"LUMP_OF_MAGMA",
+					64,
+					"CUP_OF_BLOOD",
+					32,
+					"HORN_OF_TAURUS",
+					16,
+					"FLAMING_HEART",
+					32
+				],
+				"collection": "NONE"
+			},
+			"CORRUPT_SOIL": {
+				"material": [
+					"ENCHANTED_MYCELIUM",
+					160,
+					"CORRUPTED_FRAGMENT",
+					20
+				],
+				"collection": "NONE"
+			},
+			"MATCH_STICKS": {
+				"material": [
+					"SULPHUR_ORE",
+					1,
+					"ENCHANTED_CARROT_STICK",
+					1
+				],
+				"collection": "NONE"
 			}
 		}
 	},
@@ -3852,6 +3989,60 @@
 		"DWARVEN_OS_METALLIC_MINIS",
 		"POCKET_ICEBERG",
 		"MANA_DISINTEGRATOR",
-		"DWARVEN_TREASURE"
+		"DWARVEN_TREASURE",
+		"LAPIS_BLOCK",
+		"MILK_BUCKET",
+		"HYPER_CATALYST_UPGRADE",
+		"COLOSSAL_EXP_BOTTLE_UPGRADE",
+		"HEAT_CORE",
+		"HEAT_CORE",
+		"SILVER_FANG",
+		"ULTIMATE_CARROT_CANDY_UPGRADE",
+		"BOWL",
+		"BOWL",
+		"MINION_STORAGE_EXPANDER",
+		"VINE",
+		"INK_SACK:15",
+		"MINION_STORAGE_EXPANDER",
+		"VOLT_CRUX",
+		"WILTED_BERBERIS",
+		"WATER_HYDRA_HEAD",
+		"FROSTY_CRUX",
+		"SQUEAKY_TOY",
+		"PESTHUNTING_GUIDE",
+		"MAGMAG",
+		"MAGMA_LORD_FRAGMENT",
+		"X",
+		"Y",
+		"Z",
+		"FLAMES",
+		"MUTATED_BLAZE_ASHES",
+		"FAKE_SHURIKEN",
+		"SPOTLITE",
+		"MILLENIA_OLD_BLAZE_ASHES",
+		"CUP_OF_BLOOD",
+		"SPECTRE_DUST",
+		"COMPACT_OOZE",
+		"LUMP_OF_MAGMA",
+		"DIGESTED_MUSHROOMS",
+		"HEAVY_PEARL",
+		"ORB_OF_ENERGY",
+		"FREE_WILL",
+		"CORRUPTED_NETHER_STAR",
+		"MOOGMA_PELT",
+		"REKINDLED_EMBER_FRAGMENT",
+		"LEATHER_CLOTH",
+		"KUUDRA_TEETH",
+		"WITHER_SOUL",
+		"HALLOWED_SKULL",
+		"BURNING_EYE",
+		"LAVA_SHELL",
+		"PYROCLASTIC_SCALE",
+		"TENTACLE_MEAT",
+		"KADA_LEAD",
+		"SPELL_POWDER",
+		"LUMINO_FIBER",
+		"FLAMING_HEART",
+		"YOUNGITE"
 	]
 }
